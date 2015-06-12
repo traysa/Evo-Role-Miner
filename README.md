@@ -6,3 +6,5 @@ Topic: Role-Mining of Access Control Policies with an Evolutionary Computation A
 Author: Theresa Brandt von Fackh
 Supervisor: Sebastian Risi
 Year: 2015
+
+Lolcommits enabled
