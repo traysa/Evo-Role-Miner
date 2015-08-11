@@ -1,0 +1,93 @@
+# This dataset was provided by HP Labs. Please see:
+# @inproceedings{EneHM+08,
+# 	Author = {Alina Ene and William Horne and Nikola Milosavljevic and Prasad Rao and Robert Schreiber and Robert Endre Tarjan},
+# 	Booktitle = {SACMAT},
+# 	Crossref = {DBLP:conf/sacmat/2008},
+# 	Pages = {1-10},
+# 	Title = {Fast exact and heuristic methods for role minimization problems},
+# 	Year = {2008}
+# }
+# for more information.
+#UA
+#PA
+#RH
+#DUPA
+u_U1 p_P2 p_P1
+u_U10 p_P21 p_P1 p_P24
+u_U11 p_P22 p_P20
+u_U12 p_P2 p_P1
+u_U13 p_P22 p_P20
+u_U14 p_P2 p_P1
+u_U15 p_P20
+u_U16 p_P22 p_P32 p_P21 p_P2 p_P20 p_P31 p_P30 p_P1 p_P29 p_P28 p_P10 p_P27 p_P9 p_P26 p_P25
+u_U17 p_P22 p_P20 p_P121 p_P120 p_P119 p_P118 p_P117 p_P116 p_P115 p_P114 p_P113 p_P112 p_P111 p_P110 p_P109 p_P108 p_P107 p_P106 p_P105 p_P104 p_P103 p_P102 p_P101 p_P100 p_P99 p_P98 p_P97 p_P96 p_P95 p_P94 p_P93 p_P92 p_P19 p_P91 p_P90 p_P89 p_P88 p_P87 p_P31 p_P86 p_P85 p_P84 p_P83 p_P82 p_P81 p_P80 p_P79 p_P78 p_P77 p_P76 p_P75 p_P74 p_P73 p_P72 p_P71 p_P17 p_P70 p_P69 p_P68 p_P67 p_P66 p_P65 p_P64 p_P15 p_P63 p_P14 p_P62 p_P61 p_P60 p_P59 p_P58 p_P57 p_P56 p_P55 p_P54 p_P12 p_P53 p_P52 p_P28 p_P51 p_P50 p_P10 p_P25 p_P8 p_P49 p_P6 p_P48 p_P47 p_P46 p_P45 p_P44 p_P43 p_P42 p_P41 p_P40 p_P39 p_P38 p_P37 p_P36 p_P35 p_P34 p_P4 p_P33
+u_U18 p_P2 p_P20 p_P99 p_P123 p_P26 p_P122 p_P24
+u_U19 p_P2 p_P90 p_P1
+u_U2 p_P22 p_P21 p_P20 p_P19 p_P18 p_P17 p_P16 p_P15 p_P14 p_P13 p_P12 p_P11 p_P10 p_P9 p_P8 p_P7 p_P6 p_P5 p_P4 p_P3
+u_U20 p_P20
+u_U21 p_P22 p_P20
+u_U22 p_P22 p_P20
+u_U23 p_P22 p_P219 p_P21 p_P2 p_P20 p_P121 p_P218 p_P217 p_P120 p_P119 p_P216 p_P215 p_P118 p_P117 p_P214 p_P213 p_P116 p_P115 p_P212 p_P211 p_P114 p_P113 p_P210 p_P209 p_P112 p_P111 p_P208 p_P207 p_P110 p_P109 p_P206 p_P205 p_P108 p_P107 p_P204 p_P203 p_P106 p_P105 p_P202 p_P201 p_P104 p_P103 p_P200 p_P199 p_P102 p_P101 p_P198 p_P197 p_P100 p_P99 p_P196 p_P123 p_P98 p_P97 p_P195 p_P194 p_P96 p_P95 p_P193 p_P192 p_P94 p_P93 p_P191 p_P190 p_P92 p_P189 p_P188 p_P91 p_P90 p_P187 p_P186 p_P89 p_P88 p_P185 p_P184 p_P87 p_P31 p_P86 p_P183 p_P182 p_P85 p_P84 p_P181 p_P180 p_P83 p_P82 p_P179 p_P178 p_P81 p_P80 p_P177 p_P176 p_P79 p_P78 p_P175 p_P174 p_P77 p_P76 p_P173 p_P172 p_P75 p_P74 p_P171 p_P170 p_P73 p_P72 p_P169 p_P168 p_P71 p_P17 p_P167 p_P70 p_P69 p_P166 p_P165 p_P68 p_P67 p_P164 p_P163 p_P66 p_P65 p_P162 p_P161 p_P64 p_P15 p_P160 p_P159 p_P63 p_P14 p_P158 p_P13 p_P157 p_P62 p_P61 p_P156 p_P155 p_P60 p_P59 p_P154 p_P153 p_P58 p_P57 p_P152 p_P151 p_P56 p_P55 p_P150 p_P149 p_P54 p_P12 p_P148 p_P147 p_P53 p_P52 p_P30 p_P1 p_P29 p_P28 p_P51 p_P146 p_P145 p_P50 p_P10 p_P27 p_P9 p_P26 p_P25 p_P8 p_P144 p_P143 p_P49 p_P6 p_P142 p_P48 p_P47 p_P141 p_P140 p_P139 p_P46 p_P45 p_P138 p_P137 p_P44 p_P43 p_P136 p_P135 p_P42 p_P41 p_P134 p_P133 p_P132 p_P40 p_P39 p_P131 p_P130 p_P38 p_P37 p_P129 p_P128 p_P36 p_P35 p_P127 p_P126 p_P34 p_P4 p_P125 p_P124 p_P33 p_P24
+u_U24 p_P20
+u_U25 p_P20
+u_U26 p_P20
+u_U27 p_P22 p_P20
+u_U28 p_P20
+u_U29 p_P22 p_P20
+u_U3 p_P2 p_P1
+u_U30 p_P22 p_P20
+u_U31 p_P22 p_P20 p_P121 p_P120 p_P119 p_P118 p_P117 p_P116 p_P115 p_P114 p_P113 p_P112 p_P111 p_P110 p_P109 p_P108 p_P107 p_P106 p_P105 p_P104 p_P103 p_P223 p_P102 p_P101 p_P100 p_P99 p_P98 p_P97 p_P96 p_P95 p_P94 p_P93 p_P92 p_P19 p_P91 p_P90 p_P89 p_P88 p_P87 p_P31 p_P86 p_P182 p_P85 p_P84 p_P83 p_P82 p_P81 p_P80 p_P79 p_P78 p_P174 p_P77 p_P76 p_P172 p_P75 p_P74 p_P222 p_P73 p_P72 p_P71 p_P17 p_P167 p_P70 p_P69 p_P68 p_P67 p_P66 p_P65 p_P64 p_P15 p_P63 p_P14 p_P13 p_P62 p_P61 p_P60 p_P59 p_P58 p_P57 p_P56 p_P55 p_P150 p_P54 p_P12 p_P11 p_P53 p_P52 p_P30 p_P1 p_P28 p_P51 p_P50 p_P10 p_P27 p_P26 p_P25 p_P8 p_P49 p_P6 p_P48 p_P47 p_P140 p_P46 p_P45 p_P221 p_P44 p_P43 p_P42 p_P41 p_P40 p_P39 p_P38 p_P37 p_P36 p_P220 p_P34 p_P4 p_P33 p_P24
+u_U32 p_P22 p_P227 p_P20 p_P226 p_P121 p_P120 p_P119 p_P118 p_P117 p_P116 p_P115 p_P114 p_P113 p_P112 p_P111 p_P110 p_P109 p_P108 p_P107 p_P106 p_P105 p_P104 p_P103 p_P102 p_P101 p_P100 p_P99 p_P98 p_P97 p_P96 p_P95 p_P94 p_P93 p_P92 p_P189 p_P91 p_P90 p_P89 p_P88 p_P87 p_P31 p_P85 p_P84 p_P83 p_P82 p_P81 p_P80 p_P79 p_P78 p_P77 p_P76 p_P75 p_P74 p_P73 p_P72 p_P71 p_P17 p_P70 p_P69 p_P68 p_P67 p_P66 p_P65 p_P64 p_P15 p_P63 p_P14 p_P62 p_P61 p_P60 p_P59 p_P58 p_P57 p_P56 p_P55 p_P54 p_P12 p_P53 p_P52 p_P28 p_P51 p_P50 p_P10 p_P25 p_P8 p_P225 p_P49 p_P6 p_P48 p_P47 p_P46 p_P45 p_P44 p_P43 p_P42 p_P41 p_P40 p_P39 p_P38 p_P37 p_P36 p_P35 p_P34 p_P4 p_P33 p_P224
+u_U33 p_P20
+u_U34 p_P20
+u_U35 p_P20
+u_U36 p_P22 p_P20
+u_U37 p_P22 p_P20
+u_U38 p_P21
+u_U39 p_P20
+u_U4 p_P22
+u_U40 p_P20
+u_U41 p_P20
+u_U42 p_P20
+u_U43 p_P21 p_P11 p_P9 p_P3
+u_U44 p_P21 p_P1
+u_U45 p_P21 p_P1
+u_U46 p_P20
+u_U47 p_P20
+u_U48 p_P20
+u_U49 p_P20
+u_U5 p_P23
+u_U50 p_P20
+u_U51 p_P20
+u_U52 p_P20
+u_U53 p_P21 p_P1
+u_U54 p_P22 p_P20
+u_U55 p_P22 p_P20
+u_U56 p_P20
+u_U57 p_P21 p_P31 p_P1 p_P10
+u_U58 p_P2 p_P1
+u_U59 p_P11 p_P9 p_P3
+u_U6 p_P22 p_P20
+u_U60 p_P21 p_P11 p_P9 p_P3
+u_U61 p_P21 p_P2 p_P20 p_P1
+u_U62 p_P11 p_P9 p_P3
+u_U63 p_P21 p_P11 p_P9 p_P3
+u_U64 p_P11 p_P9 p_P3
+u_U65 p_P21 p_P231 p_P187 p_P230 p_P86 p_P82 p_P179 p_P178 p_P158 p_P13 p_P57 p_P229 p_P151 p_P30 p_P1 p_P29 p_P9 p_P228 p_P7 p_P5 p_P23 p_P24
+u_U66 p_P11 p_P9 p_P3
+u_U67 p_P21 p_P11 p_P9 p_P3
+u_U68 p_P11 p_P9 p_P3
+u_U69 p_P2 p_P9
+u_U7 p_P2 p_P1 p_P10
+u_U70 p_P21
+u_U71 p_P20
+u_U72 p_P22 p_P20
+u_U73 p_P20
+u_U74 p_P20
+u_U75 p_P20
+u_U76 p_P20
+u_U77 p_P22 p_P20
+u_U78 p_P20
+u_U79 p_P20
+u_U8 p_P20
+u_U9 p_P22 p_P20
