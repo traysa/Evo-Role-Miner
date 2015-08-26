@@ -89,10 +89,11 @@ def visualizeMatrix(UPmatrix):
     plt.xlabel('Permissions')
     plt.show()
 
-parser = OptionParser()
-parser.add_option("-i", dest="filename", default="..\\TestData\\healthcare.rbac",
-     help="input file with UxP information", metavar="FILE")
-(options, args) = parser.parse_args()
+def main():
+    parser = OptionParser()
+    parser.add_option("-i", dest="filename", default="..\\TestData\\healthcare.rbac",
+         help="input file with UxP information", metavar="FILE")
+    (options, args) = parser.parse_args()
 
-UPmatrix = numpy.matrix(read(options.filename))
-print(UPmatrix)
+    UPmatrix = numpy.matrix(read(options.filename))
+    print(UPmatrix)
