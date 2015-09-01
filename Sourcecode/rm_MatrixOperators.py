@@ -19,6 +19,12 @@ def createEmptyMatrix(x, y):
         matrix.append([0 for el in range(y)])
     return matrix
 
+def createEmptyMatrix2(x, y):
+    matrix = []
+    for i in range(x):
+        matrix.append([[] for el in range(y)])
+    return matrix
+
 def printMatrix(matrix):
     matrix = numpy.array(matrix, dtype=int)
     for line in matrix:

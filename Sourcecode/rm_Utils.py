@@ -8,6 +8,15 @@ import random
 import numpy
 import rm_MatrixOperators as matrixOps
 
+# -----------------------------------------------------------------------------------
+# Data Generation for RoleMiner
+# -----------------------------------------------------------------------------------
+def generateGoalMatrix(roles, users, permissions):
+    A = matrixOps.createRandomMatrix(users, roles)
+    B = matrixOps.createRandomMatrix(roles, permissions)
+    C = matrixOps.multiplyBoolMatrix(A, B)
+    return C
+
 def resolveChromosomeIntoArray(chromosome, userSize, permissionSize):
     matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
     # Iterate through all genes of a chromosome
@@ -20,6 +29,40 @@ def resolveChromosomeIntoArray(chromosome, userSize, permissionSize):
             for permission in permission_list:
                 matrix[user - 1][permission - 1] = 1
     return matrix
+
+def resolveChromosomeIntoArray2(chromosome, userSize, permissionSize):
+    matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
+    # Iterate through all genes of a chromosome
+    for gene in range(0, len(chromosome)):
+        # print("Gene: " +str(gene))
+        # print(chromosome[gene])
+        user_list = chromosome[gene][0]
+        permission_list = chromosome[gene][1]
+        for user in user_list:
+            for permission in permission_list:
+                if (matrix[user - 1][permission - 1] == 0):
+                    matrix[user - 1][permission - 1] += gene+1
+                else:
+                    matrix[user - 1][permission - 1] = len(chromosome)+1
+    return matrix
+
+def resolveChromosomeIntoArrays(chromosome, userSize, permissionSize):
+
+    UMatrix = matrixOps.createEmptyMatrix(userSize, len(chromosome))
+    for gene in range(0, len(chromosome)):
+        user_list = chromosome[gene][0]
+        for user in user_list:
+            UMatrix[user - 1][gene] = 1
+
+    PMatrix = matrixOps.createEmptyMatrix(len(chromosome),permissionSize)
+    for gene in range(0, len(chromosome)):
+        permission_list = chromosome[gene][1]
+        for permission in permission_list:
+            PMatrix[gene][permission - 1] = 1
+
+    UPMatrix = resolveChromosomeIntoArray2(chromosome, userSize, permissionSize)
+
+    return UMatrix, PMatrix, UPMatrix
 
 def generateGene(userSize, permissionSize):
     gene = []
@@ -53,11 +96,16 @@ def combineObjects(offspring, index):
                 offspring[x][1] = list(set(offspring[x][1]) | set(offspring[y + x][1]))
                 offspring[y + x][0] = []
                 removalList.append(y + x)
+    removalList.sort()
     i = len(removalList) - 1
     #print(removalList)
     while i >= 0:
         #print("offspring:\n" + str(offspring))
-        del offspring[removalList[i]]
+        try:
+            del offspring[removalList[i]]
+        except IndexError:
+            temp = 0
+            raise
         i = i - 1
     return offspring
 

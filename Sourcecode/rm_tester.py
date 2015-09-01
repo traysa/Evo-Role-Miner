@@ -1,13 +1,11 @@
 __author__ = 'Theresa'
 
 import datetime
+import rm_Utils as utils
+import rm_Visualization as visual
 
-a = datetime.datetime.now()
-b = datetime.datetime.now()
-c = b - a
-c = datetime.timedelta(0, 4, 316543)
-print(c)
-datetime.timedelta(0, 4, 316543)
-print(c.days)
-print(c.seconds)
-print(c.microseconds)
+chromosome = [[[3],[1,3,4,5]],[[2,4,5,6,7],[1,4,5]],[[1,6],[1,2]]]
+matrix = utils.resolveChromosomeIntoArray2(chromosome, 7, 5)
+print(matrix)
+visual.showMatrix(matrix)
+

@@ -11,15 +11,6 @@ import os.path
 import datetime
 
 # -----------------------------------------------------------------------------------
-# Data Generation for RoleMiner
-# -----------------------------------------------------------------------------------
-def generateGoalMatrix(roles, users, permissions):
-    A = matrixOps.createRandomMatrix(users, roles)
-    B = matrixOps.createRandomMatrix(roles, permissions)
-    C = matrixOps.multiplyBoolMatrix(A, B)
-    return C
-
-# -----------------------------------------------------------------------------------
 # Evolutionary algorithm functions
 # -----------------------------------------------------------------------------------
 # Initialization
@@ -37,7 +28,7 @@ def generateChromosome(maxRoles, userSize, permissionSize):
 # Evaluation Function
 def evalFunc(individual, userSize, permissionSize, orig):
     array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=orig)
+    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
     'Violation of confidentiality and data availability'
     conf, accs = matrixOps.countDiffs(diffMatrix)
     #numberOfRoles = len(individual[0])
@@ -45,6 +36,10 @@ def evalFunc(individual, userSize, permissionSize, orig):
     temp = (conf+accs)
     return temp,
 
+# Evaluation Function
+def evalFunc2(individual, userSize, permissionSize, orig):
+    numberOfRoles = len(individual[0])
+    return numberOfRoles,
 
 # Mutation Function
 def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, userSize, permissionSize):
@@ -97,7 +92,9 @@ def mateFunc(ind1, ind2):
 # Evolutionary algorithm
 # -----------------------------------------------------------------------------------
 def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
-    results = []
+    start = datetime.datetime.now()
+    print(start)
+    time = 0
     fitnessValues = []
     genStart = 0
     pop = []
@@ -115,7 +112,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
         genStart = int(cp["generation"])
         Original = cp["Original"]
         fitnessValues=cp["fitnessValues"]
-        results=cp["results"]
+        time=cp["time"]
         random.setstate(cp["rndstate"])
     else:
         print("Use checkpoint: False")
@@ -136,7 +133,8 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     toolbox.register("mate", mateFunc)
     toolbox.register("mutate", mutFunc, addRolePB=0.25, removeRolePB=0.25, removeUserPB=0.25, removePermissionPB=0.25,
                      addUserPB=0.25, addPermissionPB=0.25, userSize=userSize, permissionSize=permissionSize)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selTournament, tournsize=5)
+    #toolbox.register("select", tools.selTournament, tournsize=10)
 
     # History, tracks the genealogy of the individuals in a population
     history = tools.History()
@@ -165,13 +163,13 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     # cp = dict(population=pop, generation=300, rndstate=random.getstate(), Original=Original)
     # pickle.dump(cp, open("..\\Output\\checkpoint.pkl", "wb"), 2)
 
-    freq = NGEN / 100
+    freq = 50
     stop = False
     g = genStart+1
-    print("Generation "+str(g))
+    #print("Generation "+str(g))
     while ((not stop) & (g <= genStart+NGEN)):
-        if g % freq == 0:
-            print("Generation "+str(g))
+        #if g % freq == 0:
+        #    print("Generation "+str(g))
         #if g % freq == 0:
             #results = visual.addPopulationToPlot(pop, g, Original, results)
             #results = visual.addBestIndividualToPlot(pop, g, Original, results)
@@ -188,7 +186,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
 
         # Add Fitness values to results
         for ind in pop:
-            fitnessValues.append(ind.fitness.values[0])
+            fitnessValues.append([g,ind.fitness.values[0]])
 
         g += 1
 
@@ -211,40 +209,44 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     #visual.printPopulation(pop)
     print("==> Generation "+str(g))
 
+    end = datetime.datetime.now()
+    timediff = end-start
+    time = time + timediff.total_seconds()
+
     # Set Checkpoint
-    cp = dict(population=pop, generation=g, rndstate=random.getstate(), Original=Original, fitnessValues=fitnessValues, results=results)
+    cp = dict(population=pop, generation=g, rndstate=random.getstate(), Original=Original, fitnessValues=fitnessValues, time=time)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("Dump Pickle")
 
-    return results, fitnessValues, g
+    return pop, fitnessValues, g, time
 
 # -----------------------------------------------------------------------------------
 # MAINoptions
 # -----------------------------------------------------------------------------------
 # GLOBAL PARAMETERS
-Original = generateGoalMatrix(4, 4, 5)
+testdata = [[1, 1, 0, 0, 0], [1, 0, 0, 1, 1], [1, 0, 1, 1, 1], [1, 0, 0, 1, 1], [1, 0, 0, 1, 1], [1, 1, 0, 1, 1], [1, 0, 0, 1, 1]]
+testdata2 = [[3, 3, 0, 0, 0], [2, 0, 0, 2, 2], [1, 0, 1, 1, 1], [2, 0, 0, 2, 2], [2, 0, 0, 2, 2], [4, 3, 0, 2, 2], [2, 0, 0, 2, 2]]
+Original = numpy.matrix(testdata2)
+#Original = utils.generateGoalMatrix(4, 10, 10)
 #Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
 
 pickleFile = "..\\Output\\checkpoint.pkl"
 
 # EVOLUTION PARAMETERS
-POP_SIZE = 100
+POP_SIZE = 5
 CXPB = 0.25
 MUTPB = 0.25
-NGEN = 100
+NGEN = 5
 
-start = datetime.datetime.now()
-results, fitnessValues, generation = evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, True, pickleFile)
-end = datetime.datetime.now()
-timediff = end-start
+population, fitnessValues, generation, time = evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, True, pickleFile)
 
-print("Total in seconds: "+str(timediff.total_seconds()))
-minutes = int(timediff.total_seconds()/60)
+print("Total in seconds: "+str(time))
+minutes = int(time/60)
 if (minutes > 0):
     print("Minutes: "+str(minutes))
-    print("Seconds: "+str(timediff.total_seconds()-(minutes*60)))
+    print("Seconds: "+str(time-(minutes*60)))
 
-#visual.showResults(POP_SIZE)
+visual.showBestResult(population,generation,Original)
 visual.showFitness(generation,POP_SIZE,fitnessValues)
 
 

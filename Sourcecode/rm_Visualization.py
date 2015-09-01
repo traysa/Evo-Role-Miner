@@ -14,12 +14,13 @@ def showFitness(generationSize,populationSize,fitnessValues):
     # p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = False)
     # Plot a scatter graph of all results
     colors = plt.cm.rainbow(numpy.linspace(0, 1, generationSize))
-    start = 0
     generation = 1
     for c in colors:
-        size = len(fitnessValues[start:start+populationSize])
-        plt.scatter([generation] * size, fitnessValues[start:start+populationSize], color=c)
-        start += populationSize
+        genFitness = [row for row in fitnessValues if generation == row[0]]
+        genFitnessArray = numpy.array(genFitness)
+        size = len(genFitnessArray)
+        if (size > 0):
+            plt.scatter([generation] * size, genFitnessArray[:,1], color=c)
         generation += 1
     plt.xlim(0,generationSize+0.5)
     plt.ylim(0)
@@ -66,13 +67,77 @@ def showResults(populationSize, results):
     fig.tight_layout()
     plt.show()
 
+def showBestResult(pop, generation, Original):
+    #Find best in population
+    results = []
+    bestInd = []
+    bestFit = (1000000,)
+    for ind in pop:
+        fit = ind.fitness.values
+        if (bestFit > fit):
+            bestFit = fit
+            bestInd = ind
+    if (bestInd != []):
+        UMatrix, PMatrix, UPMatrix = utils.resolveChromosomeIntoArrays(bestInd[0], Original.shape[0], Original.shape[1])
+        results.append(UMatrix)
+        results.append(PMatrix)
+        results.append(UPMatrix)
+        results.append(Original)
+
+    fig, plots = plt.subplots(2, 2)
+    p = 0
+    for ay in plots:
+        for ax in ay:
+            matrix = numpy.array(results[p])
+            x_length = matrix.shape[1]
+            y_length = matrix.shape[0]
+            ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+            ax.set_xticks(numpy.arange(x_length) + 0.5)
+            ax.set_yticks(numpy.arange(y_length) + 0.5)
+            ax.xaxis.tick_top()
+            ax.yaxis.tick_left()
+            ax.set_xlim(0, x_length)
+            ax.set_ylim(0, y_length)
+            ax.invert_yaxis()
+            ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+            ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+            ax.tick_params(width=0)
+            p = p + 1
+    plots[0][0].set_ylabel('User-Role Matrix')
+    plots[0][1].set_ylabel('Role-Permission Matrix')
+    plots[1][0].set_ylabel('User-Permission Matrix')
+    plots[1][0].set_xlabel('Gen=' + str(generation)
+                              + ';\n Eval=' + str(bestFit))
+    plots[1][1].set_ylabel('Original')
+    fig.tight_layout()
+    plt.show()
+
+def showMatrix(matrix):
+    fig, ax = plt.subplots()
+    matrix = numpy.array(matrix)
+    x_length = matrix.shape[1]
+    y_length = matrix.shape[0]
+    ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+    ax.set_xticks(numpy.arange(x_length) + 0.5)
+    ax.set_yticks(numpy.arange(y_length) + 0.5)
+    ax.xaxis.tick_top()
+    ax.yaxis.tick_left()
+    ax.set_xlim(0, x_length)
+    ax.set_ylim(0, y_length)
+    ax.invert_yaxis()
+    ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+    ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+    ax.tick_params(width=0)
+    fig.tight_layout()
+    plt.show()
+
 
 def addPopulationToPlot(pop, generation, Original, results):
     #printPopulation(pop)
     for ind in pop:
         #fit = evalFunc(ind)
         fit = ind.fitness.values
-        matrix = utils.resolveChromosomeIntoMatrix(ind[0], Original.shape[0], Original.shape[1])
+        matrix = utils.resolveChromosomeIntoArray(ind[0], Original.shape[0], Original.shape[1])
         results.append([fit, matrix, generation])
     results.append([0, Original])
     return results
@@ -88,7 +153,7 @@ def addBestIndividualToPlot(pop, generation, Original, results):
             bestFit = fit
             bestInd = ind
     if (bestInd != []):
-        matrix = utils.resolveChromosomeIntoMatrix(bestInd[0], len(Original), len(Original[0]))
+        matrix = utils.resolveChromosomeIntoArray(bestInd[0], Original.shape[0], Original.shape[1])
         results.append([bestFit, matrix, generation])
     results.append([0, Original])
     return results
