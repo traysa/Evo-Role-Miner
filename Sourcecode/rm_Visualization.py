@@ -7,32 +7,23 @@ __author__ = 'Theresa'
 import numpy
 import matplotlib.pyplot as plt
 import rm_Utils as utils
+from collections import defaultdict
 
-
-def showFitness(generationSize,populationSize,results):
-    # Find lowest values for cost and highest for savings
-    # p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = False)
+def showFitnessInPlot(results):
     # Plot a scatter graph of all results
-    colors = plt.cm.rainbow(numpy.linspace(0, 1, generationSize))
+    colors = plt.cm.rainbow(numpy.linspace(0, 1, len(results)))
     generation = 1
     for c in colors:
-        genFitness = [row for row in results if generation == row[0]]
-        genFitnessArray = numpy.array(genFitness, dtype=object)
-        size = len(genFitnessArray)
-        if (size > 0):
-            fitnessValues = [row[1] for row in genFitnessArray]
-            objective = [row[0] for row in fitnessValues]
-            plt.scatter([generation] * size, objective, color=c)
+        generationResults = numpy.array(results[generation], dtype=object)
+        pop_size = len(generationResults)
+        if (pop_size > 0):
+            objective = [row for row in generationResults]
+            plt.scatter([generation] * pop_size, objective, color=c)
         generation += 1
-    plt.xlim(0,generationSize+0.5)
+    plt.xlim(0,generation-0.5)
     plt.ylim(0)
     plt.xlabel('Generations')
     plt.ylabel('Objective')
-    #plt.scatter(Xs[:9], Ys[:9], c='b')
-    #plt.scatter(Xs[10:19], Ys[10:19], c='g')
-    #plt.scatter(Xs[20:29], Ys[20:29], c='r')
-    # Then plot the Pareto frontier on top
-    #plt.plot(p_front[0], p_front[1], c='r')
     plt.show()
 
 def showFitnessForMultiObjectives(generationSize,populationSize,results):

@@ -10,6 +10,7 @@ import time
 import os.path
 import datetime
 import fortin2013
+from collections import defaultdict
 import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------------------
@@ -88,9 +89,12 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
             del role[1][random.randint(0, len(role[1]) - 1)]
             individual[0] = utils.localOptimization(individual[0])
     if random.random() < addUserPB:
+        # Pick random gene (role)
         role = individual[0][random.randint(0, len(individual[0]) - 1)]
         length = len(role[0])
-        while ((length < userSize) & (len(role[0]) == length)):
+        #userSet = {x for x in range(1, userSize + 1)}
+        # Add exactly 1 user, if the role does not already contain all users
+        while ((length < userSize) & (len(role[0]) == length)):            #
             role[0] = list(set(role[0]) | {random.randint(1, userSize)})
         individual[0] = utils.localOptimization(individual[0])
     if random.random() < addPermissionPB:
@@ -119,17 +123,17 @@ def mateFunc(ind1, ind2):
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm
 # -----------------------------------------------------------------------------------
-def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
+def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, checkpoint, pickleFile):
     start = datetime.datetime.now()
     print(start)
-    time = 0
-    results = []
+    time = []
+    results = defaultdict(list)
     genStart = 0
     pop = []
 
     # Creator
     #creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0, -1.0))
-    creator.create("FitnessMin", base.Fitness, weights=(1.0,))
+    creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMin)
 
     # Get Checkpoint
@@ -157,10 +161,10 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
-    toolbox.register("evaluate", evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    toolbox.register("evaluate", evalFunc_Obj1, userSize=userSize, permissionSize=permissionSize, orig=Original)
     toolbox.register("mate", mateFunc)
-    toolbox.register("mutate", mutFunc, addRolePB=0.25, removeRolePB=0.25, removeUserPB=0.25, removePermissionPB=0.25,
-                     addUserPB=0.25, addPermissionPB=0.25, userSize=userSize, permissionSize=permissionSize)
+    toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3, removePermissionPB=MUTPB_4,
+                     addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
     toolbox.register("select", tools.selTournament, tournsize=5)
 
     # History, tracks the genealogy of the individuals in a population
@@ -201,7 +205,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
             #results = visual.addPopulationToPlot(pop, g, Original, results)
             #results = visual.addBestIndividualToPlot(pop, g, Original, results)
         pop = toolbox.select(pop, k=len(pop))
-        pop = algorithms.varAnd(pop, toolbox, cxpb=CXPB, mutpb=MUTPB)
+        pop = algorithms.varAnd(pop, toolbox, cxpb=CXPB, mutpb=MUTPB_All)
 
         # Evaluate individuals, which need a evaluation
         invalids = [ind for ind in pop if not ind.fitness.valid]
@@ -213,7 +217,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
 
         # Add Fitness values to results
         for ind in pop:
-            results.append([g,ind.fitness.values])
+            results[g].append(ind.fitness.values)
 
         g += 1
 
@@ -238,10 +242,28 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
 
     end = datetime.datetime.now()
     timediff = end-start
-    time = time + timediff.total_seconds()
+    #time = time + timediff.total_seconds()
+    time.append(timediff.total_seconds())
 
     # Set Checkpoint
-    cp = dict(population=pop, generation=g, rndstate=random.getstate(), Original=Original, results=results, time=time)
+    cp = dict(population=pop,
+              generation=g,
+              rndstate=random.getstate(),
+              Original=Original,
+              results=results,
+              time=time,
+              POP_SIZE=POP_SIZE,
+              CXPB=CXPB,
+              MUTPB_All=MUTPB_All,
+              MUTPB_1=MUTPB_1,
+              MUTPB_2=MUTPB_2,
+              MUTPB_3=MUTPB_3,
+              MUTPB_4=MUTPB_4,
+              MUTPB_5=MUTPB_5,
+              MUTPB_6=MUTPB_6,)
+    if (not checkpoint):
+        k = pickleFile.rfind("\\")
+        pickleFile = pickleFile[:k+1] + datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")+"_" + pickleFile[k+1:]
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("Dump Pickle")
 
@@ -576,21 +598,22 @@ pickleFile = "..\\Output\\checkpoint.pkl"
 # EVOLUTION PARAMETERS
 POP_SIZE = 100
 CXPB = 0.25
-MUTPB = 0.25
-NGEN = 1000
+MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6 = 0.25,0.25,0.25,0.25,0.25,0.25,0.25
+NGEN = 100
 
 #population, results, generation, time = evolution_multi_fortin2013(Original, POP_SIZE, CXPB, MUTPB, NGEN, False, pickleFile)
-population, results, generation, time = evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, False, pickleFile)
+population, results, generation, timeArray = evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, False, pickleFile)
 
+time = sum(timeArray)
 print("Total in seconds: "+str(time))
 minutes = int(time/60)
 if (minutes > 0):
     print("Minutes: "+str(minutes))
     print("Seconds: "+str(time-(minutes*60)))
 
-visual.showFitness(generation,POP_SIZE,results)
+visual.showFitnessInPlot(results)
 #visual.showFitnessForMultiObjectives(generation,POP_SIZE,results)
-visual.showBestResult(population,generation,Original)
+#visual.showBestResult(population,generation,Original)
 #visual.printPopulation(population)
 
 
