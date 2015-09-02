@@ -17,10 +17,12 @@ def showFitness(generationSize,populationSize,results):
     generation = 1
     for c in colors:
         genFitness = [row for row in results if generation == row[0]]
-        genFitnessArray = numpy.array(genFitness)
+        genFitnessArray = numpy.array(genFitness, dtype=object)
         size = len(genFitnessArray)
         if (size > 0):
-            plt.scatter([generation] * size, genFitnessArray[:,1], color=c)
+            fitnessValues = [row[1] for row in genFitnessArray]
+            objective = [row[0] for row in fitnessValues]
+            plt.scatter([generation] * size, objective, color=c)
         generation += 1
     plt.xlim(0,generationSize+0.5)
     plt.ylim(0)
