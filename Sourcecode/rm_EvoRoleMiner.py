@@ -26,7 +26,7 @@ def generateChromosome(maxRoles, userSize, permissionSize):
 
 
 # Evaluation Function
-def evalFunc(individual, userSize, permissionSize, orig):
+def evalFunc_Obj1(individual, userSize, permissionSize, orig):
     array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
     diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
     'Violation of confidentiality and data availability'
@@ -37,9 +37,20 @@ def evalFunc(individual, userSize, permissionSize, orig):
     return temp,
 
 # Evaluation Function
-def evalFunc2(individual, userSize, permissionSize, orig):
+def evalFunc_Obj2(individual, userSize, permissionSize, orig):
     numberOfRoles = len(individual[0])
     return numberOfRoles,
+
+# Evaluation Function
+def evalFunc_Multi(individual, userSize, permissionSize, orig):
+    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
+    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
+    'Violation of confidentiality and data availability'
+    conf, accs = matrixOps.countDiffs(diffMatrix)
+    numberOfRoles = len(individual[0])
+    temp = (conf+accs)
+    return temp,numberOfRoles
+
 
 # Mutation Function
 def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, userSize, permissionSize):
@@ -95,13 +106,13 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     start = datetime.datetime.now()
     print(start)
     time = 0
-    fitnessValues = []
+    results = []
     genStart = 0
     pop = []
 
     # Creator
     #creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0, -1.0))
-    creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+    creator.create("FitnessMin", base.Fitness, weights=(-1.0,-1.0))
     creator.create("Individual", list, fitness=creator.FitnessMin)
 
     # Get Checkpoint
@@ -111,7 +122,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
         pop = cp["population"]
         genStart = int(cp["generation"])
         Original = cp["Original"]
-        fitnessValues=cp["fitnessValues"]
+        results=cp["results"]
         time=cp["time"]
         random.setstate(cp["rndstate"])
     else:
@@ -129,12 +140,12 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
-    toolbox.register("evaluate", evalFunc, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
     toolbox.register("mate", mateFunc)
     toolbox.register("mutate", mutFunc, addRolePB=0.25, removeRolePB=0.25, removeUserPB=0.25, removePermissionPB=0.25,
                      addUserPB=0.25, addPermissionPB=0.25, userSize=userSize, permissionSize=permissionSize)
-    toolbox.register("select", tools.selTournament, tournsize=5)
-    #toolbox.register("select", tools.selTournament, tournsize=10)
+    #toolbox.register("select", tools.selTournament, tournsize=5)
+    toolbox.register("select", tools.selNSGA2)
 
     # History, tracks the genealogy of the individuals in a population
     history = tools.History()
@@ -181,12 +192,12 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
         fitnesses = toolbox.map(toolbox.evaluate, invalids)
         for ind, fit in zip(invalids, fitnesses):
             ind.fitness.values = fit
-            if (fit[0] == 0):
-                stop = True
+            #if (fit[0] == 0):
+            #    stop = True
 
         # Add Fitness values to results
         for ind in pop:
-            fitnessValues.append([g,ind.fitness.values[0]])
+            results.append([g,ind.fitness.values])
 
         g += 1
 
@@ -214,11 +225,11 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     time = time + timediff.total_seconds()
 
     # Set Checkpoint
-    cp = dict(population=pop, generation=g, rndstate=random.getstate(), Original=Original, fitnessValues=fitnessValues, time=time)
+    cp = dict(population=pop, generation=g, rndstate=random.getstate(), Original=Original, results=results, time=time)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("Dump Pickle")
 
-    return pop, fitnessValues, g, time
+    return pop, results, g, time
 
 # -----------------------------------------------------------------------------------
 # MAINoptions
@@ -233,12 +244,12 @@ Original = numpy.matrix(testdata2)
 pickleFile = "..\\Output\\checkpoint.pkl"
 
 # EVOLUTION PARAMETERS
-POP_SIZE = 5
+POP_SIZE = 100
 CXPB = 0.25
 MUTPB = 0.25
-NGEN = 5
+NGEN = 100
 
-population, fitnessValues, generation, time = evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, True, pickleFile)
+population, results, generation, time = evolution(Original, POP_SIZE, CXPB, MUTPB, NGEN, False, pickleFile)
 
 print("Total in seconds: "+str(time))
 minutes = int(time/60)
@@ -246,7 +257,9 @@ if (minutes > 0):
     print("Minutes: "+str(minutes))
     print("Seconds: "+str(time-(minutes*60)))
 
+visual.showFitnessForMultiObjectives(generation,POP_SIZE,results)
 visual.showBestResult(population,generation,Original)
-visual.showFitness(generation,POP_SIZE,fitnessValues)
+visual.printPopulation(population)
+
 
 

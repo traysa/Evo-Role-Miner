@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 import rm_Utils as utils
 
 
-def showFitness(generationSize,populationSize,fitnessValues):
+def showFitness(generationSize,populationSize,results):
     # Find lowest values for cost and highest for savings
     # p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = False)
     # Plot a scatter graph of all results
     colors = plt.cm.rainbow(numpy.linspace(0, 1, generationSize))
     generation = 1
     for c in colors:
-        genFitness = [row for row in fitnessValues if generation == row[0]]
+        genFitness = [row for row in results if generation == row[0]]
         genFitnessArray = numpy.array(genFitness)
         size = len(genFitnessArray)
         if (size > 0):
@@ -26,6 +26,33 @@ def showFitness(generationSize,populationSize,fitnessValues):
     plt.ylim(0)
     plt.xlabel('Generations')
     plt.ylabel('Objective')
+    #plt.scatter(Xs[:9], Ys[:9], c='b')
+    #plt.scatter(Xs[10:19], Ys[10:19], c='g')
+    #plt.scatter(Xs[20:29], Ys[20:29], c='r')
+    # Then plot the Pareto frontier on top
+    #plt.plot(p_front[0], p_front[1], c='r')
+    plt.show()
+
+def showFitnessForMultiObjectives(generationSize,populationSize,results):
+    # Find lowest values for cost and highest for savings
+    # p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = False)
+    # Plot a scatter graph of all results
+    colors = plt.cm.rainbow(numpy.linspace(0, 1, generationSize))
+    generation = 1
+    for c in colors:
+        genFitness = [row for row in results if generation == row[0]]
+        genFitnessArray = numpy.array(genFitness, dtype=object)
+        size = len(genFitnessArray)
+        if (size > 0):
+            fitnessValues = [row[1] for row in genFitnessArray]
+            objective1 = [row[0] for row in fitnessValues]
+            objective2 = [row[1] for row in fitnessValues]
+            plt.scatter(objective1, objective2, color=c)
+        generation += 1
+    plt.xlim(0)
+    plt.ylim(0)
+    plt.xlabel('Objective1')
+    plt.ylabel('Objective2')
     #plt.scatter(Xs[:9], Ys[:9], c='b')
     #plt.scatter(Xs[10:19], Ys[10:19], c='g')
     #plt.scatter(Xs[20:29], Ys[20:29], c='r')
@@ -131,7 +158,6 @@ def showMatrix(matrix):
     fig.tight_layout()
     plt.show()
 
-
 def addPopulationToPlot(pop, generation, Original, results):
     #printPopulation(pop)
     for ind in pop:
@@ -159,8 +185,10 @@ def addBestIndividualToPlot(pop, generation, Original, results):
     return results
 
 def printPopulation(pop):
+    i = 1
     for ind in pop:
-        print(str(ind.fitness.values) + " -- " + str(ind[0]))
+        print(str(i) + " -- " + str(ind.fitness.values) + " -- " + str(ind[0]))
+        i += 1
 
 '''
 Method to take two equally-sized lists and return just the elements which lie
