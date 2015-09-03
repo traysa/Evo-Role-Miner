@@ -10,16 +10,17 @@ import matplotlib.pyplot as plt
 from optparse import OptionParser
 
 def read(filename):
+    print("Parsing file "+str(filename)+"... ")
     data = open(filename, 'r').read()
     lines = data.splitlines()
 
     # Count users
     userCount = max(list(map(int, re.findall('u_U(.+?) ', data))))+1
-    print(userCount)
+    print("userCount: "+str(userCount))
 
     # Count permissions
     permCount = max(list(map(int, re.findall('p_P(.+?) ', data))))+1
-    print(permCount)
+    print("permCount: "+str(permCount))
 
     # Create UP Matrix
     UPmatrix = [[0 for i in range(permCount)] for j in range(userCount)]
@@ -33,6 +34,7 @@ def read(filename):
                 permId = int(perm[3:])
                 #print(str(userId)+" , "+str(permId))
                 UPmatrix[userId][permId] = 1
+    print("DONE.\n")
     return UPmatrix
 
 def visualizeMatrix(UPmatrix):

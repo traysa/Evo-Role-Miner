@@ -9,20 +9,20 @@ import matplotlib.pyplot as plt
 import rm_Utils as utils
 from collections import defaultdict
 
-def showFitnessInPlot(results):
+def showFitnessInPlot(results, NGEN, freq):
     # Plot a scatter graph of all results
     colors = plt.cm.rainbow(numpy.linspace(0, 1, len(results)))
-    generation = 1
+    generation = freq
     for c in colors:
         generationResults = numpy.array(results[generation], dtype=object)
         pop_size = len(generationResults)
         if (pop_size > 0):
             objective = [row for row in generationResults]
             plt.scatter([generation] * pop_size, objective, color=c)
-        generation += 1
-    plt.xlim(0,generation-0.5)
+        generation += freq
+    plt.xlim(0,generation - freq)
     plt.ylim(0)
-    plt.xlabel('Generations')
+    plt.xlabel('Generation')
     plt.ylabel('Objective')
     plt.show()
 

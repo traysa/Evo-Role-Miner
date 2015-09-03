@@ -12,6 +12,7 @@ import datetime
 import fortin2013
 from collections import defaultdict
 import matplotlib.pyplot as plt
+import networkx
 
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm functions
@@ -123,16 +124,14 @@ def mateFunc(ind1, ind2):
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm
 # -----------------------------------------------------------------------------------
-def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, checkpoint, pickleFile):
-    start = datetime.datetime.now()
-    print(start)
+def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, pickleFile):
+    print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
     genStart = 0
     pop = []
 
     # Creator
-    #creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0, -1.0))
     creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMin)
 
@@ -167,14 +166,9 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MU
                      addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
     toolbox.register("select", tools.selTournament, tournsize=5)
 
-    # History, tracks the genealogy of the individuals in a population
-    history = tools.History()
-    toolbox.decorate("mate", history.decorator)
-    toolbox.decorate("mutate", history.decorator)
-
     # Creating the Population
     if (not pop):
-        print("Creating new Population")
+        print("Generate new Population of "+str(POP_SIZE)+" individuals")
         pop = toolbox.population(n=POP_SIZE)
 
     # Evaluate the entire population
@@ -183,27 +177,19 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MU
         ind.fitness.values = fit
 
     # Begin the evolution
+    print("Start evolution...")
+    start = datetime.datetime.now()
+    print("Start time: "+str(start))
     #hof = tools.HallOfFame(maxsize=1)
     #stats = tools.Statistics(lambda ind: ind.fitness.values)
     #stats.register("avg", numpy.mean)
     #stats.register("std", numpy.std)
     #stats.register("min", numpy.min)
     #stats.register("max", numpy.max)
-
-    # pop, log = algorithms.eaSimple(pop, toolbox, cxpb=CXPB, mutpb=MUTPB, ngen=NGEN, halloffame=hof, stats=stats, verbose=False)
-    # cp = dict(population=pop, generation=300, rndstate=random.getstate(), Original=Original)
-    # pickle.dump(cp, open("..\\Output\\checkpoint.pkl", "wb"), 2)
-
-    freq = 50
     stop = False
     g = genStart+1
-    #print("Generation "+str(g))
+    print("Start evolution with Generation "+str(g))
     while ((not stop) & (g <= genStart+NGEN)):
-        #if g % freq == 0:
-        #    print("Generation "+str(g))
-        #if g % freq == 0:
-            #results = visual.addPopulationToPlot(pop, g, Original, results)
-            #results = visual.addBestIndividualToPlot(pop, g, Original, results)
         pop = toolbox.select(pop, k=len(pop))
         pop = algorithms.varAnd(pop, toolbox, cxpb=CXPB, mutpb=MUTPB_All)
 
@@ -212,38 +198,26 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MU
         fitnesses = toolbox.map(toolbox.evaluate, invalids)
         for ind, fit in zip(invalids, fitnesses):
             ind.fitness.values = fit
+            # Stop condition
             #if (fit[0] == 0):
             #    stop = True
 
         # Add Fitness values to results
-        for ind in pop:
-            results[g].append(ind.fitness.values)
+        if g % freq == 0:
+            print("Generation "+str(g))
+            for ind in pop:
+                results[g].append(ind.fitness.values)
 
         g += 1
 
+    end = datetime.datetime.now()
+    timediff = end-start
+    time.append(timediff.total_seconds())
     g -= 1
-    # Show history of the best
-    '''h = history.getGenealogy(hof[0], max_depth=5)
-	graph = networkx.DiGraph(h)
-	graph = graph.reverse()     # Make the grah top-down
-	colors = [toolbox.evaluate(history.genealogy_history[i])[0] for i in graph]
-	#pos = networkx.graphviz_layout(graph, prog="dot")
-	#networkx.draw(graph, pos, node_color=colors)
-	networkx.draw(graph, node_color=colors)
-	plt.show()'''
-
-    # Add final population to results
-    #results = visual.addPopulationToPlot(pop, g, Original, results)
-    #results = visual.addBestIndividualToPlot(pop, g, Original, results)
-
     # Print final population
     #visual.printPopulation(pop)
     print("==> Generation "+str(g))
-
-    end = datetime.datetime.now()
-    timediff = end-start
-    #time = time + timediff.total_seconds()
-    time.append(timediff.total_seconds())
+    print("DONE.\n")
 
     # Set Checkpoint
     cp = dict(population=pop,
@@ -265,7 +239,7 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MU
         k = pickleFile.rfind("\\")
         pickleFile = pickleFile[:k+1] + datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")+"_" + pickleFile[k+1:]
     pickle.dump(cp, open(pickleFile, "wb"), 2)
-    print("Dump Pickle")
+    print("Save checkpoint into "+str(pickleFile))
 
     return pop, results, g, time
 
@@ -274,14 +248,13 @@ def evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MU
 # -----------------------------------------------------------------------------------
 def evolution_multi(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFile):
     start = datetime.datetime.now()
-    print(start)
+    print("Start time: "+str(start))
     time = 0
     results = []
     genStart = 0
     pop = []
 
     # Creator
-    #creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0, -1.0))
     creator.create("FitnessMin", base.Fitness, weights=(-1.0,-1.0))
     creator.create("Individual", list, fitness=creator.FitnessMin)
 
@@ -323,7 +296,7 @@ def evolution_multi(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint, pickleFil
 
     # Creating the Population
     if (not pop):
-        print("Creating new Population")
+        print("Creating new Population of "+str(POP_SIZE))
         pop = toolbox.population(n=POP_SIZE)
 
     # Evaluate the individuals with an invalid fitness
@@ -584,7 +557,7 @@ def evolution_multi_fortin2013(Original, POP_SIZE, CXPB, MUTPB, NGEN, checkpoint
     return pop, results, g, time
 
 # -----------------------------------------------------------------------------------
-# MAINoptions
+# MAIN
 # -----------------------------------------------------------------------------------
 # GLOBAL PARAMETERS
 testdata = [[1, 1, 0, 0, 0], [1, 0, 0, 1, 1], [1, 0, 1, 1, 1], [1, 0, 0, 1, 1], [1, 0, 0, 1, 1], [1, 1, 0, 1, 1], [1, 0, 0, 1, 1]]
@@ -600,9 +573,10 @@ POP_SIZE = 100
 CXPB = 0.25
 MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6 = 0.25,0.25,0.25,0.25,0.25,0.25,0.25
 NGEN = 100
+freq = 5
 
 #population, results, generation, time = evolution_multi_fortin2013(Original, POP_SIZE, CXPB, MUTPB, NGEN, False, pickleFile)
-population, results, generation, timeArray = evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, False, pickleFile)
+population, results, generation, timeArray = evolution(Original, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, False, pickleFile)
 
 time = sum(timeArray)
 print("Total in seconds: "+str(time))
@@ -611,7 +585,7 @@ if (minutes > 0):
     print("Minutes: "+str(minutes))
     print("Seconds: "+str(time-(minutes*60)))
 
-visual.showFitnessInPlot(results)
+visual.showFitnessInPlot(results, NGEN, 10)
 #visual.showFitnessForMultiObjectives(generation,POP_SIZE,results)
 #visual.showBestResult(population,generation,Original)
 #visual.printPopulation(population)
