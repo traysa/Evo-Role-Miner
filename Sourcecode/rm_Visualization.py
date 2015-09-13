@@ -3,55 +3,232 @@ __author__ = 'Theresa'
 # -----------------------------------------------------------------------------------
 # Visualizations for Role Miner
 # -----------------------------------------------------------------------------------
-
+import matplotlib
+matplotlib.use('Agg')
 import numpy
 import matplotlib.pyplot as plt
 import rm_Utils as utils
+from matplotlib.backends.backend_pdf import PdfPages
 from collections import defaultdict
+import os
 
-def showFitnessInPlot(results, NGEN, freq):
+# -----------------------------------------------------------------------------------
+# Print Logbook into graph
+# -----------------------------------------------------------------------------------
+def plotLogbook(logbook, logbook_filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    gen = logbook.select("gen")
+    fit_maxs = logbook.select("max")
+    fit_mins = logbook.select("min")
+    fit_avgs = logbook.select("avg")
+
+    # Plot graphs
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_xlabel("Generation", fontsize=16)
+    ax.set_ylabel("Fitness", fontsize=16)
+    line1 = ax.plot(gen, fit_mins, "b-", label="Minimum Fitness")
+    line2 = ax.plot(gen, fit_maxs, "r-", label="Maximum Fitness")
+    line3 = ax.plot(gen, fit_avgs, "g-", label="Average Fitness")
+
+    # Build legend
+    lns = line1 + line2 + line3
+    labs = [l.get_label() for l in lns]
+    ax.legend(lns, labs, loc="center right")
+
+    if (saveAsPDF):
+        print("Save logbook plot as PDF...")
+        pp = PdfPages(logbook_filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save logbook plot as SVG...")
+        plt.savefig(logbook_filename+".svg")
+
+    if (saveAsPNG):
+        print("Save logbook plot as PNG...")
+        plt.savefig(logbook_filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            #plt.show()
+            os.startfile(logbook_filename+".png")
+
+    plt.close('all')
+
+def plotLogbookForMultiObjective(logbook, logbook_filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    gen = logbook.select("gen")
+    # Plot graphs
+    fig, plots = plt.subplots(2,1,figsize=(12, 8))
+    i = 1
+    for ax in plots:
+
+        # Get stats of objective
+        fit_mins = logbook.chapters["fitnessObj"+str(i)].select("min")
+        fit_maxs = logbook.chapters["fitnessObj"+str(i)].select("max")
+        fit_avgs = logbook.chapters["fitnessObj"+str(i)].select("avg")
+
+        # Create graphs
+        ax.set_xlabel("Generation", fontsize=16)
+        ax.set_ylabel("Fitness Objective "+str(i), fontsize=16)
+
+        line1 = ax.plot(gen, fit_mins, "b-", label="Minimum Fitness")
+        line2 = ax.plot(gen, fit_maxs, "r-", label="Maximum Fitness")
+        line3 = ax.plot(gen, fit_avgs, "g-", label="Average Fitness")
+
+        # Build legend
+        lns = line1 + line2 + line3
+        labs = [l.get_label() for l in lns]
+        ax.legend(lns, labs, loc="center right")
+        i += 1
+
+    if (saveAsPDF):
+        print("Save logbook plot as PDF...")
+        pp = PdfPages(logbook_filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save logbook plot as SVG...")
+        plt.savefig(logbook_filename+".svg")
+
+    if (saveAsPNG):
+        print("Save logbook plot as PNG...")
+        plt.savefig(logbook_filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            #plt.show()
+            os.startfile(logbook_filename+".png")
+
+    plt.close('all')
+
+# -----------------------------------------------------------------------------------------
+# Visualize evaluation values of population in a plot over generations (Single Objective)
+# -----------------------------------------------------------------------------------------
+def showFitnessInPlot(results, generations, freq, evolution_filename, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    print("\nCreate plot...")
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111)
     # Plot a scatter graph of all results
-    colors = plt.cm.rainbow(numpy.linspace(0, 1, len(results)))
+    size = len(results)
+    colors = plt.cm.rainbow(numpy.linspace(0, 1, size))
+
     generation = freq
-    for c in colors:
+    i = 0
+    while ((i < size) and (generation <= generations)):
+        c = colors[i]
         generationResults = numpy.array(results[generation], dtype=object)
         pop_size = len(generationResults)
         if (pop_size > 0):
-            objective = [row for row in generationResults]
-            plt.scatter([generation] * pop_size, objective, color=c)
+            objective = [row[0] for row in generationResults]
+            ax.scatter([generation] * pop_size, objective, color=c)
+            #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
+            i += 1
         generation += freq
-    plt.xlim(0,generation - freq)
-    plt.ylim(0)
-    plt.xlabel('Generation')
-    plt.ylabel('Objective')
-    plt.show()
+    ax.set_xlim(0,generation - freq + 0.5)
+    ax.set_ylim(0)
+    ax.set_xlabel('Generation', fontsize=16)
+    ax.set_ylabel('Objective', fontsize=16)
+    ax.tick_params(labelsize=14)
+    ax.set_position((.1, .25, .8, .7)) # [pos from left, pos from bottom, width, height]
 
-def showFitnessForMultiObjectives(generationSize,populationSize,results):
-    # Find lowest values for cost and highest for savings
-    # p_front = pareto_frontier(Xs, Ys, maxX = False, maxY = False)
+    Z = [[0,0],[0,0]]
+    levels = range(0,generation - freq + 1,freq)
+    data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
+    cbar_axes=fig.add_axes([0.92,.25,.02,.7])  # [pos from left, pos from bottom, width, height]
+    cbar = plt.colorbar(data, cax=cbar_axes)
+    cbar.set_label('Generations', fontsize=16)
+    cbar.ax.tick_params(labelsize=14)
+
+    if (saveAsPDF or saveAsPNG):
+       fig.text(0.1,0.01,"File: "+evolution_filename+"\n"+info, fontsize=14)
+    else:
+       fig.text(0.1,0.01,info, fontsize=14)
+    print("DONE.\n")
+
+    if (saveAsPDF):
+        print("Save plot as PDF...")
+        pp = PdfPages(evolution_filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save plot as SVG...")
+        plt.savefig(evolution_filename+".svg")
+
+    if (saveAsPNG):
+        print("Save plot as PNG...")
+        plt.savefig(evolution_filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            os.startfile(evolution_filename+".png")
+
+    #plt.show(block=False)
+    plt.close('all')
+
+# -----------------------------------------------------------------------------------------
+# Visualize evaluation values of population in a plot (Multi Objective)
+# -----------------------------------------------------------------------------------------
+def showFitnessInPlotForMultiObjective(results, generations, freq, evolution_filename, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    print("\nCreate plot...")
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111)
     # Plot a scatter graph of all results
-    colors = plt.cm.rainbow(numpy.linspace(0, 1, generationSize))
-    generation = 1
-    for c in colors:
-        genFitness = [row for row in results if generation == row[0]]
-        genFitnessArray = numpy.array(genFitness, dtype=object)
-        size = len(genFitnessArray)
-        if (size > 0):
-            fitnessValues = [row[1] for row in genFitnessArray]
-            objective1 = [row[0] for row in fitnessValues]
-            objective2 = [row[1] for row in fitnessValues]
-            plt.scatter(objective1, objective2, color=c)
-        generation += 1
-    plt.xlim(0)
-    plt.ylim(0)
-    plt.xlabel('Objective1')
-    plt.ylabel('Objective2')
-    #plt.scatter(Xs[:9], Ys[:9], c='b')
-    #plt.scatter(Xs[10:19], Ys[10:19], c='g')
-    #plt.scatter(Xs[20:29], Ys[20:29], c='r')
-    # Then plot the Pareto frontier on top
-    #plt.plot(p_front[0], p_front[1], c='r')
-    plt.show()
+    size = len(results)
+    colors = plt.cm.rainbow(numpy.linspace(start=0, stop=1, num=size))
+    generation = freq
+    i = 0
+    while ((i < size) and (generation <= generations)):
+        c = colors[i]
+        generationResults = numpy.array(results[generation], dtype=object)
+        pop_size = len(generationResults)
+        if (pop_size > 0):
+            objective1 = generationResults[:,0]
+            objective2 = generationResults[:,1]
+            ax.scatter(objective1, objective2, color=c)
+            #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
+            # Find lowest values for cost and highest for savings
+            p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
+            ax.plot(p_front[0], p_front[1],color=c)
+            i += 1
+        generation += freq
+    ax.set_xlim(0)
+    ax.set_ylim(0)
+    ax.set_xlabel('Objective1', fontsize=16)
+    ax.set_ylabel('Objective2', fontsize=16)
+    ax.tick_params(labelsize=14)
+    ax.set_position((.1, .25, .76, .7)) # [pos from left, pos from bottom, width, height]
+
+    Z = [[0,0],[0,0]]
+    levels = range(0,generation - freq+1,freq)
+    data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
+    cbar_axes=fig.add_axes([0.88,.25,.02,.7])  # [pos from left, pos from bottom, width, height]
+    cbar = plt.colorbar(data, cax=cbar_axes)
+    cbar.set_label('Generations', fontsize=16)
+    cbar.ax.tick_params(labelsize=14)
+
+    if (saveAsPDF or saveAsPNG):
+       fig.text(0.1,0.01,"File: "+evolution_filename+"\n"+info, fontsize=14)
+    else:
+       fig.text(0.1,0.01,info, fontsize=14)
+    print("DONE.\n")
+
+    if (saveAsPDF):
+        print("Save plot as PDF...")
+        pp = PdfPages(evolution_filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save plot as SVG...")
+        plt.savefig(evolution_filename+".svg")
+
+    if (saveAsPNG):
+        print("Save plot as PNG...")
+        plt.savefig(evolution_filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            os.startfile(evolution_filename+".png")
+
+    plt.close('all')
 
 def showResults(populationSize, results):
     fig, plots = plt.subplots(divmod(len(results), populationSize + 1)[0], populationSize + 1)
@@ -86,51 +263,74 @@ def showResults(populationSize, results):
             p = p + 1
     fig.tight_layout()
     plt.show()
+    plt.close('all')
 
-def showBestResult(pop, generation, Original):
+def showBestResult(top_pop, generation, Original, evolution_filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
     #Find best in population
-    results = []
-    bestInd = []
-    bestFit = (1000000,)
-    for ind in pop:
-        fit = ind.fitness.values
-        if (bestFit > fit):
-            bestFit = fit
-            bestInd = ind
-    if (bestInd != []):
-        UMatrix, PMatrix, UPMatrix = utils.resolveChromosomeIntoArrays(bestInd[0], Original.shape[0], Original.shape[1])
+    #results = []
+    #bestInd = []
+    #bestFit = (1000000,)
+    i = 1
+    for ind in top_pop:
+        results = []
+        #fit = ind.fitness.values
+        #if (bestFit > fit):
+        #    bestFit = fit
+        #    bestInd = ind
+    #if (bestInd != []):
+        UMatrix, PMatrix, UPMatrix = utils.resolveChromosomeIntoArrays(ind[0], Original.shape[0], Original.shape[1])
         results.append(UMatrix)
         results.append(PMatrix)
         results.append(UPMatrix)
         results.append(Original)
 
-    fig, plots = plt.subplots(2, 2)
-    p = 0
-    for ay in plots:
-        for ax in ay:
-            matrix = numpy.array(results[p])
-            x_length = matrix.shape[1]
-            y_length = matrix.shape[0]
-            ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
-            ax.set_xticks(numpy.arange(x_length) + 0.5)
-            ax.set_yticks(numpy.arange(y_length) + 0.5)
-            ax.xaxis.tick_top()
-            ax.yaxis.tick_left()
-            ax.set_xlim(0, x_length)
-            ax.set_ylim(0, y_length)
-            ax.invert_yaxis()
-            ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
-            ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
-            ax.tick_params(width=0)
-            p = p + 1
-    plots[0][0].set_ylabel('User-Role Matrix')
-    plots[0][1].set_ylabel('Role-Permission Matrix')
-    plots[1][0].set_ylabel('User-Permission Matrix')
-    plots[1][0].set_xlabel('Gen=' + str(generation)
-                              + ';\n Eval=' + str(bestFit))
-    plots[1][1].set_ylabel('Original')
-    fig.tight_layout()
-    plt.show()
+        fig, plots = plt.subplots(2, 2,figsize=(16,12))
+        p = 0
+        for ay in plots:
+            for ax in ay:
+                matrix = numpy.array(results[p])
+                x_length = matrix.shape[1]
+                y_length = matrix.shape[0]
+                ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+                ax.set_xticks(numpy.arange(x_length) + 0.5)
+                ax.set_yticks(numpy.arange(y_length) + 0.5)
+                #ax.xaxis.tick_top()
+                #ax.yaxis.tick_left()
+                ax.set_xlim(0, x_length)
+                ax.set_ylim(0, y_length)
+                ax.invert_yaxis()
+                ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+                ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+                ax.tick_params(width=0)
+                p = p + 1
+        plots[0][0].set_ylabel('User-Role Matrix',fontsize=14)
+        plots[0][1].set_ylabel('Role-Permission Matrix',fontsize=14)
+        plots[1][0].set_ylabel('User-Permission Matrix',fontsize=14)
+        plots[1][0].set_xlabel('Gen=' + str(generation) + '; Eval=' + str(ind.fitness.values),fontsize=14)
+        plots[1][1].set_ylabel('Original',fontsize=14)
+        #fig.tight_layout()
+        fig.set_tight_layout(True)
+
+        if (saveAsPDF):
+            print("Save plot for Top "+str(i)+" as PDF...")
+            pp = PdfPages(evolution_filename+str(i)+".pdf")
+            pp.savefig(fig)
+            pp.close()
+
+        if (saveAsSVG):
+            print("Save plot for Top "+str(i)+" as SVG...")
+            plt.savefig(evolution_filename+str(i)+".svg")
+
+        if (saveAsPNG):
+            print("Save plot for Top "+str(i)+" as PNG...")
+            plt.savefig(evolution_filename+str(i)+".png")
+            if (showPNG):
+                print("Show plot...")
+                #plt.show()
+                os.startfile(evolution_filename+str(i)+".png")
+
+        i += 1
+    plt.close('all')
 
 def showMatrix(matrix):
     fig, ax = plt.subplots()
@@ -150,6 +350,7 @@ def showMatrix(matrix):
     ax.tick_params(width=0)
     fig.tight_layout()
     plt.show()
+    plt.close('all')
 
 def addPopulationToPlot(pop, generation, Original, results):
     #printPopulation(pop)

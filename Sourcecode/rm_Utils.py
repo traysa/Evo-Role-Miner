@@ -8,6 +8,7 @@ import random
 import numpy
 import rm_MatrixOperators as matrixOps
 
+
 # -----------------------------------------------------------------------------------
 # Data Generation for RoleMiner
 # -----------------------------------------------------------------------------------
@@ -17,6 +18,9 @@ def generateGoalMatrix(roles, users, permissions):
     C = matrixOps.multiplyBoolMatrix(A, B)
     return C
 
+# -----------------------------------------------------------------------------------
+# Resolves a chromosome into an boolean UP-matrix
+# -----------------------------------------------------------------------------------
 def resolveChromosomeIntoArray(chromosome, userSize, permissionSize):
     matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
     # Iterate through all genes of a chromosome
@@ -30,6 +34,9 @@ def resolveChromosomeIntoArray(chromosome, userSize, permissionSize):
                 matrix[user - 1][permission - 1] = 1
     return matrix
 
+# -----------------------------------------------------------------------------------
+# Resolves a chromosome into an integer UP-matrix
+# -----------------------------------------------------------------------------------
 def resolveChromosomeIntoArray2(chromosome, userSize, permissionSize):
     matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
     # Iterate through all genes of a chromosome
@@ -46,6 +53,9 @@ def resolveChromosomeIntoArray2(chromosome, userSize, permissionSize):
                     matrix[user - 1][permission - 1] = len(chromosome)+1
     return matrix
 
+# -----------------------------------------------------------------------------------
+# Resolves a chromosome into an UR-matrix, RP-matrix and integer UP-matrix
+# -----------------------------------------------------------------------------------
 def resolveChromosomeIntoArrays(chromosome, userSize, permissionSize):
 
     UMatrix = matrixOps.createEmptyMatrix(userSize, len(chromosome))
@@ -64,6 +74,9 @@ def resolveChromosomeIntoArrays(chromosome, userSize, permissionSize):
 
     return UMatrix, PMatrix, UPMatrix
 
+# -----------------------------------------------------------------------------------
+# Generate a random gene (role)
+# -----------------------------------------------------------------------------------
 def generateGene(userSize, permissionSize):
     gene = []
     # Create random length list of users
@@ -84,6 +97,9 @@ def generateGene(userSize, permissionSize):
     gene.append(permisson_list)
     return gene
 
+# -----------------------------------------------------------------------------------
+# Combine roles if they have the same user-lists (permission-lists)
+# -----------------------------------------------------------------------------------
 def combineObjects(offspring, index):
     values = numpy.array(offspring)[:, index]
     removalList = []
@@ -109,6 +125,9 @@ def combineObjects(offspring, index):
         i = i - 1
     return offspring
 
+# -----------------------------------------------------------------------------------
+# Local optimization by user combining and permission combining
+# -----------------------------------------------------------------------------------
 def localOptimization(offspring):
     if (True):
         'Combine Users'
