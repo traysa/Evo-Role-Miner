@@ -37,6 +37,34 @@ def read(filename):
     print("DONE.\n")
     return UPmatrix
 
+def read2(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count users
+    userCount = len(lines)-1
+    print("userCount: "+str(userCount))
+
+    # Count permissions
+    permCount = max(list(map(int, re.findall('Permission ([0-9]*)', data))))
+    print("permCount: "+str(permCount))
+
+    attrCount = len(lines[0].split(','))-permCount-1
+    print("attrCount: "+str(attrCount))
+
+    # Create UP Matrix
+    matrix = [[0 for i in range(permCount+attrCount)] for j in range(userCount+1)]
+    for line in lines[1:]:
+        parts = line.split(",")
+        userId = int(parts[0])
+        for i in range(len(parts)-1):
+            attr = parts[i+1]
+            #print(str(userId)+" , "+str(attr))
+            matrix[userId][i] = attr
+    print("DONE.\n")
+    return matrix,userCount,attrCount,permCount
+
 def visualizeMatrix(UPmatrix):
     # Visualization
     fig,ax = plt.subplots()

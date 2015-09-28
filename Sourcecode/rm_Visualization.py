@@ -313,21 +313,21 @@ def showBestResult(top_pop, generation, Original, evolution_filename, saveAsPDF,
 
         if (saveAsPDF):
             print("Save plot for Top "+str(i)+" as PDF...")
-            pp = PdfPages(evolution_filename+str(i)+".pdf")
+            pp = PdfPages(evolution_filename+"_"+str(i)+".pdf")
             pp.savefig(fig)
             pp.close()
 
         if (saveAsSVG):
             print("Save plot for Top "+str(i)+" as SVG...")
-            plt.savefig(evolution_filename+str(i)+".svg")
+            plt.savefig(evolution_filename+"_"+str(i)+".svg")
 
         if (saveAsPNG):
             print("Save plot for Top "+str(i)+" as PNG...")
-            plt.savefig(evolution_filename+str(i)+".png")
+            plt.savefig(evolution_filename+"_"+str(i)+".png")
             if (showPNG):
                 print("Show plot...")
                 #plt.show()
-                os.startfile(evolution_filename+str(i)+".png")
+                os.startfile(evolution_filename+"_"+str(i)+".png")
 
         i += 1
     plt.close('all')

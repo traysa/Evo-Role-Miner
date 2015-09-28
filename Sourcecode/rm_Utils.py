@@ -97,6 +97,21 @@ def generateGene(userSize, permissionSize):
     gene.append(permisson_list)
     return gene
 
+def generateGene2(permissions, attributes):
+    gene = []
+    attr_list = {}
+    for attr in list(attributes.keys()):
+        if (random.randint(0, 1)):
+            randomAttribute = attr
+            randomAttributeValue = random.choice(list(attributes[randomAttribute]))
+            attr_list[randomAttribute] = randomAttributeValue
+    print(attr_list)
+    randomPermissions = random.sample(permissions,random.randint(1, len(permissions)))
+    print(randomPermissions)
+    gene.append["h":randomPermissions]
+    print(gene)
+    return gene
+
 # -----------------------------------------------------------------------------------
 # Combine roles if they have the same user-lists (permission-lists)
 # -----------------------------------------------------------------------------------

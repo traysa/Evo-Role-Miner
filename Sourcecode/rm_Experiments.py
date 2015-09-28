@@ -29,15 +29,17 @@ def getDataSet(DATA):
 # ----------------------------------------------------------------------------------------------------------------------
 timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 Name = timestamp+"_"+"Default_Experiment"
-DATA="healthcare"
+DATA="testdata"
 Original = getDataSet(DATA)
 POP_SIZE = 100
 CXPB = 0.25
 MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6 = 0.25,0.25,0.25,0.25,0.25,0.25,0.25
-NGEN = 100
-freq = 10
-evolutionType = "Multi"
-evalFunc = "Obj1"
+NGEN = 10
+freq = 1
+evolutionType = "Multi_Weighted"
+evalFunc = "Normal"
+OBJ1PB = 1.0
+OBJ2PB = 1.0
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORT EXPERIMENTS SEQUENCE FILE
@@ -58,22 +60,31 @@ if (selectedFile != ''):
 # ----------------------------------------------------------------------------------------------------------------------
 if (selectedFile == ''):
     rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6,
-                   NGEN,freq,evolutionType,evalFunc)
+                   NGEN,freq,evolutionType,evalFunc,OBJ1PB=OBJ1PB,OBJ2PB=OBJ2PB)
 else:
-    print(experiments[1].keys())
-    print("Experiment" in experiments[1].keys())
+    print("Experiment Settings: ")
     for experiment in experiments:
         if ("Experiment" in experiment.keys()):
             Name = timestamp+"_"+experiment["Experiment"]
+            print("Name: "+Name)
         if ("DATA" in experiment.keys()):
             DATA = experiment["DATA"]
             Original = getDataSet(DATA)
         if ("POP_SIZE" in experiment.keys()):
             POP_SIZE = int(experiment["POP_SIZE"])
+            print("POP_SIZE: "+str(POP_SIZE))
+        if ("OBJ1PB" in experiment.keys()):
+            OBJ1PB = float(experiment["OBJ1PB"])
+            print("OBJ1PB: "+str(OBJ1PB))
+        if ("OBJ2PB" in experiment.keys()):
+            OBJ2PB = float(experiment["OBJ2PB"])
+            print("OBJ2PB: "+str(OBJ2PB))
         if ("CXPB" in experiment.keys()):
             CXPB = float(experiment["CXPB"])
+            print("CXPB: "+str(CXPB))
         if ("MUTPB_All" in experiment.keys()):
             MUTPB_All = float(experiment["MUTPB_All"])
+            print("MUTPB_All: "+str(MUTPB_All))
         if ("MUTPB_1" in experiment.keys()):
             MUTPB_1 = float(experiment["MUTPB_1"])
         if ("MUTPB_2" in experiment.keys()):
@@ -88,12 +99,18 @@ else:
             MUTPB_6 = float(experiment["MUTPB_6"])
         if ("NGEN" in experiment.keys()):
             NGEN = int(experiment["NGEN"])
+            print("NGEN: "+str(NGEN))
         if ("freq" in experiment.keys()):
             freq = int(experiment["freq"])
+            print("freq: "+str(freq))
         if ("evolutionType" in experiment.keys()):
             evolutionType = experiment["evolutionType"]
+            print("evolutionType: "+evolutionType)
         if ("evalFunc" in experiment.keys()):
             evalFunc = experiment["evalFunc"]
+            print("evalFunc: "+evalFunc)
+
+        print("Start Experiment...")
 
         rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6,
-                       NGEN,freq,evolutionType,evalFunc)
+                       NGEN,freq,evolutionType,evalFunc,OBJ1PB=OBJ1PB,OBJ2PB=OBJ2PB)

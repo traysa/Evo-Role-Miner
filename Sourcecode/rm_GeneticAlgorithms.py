@@ -7,6 +7,9 @@ import rm_Utils as utils
 import os.path
 import datetime
 import fortin2013
+import fortin2013_weighted
+import nsga2_classic as nsga2
+import nsga2_weighted
 from collections import defaultdict
 
 # -----------------------------------------------------------------------------------
@@ -47,12 +50,24 @@ def evalFunc_Saenko(individual, userSize, permissionSize, orig):
     'Violation of confidentiality and data availability'
     conf, accs = matrixOps.countDiffs(diffMatrix)
     numberOfRoles = len(individual[0])
-    #return conf, accs, numberOfRoles
     w1 = 0.00001
     w2 = 1
     w3 = 1
     temp = (w1 * numberOfRoles + w2 * conf + w3 * accs)**(-1)
     return temp,
+# Number of Roles + Violations as euclidean (from paper)
+def evalFunc_Saenko_Euclidean(individual, userSize, permissionSize, orig):
+    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
+    dist = numpy.linalg.norm(array-numpy.matrix(orig,dtype=bool)) #Frobenius norm, also called the Euclidean norm
+    numberOfRoles = len(individual[0])
+    w1 = 1
+    w2 = 10
+    temp = (w1 * numberOfRoles + w2 * dist)**(-1)
+    return temp,
+
+def evalFunc_Generalization_Error(individual, UPA2):
+
+    return 0
 
 # -----------------------------------------------------------------------------------
 # Multi Objective Evaluation Functions
@@ -64,7 +79,13 @@ def evalFunc_Multi(individual, userSize, permissionSize, orig):
     conf, accs = matrixOps.countDiffs(diffMatrix)
     numberOfRoles = len(individual[0])
     temp = (conf+accs)
-    return temp,numberOfRoles
+    return temp, numberOfRoles
+
+def evalFunc_Multi_EuclideanDistance(individual, userSize, permissionSize, orig):
+    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
+    dist = numpy.linalg.norm(array-numpy.matrix(orig,dtype=bool)) #Frobenius norm, also called the Euclidean norm
+    numberOfRoles = len(individual[0])
+    return dist, numberOfRoles
 
 # Mutation Function
 def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, userSize, permissionSize):
@@ -137,6 +158,8 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,)) #Minimization
     elif (evalFunc=="Saenko"):
         creator.create("FitnessMin", base.Fitness, weights=(1.0,)) #Maximization
+    elif (evalFunc=="Saenko_Euclidean"):
+        creator.create("FitnessMin", base.Fitness, weights=(1.0,)) #Maximization
     else:
         raise ValueError('Evaluation function not known')
     creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -181,6 +204,8 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
         toolbox.register("evaluate", evalFunc_Obj2, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Saenko"):
         toolbox.register("evaluate", evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Saenko_Euclidean"):
+        toolbox.register("evaluate", evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original)
     else:
         raise ValueError('Evaluation function not known')
     toolbox.register("mate", mateFunc)
@@ -286,7 +311,9 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - Multi objective
 # -----------------------------------------------------------------------------------
-def evolution_multi(Original, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile):
+def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
+    if (not(populationSize % 4 == 0)):
+        raise ValueError("Population size has to be a multiple of 4")
     print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
@@ -334,11 +361,22 @@ def evolution_multi(Original, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2,
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
-    toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    if (evalFunc=="Normal"):
+        toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Euclidean"):
+        toolbox.register("evaluate", evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    else:
+        raise ValueError("Unknown Evaluation Function: "+evalFunc)
+
     toolbox.register("mate", mateFunc)
     toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3, removePermissionPB=MUTPB_4,
                      addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
-    toolbox.register("select", tools.selNSGA2)
+    if (fortin):
+        toolbox.register("preselect", fortin2013.selTournamentFitnessDCD)
+        toolbox.register("select", fortin2013.selNSGA2)
+    else:
+        toolbox.register("preselect", tools.selTournamentDCD)
+        toolbox.register("select", tools.selNSGA2)
 
     # Register statistics
     statsObj1 = tools.Statistics(key=lambda ind: ind.fitness.values[0])
@@ -389,7 +427,7 @@ def evolution_multi(Original, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2,
     while ((not stop) and (generation <= genStart+NGEN)):
 
         # Vary the population
-        offspring = tools.selTournamentDCD(population, len(population))
+        offspring = toolbox.preselect(population, len(population))
         offspring = [toolbox.clone(ind) for ind in offspring]
         for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
             if random.random() <= CXPB:
@@ -463,9 +501,11 @@ def evolution_multi(Original, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2,
     return population, results, generation, time, prevFiles, tools.selBest(population, k=5), logbook, fileExt
 
 # -----------------------------------------------------------------------------------
-# Evolutionary algorithm - Multi objective with Fortin2013
+# Evolutionary algorithm - Multi objective with weights
 # -----------------------------------------------------------------------------------
-def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile):
+def evolution_multi_weighted(Original, evalFunc, populationSize, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
+    if (not(populationSize % 4 == 0)):
+        raise ValueError("Population size has to be a multiple of 4")
     print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
@@ -477,6 +517,7 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
 
     # Creator
     creator.create("FitnessMin", base.Fitness, weights=(-1.0,-1.0))
+    probabilitiesForObjectives = [OBJ1PB,OBJ2PB]
     creator.create("Individual", list, fitness=creator.FitnessMin)
 
     # Get Checkpoint
@@ -513,12 +554,23 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
-    toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    if (evalFunc=="Normal"):
+        toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Euclidean"):
+        toolbox.register("evaluate", evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    else:
+        raise ValueError("Unknown Evaluation Function: "+evalFunc)
+
     toolbox.register("mate", mateFunc)
     toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3, removePermissionPB=MUTPB_4,
                      addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
-    toolbox.register("preselect", fortin2013.selTournamentFitnessDCD)
-    toolbox.register("select", fortin2013.selNSGA2)
+
+    if (fortin):
+        toolbox.register("preselect", fortin2013_weighted.selTournamentFitnessDCD, probabilitiesForObjectives=probabilitiesForObjectives)
+        toolbox.register("select", fortin2013_weighted.selNSGA2, probabilitiesForObjectives=probabilitiesForObjectives)
+    else:
+        toolbox.register("preselect", nsga2_weighted.selTournamentDCD, probabilitiesForObjectives=probabilitiesForObjectives)
+        toolbox.register("select", nsga2_weighted.selNSGA2, probabilitiesForObjectives=probabilitiesForObjectives)
 
     # Register statistics
     statsObj1 = tools.Statistics(key=lambda ind: ind.fitness.values[0])
@@ -550,16 +602,17 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
         print("Generation "+str(genStart)+":\t"
               +str(logbook.stream)+"\n"
               +str(logbook.chapters["fitnessObj1"].stream)+"\n"
-              +str(logbook.chapters["fitnessObj2"].stream))
+              +str(logbook.chapters["fitnessObj2"].stream)
+              )
 
     # Begin the evolution
     print("Start evolution...")
     start = datetime.datetime.now()
     print("Start time: "+str(start))
-    #hof = tools.HallOfFame(maxsize=1)
+    #hof = tools.HallOfFame(maxsize=1))'''
 
     # This is just to assign the crowding distance to the individuals
-    #  no actual selection is done
+    # no actual selection is done
     population = toolbox.select(population, len(population))
 
     stop = False
@@ -568,7 +621,6 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
     while ((not stop) and (generation <= genStart+NGEN)):
 
         # Vary the population
-        #offspring = tools.selTournamentDCD(population, len(population))
         offspring = toolbox.preselect(population, len(population))
         offspring = [toolbox.clone(ind) for ind in offspring]
         for ind1, ind2 in zip(offspring[::2], offspring[1::2]):
@@ -597,10 +649,11 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
             # Log statistics for generation
             record = mstats.compile(population)
             logbook.record(gen=generation, evals=len(invalid_ind), **record)
-            print("Generation "+str(genStart)+":\t"
-              +str(logbook.stream)+"\n"
-              +str(logbook.chapters["fitnessObj1"].stream)+"\n"
-              +str(logbook.chapters["fitnessObj2"].stream))
+            print("Generation "+str(generation)+":\t"
+                  +str(logbook.stream)+"\t"
+                  +str(logbook.chapters["fitnessObj1"].stream)+"\t\t"
+                  +str(logbook.chapters["fitnessObj2"].stream)
+                  )
 
         generation += 1
 
@@ -615,6 +668,7 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
 
     # Set Checkpoint
     fileExt = "_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt += "_" + str(OBJ1PB)+ "_" + str(OBJ2PB)
     if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
         pickleFile = "Checkpoint"+fileExt+".pkl"
@@ -626,6 +680,8 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
               results=results,
               time=time,
               populationSize=populationSize,
+              OBJ1PB=OBJ1PB,
+              OBJ2PB=OBJ2PB,
               CXPB=CXPB,
               prevFiles=prevFiles,
               MUTPB_All=MUTPB_All,
@@ -640,4 +696,3 @@ def evolution_multi_fortin2013(Original, populationSize, CXPB, MUTPB_All, MUTPB_
     print("DONE.\n")
 
     return population, results, generation, time, prevFiles, tools.selBest(population, k=5), logbook, fileExt
-
