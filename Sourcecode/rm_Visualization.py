@@ -332,6 +332,119 @@ def showBestResult(top_pop, generation, Original, evolution_filename, saveAsPDF,
         i += 1
     plt.close('all')
 
+def showAllRoles(top_pop, generation, Original, evolution_filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    i = len(top_pop)
+    results = []
+
+    UMatrix, PMatrix, UPMatrix = utils.resolveIndividualsIntoArrays(top_pop, Original.shape[0], Original.shape[1])
+    results.append(UMatrix)
+    results.append(PMatrix)
+    results.append(UPMatrix)
+    results.append(Original)
+
+    fig, plots = plt.subplots(2, 2,figsize=(16,12))
+    p = 0
+    for ay in plots:
+        for ax in ay:
+            matrix = numpy.array(results[p])
+            x_length = matrix.shape[1]
+            y_length = matrix.shape[0]
+            ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+            ax.set_xticks(numpy.arange(x_length) + 0.5)
+            ax.set_yticks(numpy.arange(y_length) + 0.5)
+            #ax.xaxis.tick_top()
+            #ax.yaxis.tick_left()
+            ax.set_xlim(0, x_length)
+            ax.set_ylim(0, y_length)
+            ax.invert_yaxis()
+            ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+            ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+            ax.tick_params(width=0)
+            p = p + 1
+    plots[0][0].set_ylabel('User-Role Matrix',fontsize=14)
+    plots[0][1].set_ylabel('Role-Permission Matrix',fontsize=14)
+    plots[1][0].set_ylabel('User-Permission Matrix',fontsize=14)
+    plots[1][0].set_xlabel('Gen=' + str(generation),fontsize=14)
+    plots[1][1].set_ylabel('Original',fontsize=14)
+    #fig.tight_layout()
+    fig.set_tight_layout(True)
+
+    if (saveAsPDF):
+        print("Save plot for Top "+str(i)+" as PDF...")
+        pp = PdfPages(evolution_filename+"_"+str(i)+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save plot for Top "+str(i)+" as SVG...")
+        plt.savefig(evolution_filename+"_"+str(i)+".svg")
+
+    if (saveAsPNG):
+        print("Save plot for Top "+str(i)+" as PNG...")
+        plt.savefig(evolution_filename+"_"+str(i)+".png")
+        if (showPNG):
+            print("Show plot...")
+            #plt.show()
+            os.startfile(evolution_filename+"_"+str(i)+".png")
+
+    plt.close('all')
+
+# -----------------------------------------------------------------------------------------
+# Visualize the URMatrix, PRMatrix and UPMatrix
+# -----------------------------------------------------------------------------------------
+def showRoleModel(UMatrix, PMatrix, UPMatrix, filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    results = []
+    results.append(UMatrix)
+    results.append(PMatrix)
+    results.append(UPMatrix)
+    results.append(UPMatrix)
+
+    fig, plots = plt.subplots(2, 2,figsize=(16,12))
+    p = 0
+    for ay in plots:
+        for ax in ay:
+            matrix = numpy.array(results[p])
+            x_length = matrix.shape[1]
+            y_length = matrix.shape[0]
+            ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+            ax.set_xticks(numpy.arange(x_length) + 0.5)
+            ax.set_yticks(numpy.arange(y_length) + 0.5)
+            #ax.xaxis.tick_top()
+            #ax.yaxis.tick_left()
+            ax.set_xlim(0, x_length)
+            ax.set_ylim(0, y_length)
+            ax.invert_yaxis()
+            ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+            ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+            ax.tick_params(width=0)
+            p = p + 1
+    plots[0][0].set_ylabel('User-Role Matrix',fontsize=14)
+    plots[0][1].set_ylabel('Role-Permission Matrix',fontsize=14)
+    plots[1][0].set_ylabel('User-Permission Matrix',fontsize=14)
+    plots[1][1].set_ylabel('User-Permission Matrix',fontsize=14)
+    #fig.tight_layout()
+    fig.set_tight_layout(True)
+
+    if (saveAsPDF):
+        print("Save plot as PDF...")
+        pp = PdfPages(filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save plot as SVG...")
+        plt.savefig(filename+".svg")
+
+    if (saveAsPNG):
+        print("Save plot as PNG...")
+        plt.savefig(filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            #plt.show()
+            os.startfile(filename+".png")
+
+    plt.close('all')
+
 def showMatrix(matrix):
     fig, ax = plt.subplots()
     matrix = numpy.array(matrix)

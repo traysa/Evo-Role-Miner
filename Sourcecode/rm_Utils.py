@@ -75,6 +75,40 @@ def resolveChromosomeIntoArrays(chromosome, userSize, permissionSize):
     return UMatrix, PMatrix, UPMatrix
 
 # -----------------------------------------------------------------------------------
+# Resolves individuals into an boolean UP-matrix
+# -----------------------------------------------------------------------------------
+def resolveIndividualsIntoArray(individuals, userSize, permissionSize):
+    matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
+    for ind in individuals:
+        user_list = ind[0][0]
+        permission_list = ind[0][1]
+        for user in user_list:
+            for permission in permission_list:
+                matrix[user - 1][permission - 1] = 1
+    return matrix
+
+# -----------------------------------------------------------------------------------
+# Resolves a chromosome into an UR-matrix, RP-matrix and integer UP-matrix
+# -----------------------------------------------------------------------------------
+def resolveIndividualsIntoArrays(individuals, userSize, permissionSize):
+
+    UMatrix = matrixOps.createEmptyMatrix(userSize, len(individuals))
+    for i,ind in enumerate(individuals):
+        user_list = ind[0][0]
+        for user in user_list:
+            UMatrix[user - 1][i] = 1
+
+    PMatrix = matrixOps.createEmptyMatrix(len(individuals),permissionSize)
+    for i,ind in enumerate(individuals):
+        permission_list = ind[0][1]
+        for permission in permission_list:
+            PMatrix[i][permission - 1] = 1
+
+    UPMatrix = resolveIndividualsIntoArray(individuals, userSize, permissionSize)
+
+    return UMatrix, PMatrix, UPMatrix
+
+# -----------------------------------------------------------------------------------
 # Generate a random gene (role)
 # -----------------------------------------------------------------------------------
 def generateGene(userSize, permissionSize):
