@@ -392,12 +392,12 @@ def showAllRoles(top_pop, generation, Original, evolution_filename, saveAsPDF, s
 # -----------------------------------------------------------------------------------------
 # Visualize the URMatrix, PRMatrix and UPMatrix
 # -----------------------------------------------------------------------------------------
-def showRoleModel(UMatrix, PMatrix, UPMatrix, filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+def showRoleModel(UMatrix, PMatrix, UPMatrix, UPMatrixWithNoise, filename, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
     results = []
     results.append(UMatrix)
     results.append(PMatrix)
     results.append(UPMatrix)
-    results.append(UPMatrix)
+    results.append(UPMatrixWithNoise)
 
     fig, plots = plt.subplots(2, 2,figsize=(16,12))
     p = 0
@@ -421,7 +421,7 @@ def showRoleModel(UMatrix, PMatrix, UPMatrix, filename, saveAsPDF, saveAsSVG, sa
     plots[0][0].set_ylabel('User-Role Matrix',fontsize=14)
     plots[0][1].set_ylabel('Role-Permission Matrix',fontsize=14)
     plots[1][0].set_ylabel('User-Permission Matrix',fontsize=14)
-    plots[1][1].set_ylabel('User-Permission Matrix',fontsize=14)
+    plots[1][1].set_ylabel('User-Permission Matrix With Noise',fontsize=14)
     #fig.tight_layout()
     fig.set_tight_layout(True)
 
