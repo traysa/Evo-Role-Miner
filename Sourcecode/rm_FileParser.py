@@ -15,11 +15,11 @@ def read(filename):
     lines = data.splitlines()
 
     # Count users
-    userCount = max(list(map(int, re.findall('u_U(.+?) ', data))))+1
+    userCount = max(list(map(int, re.findall('u_U(.+?)[\n\r\s]+', data))))+1
     print("userCount: "+str(userCount))
 
     # Count permissions
-    permCount = max(list(map(int, re.findall('p_P(.+?) ', data))))+1
+    permCount = max(list(map(int, re.findall('p_P(.+?)[\n\r\s]+', data))))+1
     print("permCount: "+str(permCount))
 
     # Create UP Matrix
