@@ -31,7 +31,7 @@ def resolveChromosomeIntoArray(chromosome, userSize, permissionSize):
         permission_list = chromosome[gene][1]
         for user in user_list:
             for permission in permission_list:
-                matrix[user - 1][permission - 1] = 1
+                matrix[user][permission] = 1
     return matrix
 
 # -----------------------------------------------------------------------------------
@@ -47,10 +47,11 @@ def resolveChromosomeIntoArray2(chromosome, userSize, permissionSize):
         permission_list = chromosome[gene][1]
         for user in user_list:
             for permission in permission_list:
-                if (matrix[user - 1][permission - 1] == 0):
-                    matrix[user - 1][permission - 1] += gene+1
-                else:
-                    matrix[user - 1][permission - 1] = len(chromosome)+1
+                matrix[user][permission] += 1
+                #if (matrix[user][permission] == 0):
+                #    matrix[user][permission] += 1 #gene+1
+                #else:
+                #    matrix[user][permission] += 1 #len(chromosome)+1
     return matrix
 
 # -----------------------------------------------------------------------------------
@@ -60,17 +61,23 @@ def resolveChromosomeIntoArrays(chromosome, userSize, permissionSize):
 
     UMatrix = matrixOps.createEmptyMatrix(userSize, len(chromosome))
     for gene in range(0, len(chromosome)):
-        user_list = chromosome[gene][0]
-        for user in user_list:
-            UMatrix[user - 1][gene] = 1
+        user_set = chromosome[gene][0]
+        for user in user_set:
+            UMatrix[user][gene] = 1
+    #print("\nUMatrix")
+    #print(UMatrix)
 
     PMatrix = matrixOps.createEmptyMatrix(len(chromosome),permissionSize)
     for gene in range(0, len(chromosome)):
         permission_list = chromosome[gene][1]
         for permission in permission_list:
-            PMatrix[gene][permission - 1] = 1
+            PMatrix[gene][permission] = 1
+    #print("\nPMatrix")
+    #print(PMatrix)
 
     UPMatrix = resolveChromosomeIntoArray2(chromosome, userSize, permissionSize)
+    #print("\nUPMatrix")
+    #print(UPMatrix)
 
     return UMatrix, PMatrix, UPMatrix
 
@@ -84,7 +91,7 @@ def resolveIndividualsIntoArray(individuals, userSize, permissionSize):
         permission_list = ind[0][1]
         for user in user_list:
             for permission in permission_list:
-                matrix[user - 1][permission - 1] = 1
+                matrix[user][permission] = 1
     return matrix
 
 # -----------------------------------------------------------------------------------
@@ -96,13 +103,13 @@ def resolveIndividualsIntoArrays(individuals, userSize, permissionSize):
     for i,ind in enumerate(individuals):
         user_list = ind[0][0]
         for user in user_list:
-            UMatrix[user - 1][i] = 1
+            UMatrix[user][i] = 1
 
     PMatrix = matrixOps.createEmptyMatrix(len(individuals),permissionSize)
     for i,ind in enumerate(individuals):
         permission_list = ind[0][1]
         for permission in permission_list:
-            PMatrix[i][permission - 1] = 1
+            PMatrix[i][permission] = 1
 
     UPMatrix = resolveIndividualsIntoArray(individuals, userSize, permissionSize)
 
@@ -115,21 +122,60 @@ def generateGene(userSize, permissionSize):
     gene = []
     # Create random length list of users
     user_list = []
-    for i in range(1, userSize + 1):
+    for i in range(0, userSize):
         if (random.randint(0, 1)):
             user_list.append(i)
     if (len(user_list) < 1):
-        user_list.append(random.randint(1, userSize))
+        user_list.append(random.randint(0, userSize))
     gene.append(user_list)
     # Create random length list of permissions
-    permisson_list = []
-    for i in range(1, permissionSize + 1):
+    permission_list = []
+    for i in range(0, permissionSize):
         if (random.randint(0, 1)):
-            permisson_list.append(i)
-    if (len(permisson_list) < 1):
-        permisson_list.append(random.randint(1, permissionSize))
-    gene.append(permisson_list)
+            permission_list.append(i)
+    if (len(permission_list) < 1):
+        permission_list.append(random.randint(0, permissionSize))
+    gene.append(permission_list)
     return gene
+
+def generateGene3(userUsage, permissionUsage):
+    gene = []
+    # Create random length list of users
+    user_set = set()
+    unusedUsers = [u for u in range(len(userUsage)) if userUsage[u]==0]
+    if (unusedUsers):
+        user = random.sample(unusedUsers,1)[0] # Ensure that user list is not empty and unused users are used first
+        user_set.add(user)
+        userUsage[user] += 1
+    for i in range(random.randint(0,len(userUsage))):
+        user = random.sample(range(0,len(userUsage)),1)[0]
+        if (user not in user_set):
+            user_set.add(user)
+            userUsage[user] += 1
+    if (len(user_set)==0):
+        user = random.sample(range(0,len(userUsage)),1)[0]
+        user_set.add(user)
+        userUsage[user] += 1
+    gene.append(user_set)
+
+    # Create random length list of permissions
+    permission_set = set()
+    unusedPermissions = [u for u in range(len(permissionUsage)) if permissionUsage[u]==0]
+    if (unusedPermissions):
+        permission = random.sample(unusedPermissions,1)[0] # Ensure that user list is not empty and unused users are used first
+        permission_set.add(permission)
+        permissionUsage[permission] += 1
+    for i in range(random.randint(0,len(permissionUsage))):
+        permission = random.sample(range(0,len(permissionUsage)),1)[0]
+        if (permission not in permission_set):
+            permission_set.add(permission)
+            permissionUsage[permission] += 1
+    if (len(permission_set)==0):
+        permission = random.sample(range(0,len(permissionUsage)),1)[0]
+        permission_set.add(permission)
+        userUsage[user] += 1
+    gene.append(permission_set)
+    return gene, userUsage, permissionUsage
 
 def generateGene2(permissions, attributes):
     gene = []
@@ -151,37 +197,44 @@ def generateGene2(permissions, attributes):
 # -----------------------------------------------------------------------------------
 def combineObjects(offspring, index):
     values = numpy.array(offspring)[:, index]
-    removalList = []
+    removalSet = set()
     # print("\nUSER COMBINING: "+str(values))
     for x, left in enumerate(values):
-        for y, right in enumerate(values[x:]):
-            if ((y + x not in removalList) & (x != y + x) & (len(left) == len(right)) & (
-                        len(left) == (len(set(left) & set(right))))):
-                # print("USER COMBINING: item%s in %s has %s values in common with item%s" % (x, values, len(left), y + x))
-                offspring[x][1] = list(set(offspring[x][1]) | set(offspring[y + x][1]))
-                offspring[y + x][0] = []
-                removalList.append(y + x)
-    removalList.sort()
-    i = len(removalList) - 1
-    #print(removalList)
-    while i >= 0:
-        #print("offspring:\n" + str(offspring))
+        for y, right in enumerate(values[x+1:]):
+            if ((y+1+x) not in removalSet and len(left ^ right)==0):
+                offspring[x][index] = offspring[x][index] | offspring[y+1 + x][index]
+                offspring[y+1 + x][index] = set()
+                removalSet.add(y+1 + x)
+    removalList = list(removalSet)
+    sorted(removalList)
+    if (len(removalList) > 1):
+        temp = 0
+    while removalList:
         try:
-            del offspring[removalList[i]]
+            del offspring[removalList.pop()]
         except IndexError:
             temp = 0
             raise
-        i = i - 1
     return offspring
+
 
 # -----------------------------------------------------------------------------------
 # Local optimization by user combining and permission combining
 # -----------------------------------------------------------------------------------
 def localOptimization(offspring):
     if (True):
-        'Combine Users'
-        offspring = combineObjects(offspring, 0)
         'Combine Permissions'
         offspring = combineObjects(offspring, 1)
+        'Combine Users'
+        offspring = combineObjects(offspring, 0)
+
         # print("\nOPTIMIZATION: "+str(offspring))
+        #'Remove similar Genes'
+        #offspring = removeSimilarGenes(offspring)
     return offspring
+
+def compareMatrices(MatrixA,MatrixB):
+    diffMatrix = matrixOps.subtractIntMatrix(A=numpy.matrix(MatrixA,dtype=bool), B=numpy.matrix(MatrixB,dtype=bool))
+    'Violation of confidentiality and data availability'
+    conf, accs = matrixOps.countDiffs(diffMatrix)
+    return conf, accs

@@ -10,138 +10,15 @@ import fortin2013
 import fortin2013_weighted
 import nsga2_classic as nsga2
 import nsga2_weighted
+import rm_EAOperators as ops
+import rm_EAEvaluations as evals
 from collections import defaultdict
-
-# -----------------------------------------------------------------------------------
-# Evolutionary algorithm functions
-# -----------------------------------------------------------------------------------
-# Initialization
-def generateChromosome(maxRoles, userSize, permissionSize):
-    chromosome = []
-    # Create random number of genes (roles) for one chromosome
-    for i in range(0, random.randint(1, maxRoles)):
-        gene = utils.generateGene(userSize, permissionSize)
-        # Add gene to chromosome
-        chromosome.append(gene)
-    chromosome = utils.localOptimization(chromosome)
-    return chromosome
-
-# -----------------------------------------------------------------------------------
-# Single Objective Evaluation Functions
-# -----------------------------------------------------------------------------------
-# Violataions
-def evalFunc_Obj1(individual, userSize, permissionSize, orig):
-    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
-    'Violation of confidentiality and data availability'
-    conf, accs = matrixOps.countDiffs(diffMatrix)
-    #numberOfRoles = len(individual[0])
-    #return conf, accs, numberOfRoles
-    temp = (conf+accs)
-    return temp,
-# Number of Roles
-def evalFunc_Obj2(individual, userSize, permissionSize, orig):
-    numberOfRoles = len(individual[0])
-    return numberOfRoles,
-# Number of Roles + Violations (from paper)
-def evalFunc_Saenko(individual, userSize, permissionSize, orig):
-    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
-    'Violation of confidentiality and data availability'
-    conf, accs = matrixOps.countDiffs(diffMatrix)
-    numberOfRoles = len(individual[0])
-    w1 = 0.00001
-    w2 = 1
-    w3 = 1
-    temp = (w1 * numberOfRoles + w2 * conf + w3 * accs)**(-1)
-    return temp,
-# Number of Roles + Violations as euclidean (from paper)
-def evalFunc_Saenko_Euclidean(individual, userSize, permissionSize, orig):
-    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    dist = numpy.linalg.norm(array-numpy.matrix(orig,dtype=bool)) #Frobenius norm, also called the Euclidean norm
-    numberOfRoles = len(individual[0])
-    w1 = 1
-    w2 = 10
-    temp = (w1 * numberOfRoles + w2 * dist)**(-1)
-    return temp,
-
-def evalFunc_Generalization_Error(individual, UPA2):
-
-    return 0
-
-# -----------------------------------------------------------------------------------
-# Multi Objective Evaluation Functions
-# -----------------------------------------------------------------------------------
-def evalFunc_Multi(individual, userSize, permissionSize, orig):
-    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
-    'Violation of confidentiality and data availability'
-    conf, accs = matrixOps.countDiffs(diffMatrix)
-    numberOfRoles = len(individual[0])
-    temp = (conf+accs)
-    return temp, numberOfRoles
-
-def evalFunc_Multi_EuclideanDistance(individual, userSize, permissionSize, orig):
-    array = utils.resolveChromosomeIntoArray(individual[0], userSize, permissionSize)
-    dist = numpy.linalg.norm(array-numpy.matrix(orig,dtype=bool)) #Frobenius norm, also called the Euclidean norm
-    numberOfRoles = len(individual[0])
-    return dist, numberOfRoles
-
-# Mutation Function
-def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, userSize, permissionSize):
-    #print("Mutation")
-    if random.random() < addRolePB:
-        gene = utils.generateGene(userSize, permissionSize)
-        individual[0].append(gene)
-        individual[0] = utils.localOptimization(individual[0])
-    if ((len(individual[0]) > 1) and (random.random() < removeRolePB)):
-        role = individual[0][random.randint(0, len(individual[0]) - 1)]
-        del role
-    if random.random() < removeUserPB:
-        role = individual[0][random.randint(0, len(individual[0]) - 1)]
-        if (len(role[0]) > 1):
-            del role[0][random.randint(0, len(role[0]) - 1)]
-            individual[0] = utils.localOptimization(individual[0])
-    if random.random() < removePermissionPB:
-        role = individual[0][random.randint(0, len(individual[0]) - 1)]
-        if (len(role[1]) > 1):
-            del role[1][random.randint(0, len(role[1]) - 1)]
-            individual[0] = utils.localOptimization(individual[0])
-    if random.random() < addUserPB:
-        # Pick random gene (role)
-        role = individual[0][random.randint(0, len(individual[0]) - 1)]
-        length = len(role[0])
-        #userSet = {x for x in range(1, userSize + 1)}
-        # Add exactly 1 user, if the role does not already contain all users
-        while ((length < userSize) and (len(role[0]) == length)):            #
-            role[0] = list(set(role[0]) | {random.randint(1, userSize)})
-        individual[0] = utils.localOptimization(individual[0])
-    if random.random() < addPermissionPB:
-        role = individual[0][random.randint(0, len(individual[0]) - 1)]
-        length = len(role[1])
-        while ((length < permissionSize) and (len(role[1]) == length)):
-            role[1] = list(set(role[1]) | {random.randint(1, permissionSize)})
-        individual[0] = utils.localOptimization(individual[0])
-    return individual,
-
-# Crossover Function
-def mateFunc(ind1, ind2):
-    #print("Crossover")
-    temp1 = ind1[0]
-    temp2 = ind2[0]
-    size = min(len(temp1), len(temp2))
-    if size > 1:
-        cxpoint = random.randint(1, size - 1)
-        temp1[cxpoint:], temp2[cxpoint:] = temp2[cxpoint:], temp1[cxpoint:]
-        temp1 = utils.localOptimization(temp1)
-        temp2 = utils.localOptimization(temp2)
-    return ind1, ind2
 
 
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - One objective
 # -----------------------------------------------------------------------------------
-def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile):
+def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, checkpoint, prevFiles, directory, pickleFile):
     print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
@@ -192,25 +69,25 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
     # Toolbox
     toolbox = base.Toolbox()
     # Chromosome generator
-    toolbox.register("chromosome", generateChromosome, userSize, userSize, permissionSize)
+    toolbox.register("chromosome", ops.generateChromosome, maxRoles=userSize, userSize=userSize, permissionSize=permissionSize)
     # Structure initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
     if (evalFunc=="Obj1"):
-        toolbox.register("evaluate", evalFunc_Obj1, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Obj1, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Obj2"):
-        toolbox.register("evaluate", evalFunc_Obj2, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Obj2, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Saenko"):
-        toolbox.register("evaluate", evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Saenko_Euclidean"):
-        toolbox.register("evaluate", evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original)
     else:
         raise ValueError('Evaluation function not known')
-    toolbox.register("mate", mateFunc)
-    toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3,
-                     removePermissionPB=MUTPB_4, addUserPB=MUTPB_5, addPermissionPB=MUTPB_6,
+    toolbox.register("mate", ops.mateFunc)
+    toolbox.register("mutate", ops.mutFunc, addRolePB=addRolePB, removeRolePB=removeRolePB, removeUserPB=removeUserPB,
+                     removePermissionPB=removePermissionPB, addUserPB=addUserPB, addPermissionPB=addPermissionPB,
                      userSize=userSize, permissionSize=permissionSize)
     toolbox.register("select", tools.selTournament, tournsize=5)
 
@@ -296,12 +173,12 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
               CXPB=CXPB,
               prevFiles=prevFiles,
               MUTPB_All=MUTPB_All,
-              MUTPB_1=MUTPB_1,
-              MUTPB_2=MUTPB_2,
-              MUTPB_3=MUTPB_3,
-              MUTPB_4=MUTPB_4,
-              MUTPB_5=MUTPB_5,
-              MUTPB_6=MUTPB_6,
+              addRolePB=addRolePB,
+              removeRolePB=removeRolePB,
+              removeUserPB=removeUserPB,
+              removePermissionPB=removePermissionPB,
+              addUserPB=addUserPB,
+              addPermissionPB=addPermissionPB,
               logbook=logbook)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("DONE.\n")
@@ -311,7 +188,7 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTP
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - Multi objective
 # -----------------------------------------------------------------------------------
-def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
+def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
     if (not(populationSize % 4 == 0)):
         raise ValueError("Population size has to be a multiple of 4")
     print("Prepare evolutionary algorithm...")
@@ -355,22 +232,26 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1
     # Toolbox
     toolbox = base.Toolbox()
     # Chromosome generator
-    toolbox.register("chromosome", generateChromosome, userSize, userSize, permissionSize)
+    toolbox.register("chromosome", ops.generateChromosome, userSize, userSize, permissionSize)
     # Structure initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
     if (evalFunc=="Normal"):
-        toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Euclidean"):
-        toolbox.register("evaluate", evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
     else:
         raise ValueError("Unknown Evaluation Function: "+evalFunc)
 
-    toolbox.register("mate", mateFunc)
-    toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3, removePermissionPB=MUTPB_4,
-                     addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
+    toolbox.register("mate", ops.mateFunc)
+    toolbox.register("mutate", ops.mutFunc, addRolePB=addRolePB,
+              removeRolePB=removeRolePB,
+              removeUserPB=removeUserPB,
+              removePermissionPB=removePermissionPB,
+              addUserPB=addUserPB,
+              addPermissionPB=addPermissionPB, userSize=userSize, permissionSize=permissionSize)
     if (fortin):
         toolbox.register("preselect", fortin2013.selTournamentFitnessDCD)
         toolbox.register("select", fortin2013.selNSGA2)
@@ -488,12 +369,12 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1
               CXPB=CXPB,
               prevFiles=prevFiles,
               MUTPB_All=MUTPB_All,
-              MUTPB_1=MUTPB_1,
-              MUTPB_2=MUTPB_2,
-              MUTPB_3=MUTPB_3,
-              MUTPB_4=MUTPB_4,
-              MUTPB_5=MUTPB_5,
-              MUTPB_6=MUTPB_6,
+              addRolePB=addRolePB,
+              removeRolePB=removeRolePB,
+              removeUserPB=removeUserPB,
+              removePermissionPB=removePermissionPB,
+              addUserPB=addUserPB,
+              addPermissionPB=addPermissionPB,
               logbook=logbook)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("DONE.\n")
@@ -503,7 +384,12 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, MUTPB_1
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - Multi objective with weights
 # -----------------------------------------------------------------------------------
-def evolution_multi_weighted(Original, evalFunc, populationSize, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
+def evolution_multi_weighted(Original, evalFunc, populationSize, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, addRolePB,
+              removeRolePB,
+              removeUserPB,
+              removePermissionPB,
+              addUserPB,
+              addPermissionPB, NGEN, freq, checkpoint, prevFiles, directory, pickleFile, fortin=False):
     if (not(populationSize % 4 == 0)):
         raise ValueError("Population size has to be a multiple of 4")
     print("Prepare evolutionary algorithm...")
@@ -548,22 +434,26 @@ def evolution_multi_weighted(Original, evalFunc, populationSize, OBJ1PB, OBJ2PB,
     # Toolbox
     toolbox = base.Toolbox()
     # Chromosome generator
-    toolbox.register("chromosome", generateChromosome, userSize, userSize, permissionSize)
+    toolbox.register("chromosome", ops.generateChromosome, userSize, userSize, permissionSize)
     # Structure initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
     if (evalFunc=="Normal"):
-        toolbox.register("evaluate", evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Euclidean"):
-        toolbox.register("evaluate", evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
     else:
         raise ValueError("Unknown Evaluation Function: "+evalFunc)
 
-    toolbox.register("mate", mateFunc)
-    toolbox.register("mutate", mutFunc, addRolePB=MUTPB_1, removeRolePB=MUTPB_2, removeUserPB=MUTPB_3, removePermissionPB=MUTPB_4,
-                     addUserPB=MUTPB_5, addPermissionPB=MUTPB_6, userSize=userSize, permissionSize=permissionSize)
+    toolbox.register("mate", ops.mateFunc)
+    toolbox.register("mutate", ops.mutFunc, addRolePB=addRolePB,
+              removeRolePB=removeRolePB,
+              removeUserPB=removeUserPB,
+              removePermissionPB=removePermissionPB,
+              addUserPB=addUserPB,
+              addPermissionPB=addPermissionPB, userSize=userSize, permissionSize=permissionSize)
 
     if (fortin):
         toolbox.register("preselect", fortin2013_weighted.selTournamentFitnessDCD, probabilitiesForObjectives=probabilitiesForObjectives)
@@ -685,12 +575,12 @@ def evolution_multi_weighted(Original, evalFunc, populationSize, OBJ1PB, OBJ2PB,
               CXPB=CXPB,
               prevFiles=prevFiles,
               MUTPB_All=MUTPB_All,
-              MUTPB_1=MUTPB_1,
-              MUTPB_2=MUTPB_2,
-              MUTPB_3=MUTPB_3,
-              MUTPB_4=MUTPB_4,
-              MUTPB_5=MUTPB_5,
-              MUTPB_6=MUTPB_6,
+              addRolePB=addRolePB,
+              removeRolePB=removeRolePB,
+              removeUserPB=removeUserPB,
+              removePermissionPB=removePermissionPB,
+              addUserPB=addUserPB,
+              addPermissionPB=addPermissionPB,
               logbook=logbook)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("DONE.\n")

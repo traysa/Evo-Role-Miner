@@ -6,7 +6,9 @@ __author__ = 'Theresa'
 
 import numpy
 import rm_Visualization as visual
-import rm_GeneticAlgorithms as ga
+import rm_EvoAlg_SingleObj as ea_single
+import rm_EvoAlg_MultiObj as ea_multi
+import rm_EvoAlg_MultiObj_weighted as ea_multi_w
 import os.path
 import tkinter as tk
 from tkinter import filedialog
@@ -28,8 +30,8 @@ showEvolutionPNG = True
 
 roleModelsAsPDF = False
 roleModelsAsSVG = False
-roleModelsAsPNG = False
-showRoleModelsPNG = False
+roleModelsAsPNG = True
+showRoleModelsPNG = True
 
 logPlotAsPDF = False
 logPlotAsSVG = False
@@ -78,15 +80,15 @@ def startExperiment(Name, Original, DATA, POP_SIZE, CXPB,
     logbook = tools.Logbook()
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ga.evolution(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5,
+            ea_single.evolution(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5,
                          MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ga.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
+            ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
                                           MUTPB_5, MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013"))
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ga.evolution_multi_weighted(Original, evalFunc, POP_SIZE, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
+            ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
                                           MUTPB_5, MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013_Weighted"))
     else:
         raise ValueError('Evolution type not known')

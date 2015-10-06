@@ -146,7 +146,7 @@ def generateRoles4(roleCnt,permissionCnt, maxPermissionUsage, configPermissionsF
         while (0 in permissionUsage):
             unusedPermissions = [p for p in range(permissionCnt) if permissionUsage[p]==0]
             for unusedPermission in unusedPermissions:
-                selectedRole = random.randint(0,roleCnt)
+                selectedRole = random.randint(0,roleCnt-1)
                 permissions = roles[selectedRole]
                 selectedPermission = permissions.pop()
                 permissionUsage[selectedPermission] -= 1
@@ -412,15 +412,15 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoi
     print("DONE.\n")
 
 attributes = [['Sales','Motor','Administration'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
-userCnt = 46 #Total number of users
-userTypeCnt = 7 #Number of different usertypes (usertype is desribed by the users attributes)
-permissionCnt = 46 #Total number of permissions
-roleCnt = 18 #Total number of roles
+userCnt = 5 #Total number of users
+userTypeCnt = 5 #Number of different usertypes (usertype is desribed by the users attributes)
+permissionCnt = 7 #Total number of permissions
+roleCnt = 3 #Total number of roles
 configPermissionsForRoles = [(0.2,10,20),(0.8,1,5)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
 #RPdensity = 0.8
 #maxPermissionForRole = 46
 maxPermissionUsage = 3 #How often a permission can occur in different roles
-maxRuleConditionCnt = 3 #
+maxRuleConditionCnt = 2 #
 noise = [0.01,0.04] #Artificial noise (bit-flip in UP-Matrix):[users with to few permissions, users with too many permissions]
 
 #roles = generateRoles3(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage, RPdensity)

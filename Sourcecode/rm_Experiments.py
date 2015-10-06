@@ -22,6 +22,10 @@ def getDataSet(DATA):
         Original = numpy.matrix(testdata2)
     elif (DATA=="random"):
         Original = utils.generateGoalMatrix(4, 10, 10)
+    elif (DATA=="GeneratedData"):
+        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151004-191825\\testdata.rbac"))
+    elif (DATA=="GeneratedData_small"):
+        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151005-194203\\testdata.rbac"))
     return Original
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -29,17 +33,24 @@ def getDataSet(DATA):
 # ----------------------------------------------------------------------------------------------------------------------
 timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 Name = timestamp+"_"+"Default_Experiment"
-DATA="testdata"
+DATA="GeneratedData"
 Original = getDataSet(DATA)
 POP_SIZE = 100
-CXPB = 0.25
-MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6 = 0.25,0.25,0.25,0.25,0.25,0.25,0.25
-NGEN = 10
+CXPB = 0.5
+MUTPB_All = 0.5
+addRolePB = 0.5
+removeRolePB = 0.5
+removeUserPB = 0.5
+removePermissionPB = 0.5
+addUserPB = 0.5
+addPermissionPB = 0.5
+NGEN = 1000
 freq = 1
-evolutionType = "Multi_Weighted"
-evalFunc = "Normal"
+evolutionType = "Single"
+evalFunc = "Saenko"
 OBJ1PB = 1.0
-OBJ2PB = 1.0
+OBJ2PB = 0.01
+#OBJ3PB = 1.0
 
 # ----------------------------------------------------------------------------------------------------------------------
 # IMPORT EXPERIMENTS SEQUENCE FILE
@@ -59,7 +70,7 @@ if (selectedFile != ''):
 # START EXPERIMENT
 # ----------------------------------------------------------------------------------------------------------------------
 if (selectedFile == ''):
-    rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6,
+    rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                    NGEN,freq,evolutionType,evalFunc,OBJ1PB=OBJ1PB,OBJ2PB=OBJ2PB)
 else:
     print("Experiment Settings: ")
@@ -85,18 +96,18 @@ else:
         if ("MUTPB_All" in experiment.keys()):
             MUTPB_All = float(experiment["MUTPB_All"])
             print("MUTPB_All: "+str(MUTPB_All))
-        if ("MUTPB_1" in experiment.keys()):
-            MUTPB_1 = float(experiment["MUTPB_1"])
-        if ("MUTPB_2" in experiment.keys()):
-            MUTPB_2 = float(experiment["MUTPB_2"])
-        if ("MUTPB_3" in experiment.keys()):
-            MUTPB_3 = float(experiment["MUTPB_3"])
-        if ("MUTPB_4" in experiment.keys()):
-            MUTPB_4 = float(experiment["MUTPB_4"])
-        if ("MUTPB_5" in experiment.keys()):
-            MUTPB_5 = float(experiment["MUTPB_5"])
-        if ("MUTPB_6" in experiment.keys()):
-            MUTPB_6 = float(experiment["MUTPB_6"])
+        if ("addRolePB" in experiment.keys()):
+            addRolePB = float(experiment["addRolePB"])
+        if ("removeRolePB" in experiment.keys()):
+            removeRolePB = float(experiment["removeRolePB"])
+        if ("removeUserPB" in experiment.keys()):
+            removeUserPB = float(experiment["removeUserPB"])
+        if ("removePermissionPB" in experiment.keys()):
+            removePermissionPB = float(experiment["removePermissionPB"])
+        if ("addUserPB" in experiment.keys()):
+            addUserPB = float(experiment["addUserPB"])
+        if ("addPermissionPB" in experiment.keys()):
+            addPermissionPB = float(experiment["addPermissionPB"])
         if ("NGEN" in experiment.keys()):
             NGEN = int(experiment["NGEN"])
             print("NGEN: "+str(NGEN))
@@ -112,5 +123,5 @@ else:
 
         print("Start Experiment...")
 
-        rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5, MUTPB_6,
+        rm.startExperiment(Name,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                        NGEN,freq,evolutionType,evalFunc,OBJ1PB=OBJ1PB,OBJ2PB=OBJ2PB)

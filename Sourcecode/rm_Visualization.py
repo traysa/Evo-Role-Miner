@@ -279,6 +279,7 @@ def showBestResult(top_pop, generation, Original, evolution_filename, saveAsPDF,
         #    bestInd = ind
     #if (bestInd != []):
         UMatrix, PMatrix, UPMatrix = utils.resolveChromosomeIntoArrays(ind[0], Original.shape[0], Original.shape[1])
+
         results.append(UMatrix)
         results.append(PMatrix)
         results.append(UPMatrix)
@@ -291,7 +292,10 @@ def showBestResult(top_pop, generation, Original, evolution_filename, saveAsPDF,
                 matrix = numpy.array(results[p])
                 x_length = matrix.shape[1]
                 y_length = matrix.shape[0]
-                ax.pcolor(matrix, cmap=plt.cm.Blues, edgecolors='#FFFFFF', linewidths=0.5)
+                cmap = plt.cm.Blues
+                cmap.set_under('white') # Color for values less than vmin
+                eps = numpy.spacing(0.0) # Very small float such that 0.0 != 0 + eps
+                ax.pcolor(matrix, cmap=cmap, vmin=eps, edgecolors='#FFFFFF', linewidths=0.5)
                 ax.set_xticks(numpy.arange(x_length) + 0.5)
                 ax.set_yticks(numpy.arange(y_length) + 0.5)
                 #ax.xaxis.tick_top()
