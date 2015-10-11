@@ -1,0 +1,139 @@
+\newpage
+\section{Experiments}
+This chapter describes the setup of the experiments executed. First the data sets used in the experiments are described. Then the measures and the setup of the experiments are introduced.
+
+\subsection{Data Sets}
+\subsubsection{Synthetic Datasets}
+Some papers are providing data generators for synthetic datasets for the performance evaluation of the various role mining algorithms. The data generator in \cite{Vaidya:2006:RMR:1180405.1180424} takes as input the number of users, permissions and roles to generate a pair of User-Role-Assignment and Role-Permission-Assignment matrices. Combining these two matrices, the corresponding User-Permission-Assignment matrix is obtained.
+In the data generator introduced in [Lu et al. 2014]...\\
+"In [Lu et al. 2014], several sets of synthetic data of varying parameters are used. The data gen- erator takes as input the number of users and permissions, density of 1s in the PA, density of 1s in the UA and the noise level to produce the UA and PA matrices."
+
+These data generators only consider users, permissions and their assignment to each other. They do not consider user information. Due to this a new synthetic data generator was created for this thesis, which is described in the following.
+The data generator 
+
+\begin{algorithm}
+\caption{Algorithm for creating an synthetic dataset for testing of role mining algorithms}
+\label{alg:CreateDataSet}
+\begin{algorithmic}[1]
+\Procedure{CreateRoles}{$roleCnt$,$permissionCnt$,$maxPermissionForRole$,$maxPermissionUsage$}
+    \State $roles$ = [ ] for each $roles$[$r$] with $r$ = 0..$roleCnt$-1
+    \State $permissionBucket$ = $maxPermissionUsage$ for each $permissionBucket$[$p$] with $p$ = 0..$permissionCnt$-1
+    \For{$role$ in $roles$ }
+        \State $permissionForRoleCnt$ = pick randomly between 1..$maxPermissionForRole$
+        \State $tempPermissionBucket$ = $permissionBucket$ - $role$
+        \If{\text{length of }$tempPermissionBucket$ \textgreater 0}
+            \State $permission$ = draw randomly number of $permissionForRoleCnt$ out of $tempPermissionBucket$
+            \State $role$.add($permission$)
+        \Else
+            \State Error
+        \EndIf
+    \EndFor
+    \State \Return $roles$
+\EndProcedure
+\State
+\Procedure{CreateUsers}{$userCnt$,$attribute$}
+    \State $users$ = [ ] for each $users$[$u$] with $u$ = 0..$userCnt$-1
+    \For{$user$ in $users$ }
+        \For{$a$,$attrValues$ in $attributes$ }
+            \State $user$[$a$] = pick randomly a value of $attrValues$
+        \EndFor
+    \EndFor
+    \State \Return $users$
+\EndProcedure
+\State
+\Procedure{CreateRules}{$roleCnt$,$attributes$,$maxRuleConditionCnt$}
+    \State $rules$ = [{}] for each $rules$[$r$] with $r$ = 0..$roleCnt$-1
+    \For{$rule$ in $rules$ }
+        \State $selectedAttributes$ = pick $maxRuleConditionCnt$ random $attributes$
+        \For{$a$,$attrValues$ in $selectedAttributes$ }
+            \State $rule$[$a$] = pick randomly values of $attrValues$
+        \EndFor
+    \EndFor
+    \State \Return $rules$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Real Datasets}
+In many research papers the same datasets are used for performance evaluation of role mining Algorithms. Table \ref{tab:realDatasets} lists some of these data sets and their components.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \rowcolor[HTML]{EFEFEF} 
+        \textbf{Dataset} & \textbf{Users} & \textbf{Permissions} & \textbf{User Permission Assignments} \\ \hline
+        healthcare       & 46             & 46                   & 1486                                 \\ \hline
+        domino           & 79             & 231                  & 730                                  \\ \hline
+        emea             & 35             & 3046                 & 7220                                 \\ \hline
+        apj              & 2044           & 1146                 & 6841                                 \\ \hline
+        firewall-1       & 365            & 709                  & 31951                                \\ \hline
+        firewall-2       & 325            & 590                  & 36428                                \\ \hline
+        americas-small   & 3477           & 1587                 & 105205                               \\ \hline
+        americas-large   &                &                      &                                      \\ \hline
+    \end{tabular}
+    \caption{Real Datasets}
+    \label{tab:realDatasets}
+\end{table}
+
+The authors of \cite{Ene} obtained these datasets from Cisco firewalls and the Lotus Domino server of the Hewlett Packard (HP) networks. The healthcare dataset was collected from the US Veteran’s Administration.
+
+Also see \cite{Xu}
+
+\subsection{Visualisation of the RBAC Model}
+
+\subsection{Experiments with Single-Objective GAs}
+\subsubsection{Setup}
+\begin{itemize}
+    \item Number of turns
+    \item Random Start-population
+    \item Fixed Start-population
+\end{itemize}
+\subsubsection{Measures}
+\begin{itemize}
+    \item Fitness (Min, Max, Avg)
+    \item Time complexity
+    \item Space complexity
+\end{itemize}
+
+\subsection{Experiments with Multi-Objective GAs}
+\subsubsection{Setup}
+\begin{itemize}
+    \item Number of turns
+    \item Random Start-population
+    \item Fixed Start-population
+\end{itemize}
+\subsubsection{Measures}
+\begin{itemize}
+    \item Fitness (Min, Max, Avg)
+    \item Time complexity
+    \item Space complexity
+\end{itemize}
+
+\subsection{Experiments with Co-Evolution}
+\subsubsection{Setup}
+\begin{itemize}
+    \item Number of turns
+    \item Random Start-population
+    \item Fixed Start-population
+\end{itemize}
+\subsubsection{Measures}
+\begin{itemize}
+    \item Fitness (Min, Max, Avg)
+    \item Time complexity
+    \item Space complexity
+\end{itemize}
+
+\subsection{Experiments with Human Interaction}
+\subsubsection{Setup}
+\begin{itemize}
+    \item Number of turns
+    \item Random Start-population
+    \item Fixed Start-population
+\end{itemize}
+\subsubsection{Measures}
+\begin{itemize}
+    \item Fitness (Min, Max, Avg)
+    \item Time complexity
+    \item Space complexity
+\end{itemize}

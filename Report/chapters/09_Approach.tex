@@ -1,0 +1,122 @@
+\newpage
+\section{Approach}
+\hl{Content:}
+\begin{itemize}
+    \item \hl{The research method by which you will investigate the world. }
+        \subitem \hl{A short summary of the available methods}
+        \subitem \hl{Your choice}
+        \subitem \hl{Detailed report of how you actually carried out your research. Presenting how you selected the people taking part is of special importance.}
+
+    \item \hl{The third chapter of the Master's Thesis is the Materials and Methods, sometimes also referred to as the Study Design and Methodology. It is in this section that the writer describes the sample population and procedures used in enough detail that others could replicate the study and verify its validity. This section should begin with specific data on the number of study participants, how they were chosen, and relevant demographic information. The writer may also present the rationale for the specific sample size used. Next, all tools and instruments used in the study should be described. If such tools are described in detail elsewhere in the literature, the writer can indicate this along with a relevant reference. Actual surveys or questionnaires will not be presented here. Instead, the writer provides an overview and then inserts copies of the tools into the Appendix at the end of the paper. }
+\end{itemize}
+\\\\
+Limitation of Data Mining Techniques\\
+Why EA?\\
+
+\subsection{Evolutionary algorithm (EA)}
+
+Basis of evolutionary Systems:\cite{Eiben}
+\begin{itemize}
+    \item Variation operators for novelty
+    \item Selection for improving quality
+    \begin{itemize}
+        \item Parent selection and Survivor selection
+    \end{itemize}
+\end{itemize}
+Components, Procedures, Operators to be specified in order to define a particular EA:\cite{Eiben}
+
+\subsubsection{Representation (Definition of individuals)}
+    \begin{itemize}
+        \item Mapping from phenotypes to genotypes (Encoding)\\
+        Finding the genotype \cite{Igor}\\
+        ACL = UxP\\
+        Y = UxR\\
+        X = RxP\\
+        RM = XxY\\
+        Problem: Size of R is unknown\\
+        Solution from \cite{Igor}: 3rd chromosome Z to mark R's as "active" or "passive"\\
+        Other solutions: \\
+        Gray coding??
+        \item Variable = Locus; Value = Allele
+        \item Mapping from genotypes to phenotypes (Decoding)
+    \end{itemize}
+\subsubsection{Evaluation function (or Fitness function)}
+    \begin{itemize}
+        \item represent the requirements to adapt to
+        \item defines what improvement means
+        \item Quality measure to genotypes
+        \item composed from a quality measure in the phenotype space
+        \item Turn minimization problem to maximization problem first
+    \end{itemize}
+\subsubsection{Population}
+    \begin{itemize}
+        \item Multiset of genotypes
+        \item Additional spatial structure: Distance measure or neighbourhood relation
+        \item Measures:
+        \begin{itemize}
+            \item Diversity = Number of different solutions present
+            \item Entropy
+        \end{itemize}
+    \end{itemize}
+\subsubsection{Parent selection mechanism}
+    \begin{itemize}
+        \item Responsible for pushing quality improvements
+        \item typically probabilistic
+        \item low quality individuals also get a small chance in order to avoid local optimums
+    \end{itemize}
+\subsubsection{Variation operators, recombination and mutation}
+    \begin{itemize}
+        \item Create new individuals from old ones
+        \item Mutation
+        \begin{itemize}
+            \item Unary variation operator
+            \item Stochastic: Output (child) depends on random choices
+            \item Guarantees that the space is connected
+        \end{itemize}
+        \item Recombination / Crossover
+        \begin{itemize}
+            \item Binary variation operator
+            \item Merge information from 2 parent genotypes
+            \item Stochastic: Choice of parent parts and their merging depend on random drawings
+            \item Recombination operators with higher arities possible
+        \end{itemize}
+    \end{itemize}
+\subsubsection{Survivor selection mechanism (Replacement)}
+    \begin{itemize}
+        \item Called after creating offsprings
+        \item deterministic
+        \item Replacement strategy
+    \end{itemize}
+\subsubsection{Initialisation procedure}
+    \begin{itemize}
+        \item First population is randomly selected or chosen with higher fitness 
+    \end{itemize}
+\subsubsection{Termination condition}
+    \begin{itemize}
+        \item Known optimal fitness level reached
+        \item Other conditions which certainly stop algorithm
+        \begin{itemize}
+            \item Max. Allowed CPU time
+            \item Total number of fitness evaluations
+            \item Period of time (number of generations or fitness evaluations)
+            \item Population diversity drops under a given threshold
+        \end{itemize}
+    \end{itemize}
+
+\subsection{Genetic Programming (GP)}
+\subsection{Multi-Objective Genetic Algorithms}
+\begin{itemize}
+    \item NSGA2\\
+    Why? The higher the role number (1 Role for each user), the more likely it is to have no violations. The lower the role number, the more violations
+    \item Improved NSGA2 (Fortin)\\
+    Why? Different Individuals have same fitness
+    \item Weighted NSGA2\\
+    Why? 2nd objective is less important\\
+    Issue? Skipped fronts, no symmetry in domination matrix
+\end{itemize}
+
+\subsection{Co-Evolution}
+\subsubsection{Symbiotic, Adaptive Neuro-Evolution (SANE)}
+\subsubsection{Enforced Sub-Populations (ESP)}
+
+\subsection{Human interaction}

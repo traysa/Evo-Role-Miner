@@ -1,0 +1,183 @@
+\newpage
+\section{Background}
+
+    \subsection{Domain Background}
+    In this section a basic introduction to the domain is given. It is important that the motivation and concepts of the domain are known in order to scope the problem definition and for guidance in the implementation of the approach.
+        \subsubsection{Access Control Models}
+        Access control ensures through policy definitions and enforcement that users\footnote{For simplicity the term "User" is used throughout the thesis although the term "subject" would be more general, since they do not only include a user, but also service accounts or any other subject} can only access resources (e.g. files, applications, networks) they are authorized for. The policy definitions describe which user is authorized for which permission. A permission describes which action (e.g. read, write, execute) can be done on a resource.\\
+        There are business, security and regulatory drivers for managing access control policies \cite{o20102010}. The interest of the business is to lowering the costs for managing the permissions for employees and quickly equip employees with necessary permissions such that they can efficiently full-fill their duties. The security driver is to ensure information security, integrity, and availability to prevent accidental and intentional security breaches. But also to be compliant with regularities, such as the Data Protection Directive in Europe (Directive 95/46/EC)\footnote{\url{http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=CELEX:31995L0046:en:HTML; 07-10-2015}}, Basel II\footnote{\url{https://en.wikipedia.org/wiki/Basel_II; 07-10-2015}} or company regulations, have an impact on the access control policies.\\
+        There is no consensus on the different types of access control models. The National Institute of Standards and Technology (NIST) \cite{Hu13guideto} describes various logical access control models, which provide a policy framework that specifies how permissions are managed and who, under what circumstances, is entitled to which permission and enforce these access control decision. Some of these logical access control models are briefly described in the following to enable the reader to differentiate between the concepts.
+        \iffalse There is no consensus on the terms access control models, mechanisms and techniques. In this thesis an access control policy model describes a policy framework that specifies how permissions are managed and who, under what circumstances, is entitled to which permission on a high-level. There are different Access Control Policy Models which come with different advantages and disadvantages. Some of these models are briefly described in the following to enable the reader to differentiate between the concepts. \fi
+        \begin{itemize}
+            \iffalse \item \textbf{Discretionary Access Control (DAC)}\\\fi
+            \item \textbf{Identity-based Access Control (IBAC)}\\
+            In IBAC an user gets a certain access to a resource by being assigned directly to a permission, which is connected to a resource. On a low-level Access Control Lists (ACLs) are implementations of IBAC. While IBAC may be manageable in companies with a small amount of users and permissions, the maintenance can be quickly overwhelming in consideration of satisfying all drivers of access control policies (see above).
+            \item \textbf{Role-based Access Control (RBAC)}\\
+            In RBAC permissions are bundled to roles, which then are assigned to users. A user gets a certain access to a resource by being assigned to a role, which contains the corresponding permission to that access. In other words users inherit all permissions of the roles they are assigned to. The motivation of this extra abstraction layer of a role is to easier maintain the access control of users.
+            Even more abstraction can be introduced by role hierarchies (see next section).\iffalse , where a role inherits all permissions of its parent-role.\fi The RBAC model, which contains the roles, the user assignments to roles, the permission assignments to roles and the role-hierarchy, needs to be defined before the access control mechanism can enforce the access control. The RBAC model can be an ease of administration in comparison to direct assignments in IBAC. The degree of the benefit is dependent on the RBAC model.
+            \item \textbf{Attribute-based Access Control (ABAC)}\\
+            In \cite{Hu13guideto} the authors try to guide to a standard definition of ABAC, since there seems to be no consensus. The basic concept of ABAC is to introduce an additional abstraction layer in form of ABAC policies, which are basically complex boolean rule sets that can evaluate different kinds of attributes. These attributes could be user information (e.g. department, job title), resource information (e.g. threat level) or environment information (e.g. current time, current location). A user gets a certain access to a resource if the rule set is satisfiable. The rule sets need to be defined before the access control mechanism can enforce the access control. Compared to RBAC ABAC seems more flexible, but it also comes with challenges regarding risk and auditing\cite{Coyne:2013}.
+        \end{itemize}
+        The scope of this thesis is to research an approach which outputs an RBAC model. Some ideas of the ABAC model are exploited to some extent in the implementation of the thesis approach.\\
+        \subsubsection{Functional capabilities of RBAC}
+        The RBAC model is often used in bigger organizations\cite{o20102010} and is leveraged by many Identity- and Access Management (IAM) systems. There are different functional capabilities of RBAC models. The NIST RBAC model \cite{sandhu2000nist} distinguished between four levels of RBAC models: Flat, Hierarchical, Constrained and Symmetric RBAC. Each level introduces an additional functional capability to the previous level. Some of the functional capabilities of an RBAC model are introduced in the following.
+        \begin{itemize}
+            \item \textbf{Basic RBAC Capability}\\
+            In the basic RBAC model roles are bundles of permissions and users are assigned to these roles in order to get the according permissions. A user can be assigned to several roles and roles can be assigned to several users. The same many-to-many relation exists between roles and permissions. Therefore a user get can get the same permission several times by different roles.
+            \item \textbf{Role Hierarchy}\\
+            In a role hierarchy roles can be assigned to roles and inherit their permissions to the roles they have been assigned to. The role hierarchy can be restricted as a tree or inverted tree, where a role inherits only the permissions of its child-roles, or a partially ordered set, where a role inherits the permissions from any other role, which is assigned to it. It is also possible to limit inheritance in role hierarchies to control the power of impact of roles.
+            \item \textbf{Separation-of-Duties (SoD)}\\
+            Separation-of-Duties, also known as Segregation-of-duties, is a security principle for preventing fraud and errors by splitting tasks and associated permissions among multiple users. For example an user who has the permission to request the purchase of goods or services should not have the permission of approving the purchase. Roles in an RBAC model should therefore not have permissions bundled, which violate each other due to SoD. But also user assignments to multiple roles should not violate the SoD requirements.
+        \end{itemize}
+        In this thesis the main focus will be on the basic RBAC Capability and SoD Capability.\\
+        \subsubsection{Role Engineering}
+        Role engineering \cite{coyne2011role} describes the process to create a role model for RBAC, which includes designing the roles and assigning permissions and users to roles. This task is proved to be very difficult in large enterprises.\\The goal is to find a role model, which best leverages the RBAC model by satisfying the business, security and regulatory drivers: Lowering the costs for the administration of access control and equip employees with necessary permissions such that they can efficiently full-fill their duties while keeping security requirements and being compliant.
+        How this goal is measured in the role model has been described by several quality criteria\cite{Kunz}\cite{}. The criteria concern the role model state, individual roles or both.
+        \begin{itemize}
+            \item \textbf{Completeness}\\
+            
+            Overentitlement, Underentitlement\\ 
+            \item \textbf{Minimum Roles}\\
+             role explosion\\
+            \item \textbf{Complexity}\\
+            \item \textbf{Constraints}\\
+            Toxic Combinations of Permissions\\
+        \end{itemize}
+        
+        
+        The process consists of several steps (see Figure XX).\\
+        
+        
+        There are three different approaches to conquer the goal of finding the right role model: Top-Down, Bottom-Up and the Hybrid approach.\\
+        In the top-down approach ...\\
+        One approach is to do a top-down analysis, where the roles are built out of business information.\\
+        The bottom-up approach ...\\
+        The bottom-up approach counteract on the issue of not considering the current user permission assignments and tries to gather a role model out of the given user permission assignments. Since this approach often uses Data Mining Techniques, the method is also called Role Mining, which has been firstly coined by Kuhlmann \cite{Kuhlmann}.\\
+        Since the advantages and disadvantages of the top-down and the bottom-up approach are mirrored, hybrid approaches came up.
+        
+    \subsubsection{Role Model Quality measures}
+        \begin{itemize}
+            \item Completeness
+            \item Minimum Roles
+            \item Diversity
+        \end{itemize}
+        
+    \subsubsection{Role Mining Problem Definitions}
+        \begin{itemize}
+            \item Basic RMP
+            \item Edge RMP
+            \item Interference RMP
+        \end{itemize}
+        
+    \subsubsection{Related Problems}
+        \begin{itemize}
+            \item Boolean Decomposition Problem (BDM)
+            \item Tiling Problem
+        \end{itemize}
+    
+    \subsection{Evolutionary algorithm (EA)}
+    Basis of evolutionary Systems:\cite{Eiben}
+    \begin{itemize}
+        \item Variation operators for novelty
+        \item Selection for improving quality
+        \begin{itemize}
+            \item Parent selection and Survivor selection
+        \end{itemize}
+    \end{itemize}
+    Components, Procedures, Operators to be specified in order to define a particular EA:\cite{Eiben}
+    
+    \subsubsection{Representation (Definition of individuals)}
+        \begin{itemize}
+            \item Mapping from phenotypes to genotypes (Encoding)\\
+            Finding the genotype \cite{Igor}\\
+            ACL = UxP\\
+            Y = UxR\\
+            X = RxP\\
+            RM = XxY\\
+            Problem: Size of R is unknown\\
+            Solution from \cite{Igor}: 3rd chromosome Z to mark R's as "active" or "passive"\\
+            Other solutions: \\
+            Gray coding??
+            \item Variable = Locus; Value = Allele
+            \item Mapping from genotypes to phenotypes (Decoding)
+        \end{itemize}
+    \subsubsection{Evaluation function (or Fitness function)}
+        \begin{itemize}
+            \item represent the requirements to adapt to
+            \item defines what improvement means
+            \item Quality measure to genotypes
+            \item composed from a quality measure in the phenotype space
+            \item Turn minimization problem to maximization problem first
+        \end{itemize}
+    \subsubsection{Population}
+        \begin{itemize}
+            \item Multiset of genotypes
+            \item Additional spatial structure: Distance measure or neighbourhood relation
+            \item Measures:
+            \begin{itemize}
+                \item Diversity = Number of different solutions present
+                \item Entropy
+            \end{itemize}
+        \end{itemize}
+    \subsubsection{Parent selection mechanism}
+        \begin{itemize}
+            \item Responsible for pushing quality improvements
+            \item typically probabilistic
+            \item low quality individuals also get a small chance in order to avoid local optimums
+        \end{itemize}
+    \subsubsection{Variation operators, recombination and mutation}
+        \begin{itemize}
+            \item Create new individuals from old ones
+            \item Mutation
+            \begin{itemize}
+                \item Unary variation operator
+                \item Stochastic: Output (child) depends on random choices
+                \item Guarantees that the space is connected
+            \end{itemize}
+            \item Recombination / Crossover
+            \begin{itemize}
+                \item Binary variation operator
+                \item Merge information from 2 parent genotypes
+                \item Stochastic: Choice of parent parts and their merging depend on random drawings
+                \item Recombination operators with higher arities possible
+            \end{itemize}
+        \end{itemize}
+    \subsubsection{Survivor selection mechanism (Replacement)}
+        \begin{itemize}
+            \item Called after creating offsprings
+            \item deterministic
+            \item Replacement strategy
+        \end{itemize}
+    \subsubsection{Initialisation procedure}
+        \begin{itemize}
+            \item First population is randomly selected or chosen with higher fitness 
+        \end{itemize}
+    \subsubsection{Termination condition}
+        \begin{itemize}
+            \item Known optimal fitness level reached
+            \item Other conditions which certainly stop algorithm
+            \begin{itemize}
+                \item Max. Allowed CPU time
+                \item Total number of fitness evaluations
+                \item Period of time (number of generations or fitness evaluations)
+                \item Population diversity drops under a given threshold
+            \end{itemize}
+        \end{itemize}
+    
+    \subsection{Genetic Programming (GP)}
+    \subsection{Multi-Objective Genetic Algorithms}
+    \begin{itemize}
+        \item NSGA2\\
+        Why? The higher the role number (1 Role for each user), the more likely it is to have no violations. The lower the role number, the more violations
+        \item Improved NSGA2 (Fortin)\\
+        Why? Different Individuals have same fitness
+        \item Weighted NSGA2\\
+        Why? 2nd objective is less important\\
+        Issue? Skipped fronts, no symmetry in domination matrix
+    \end{itemize}
+    
+    \subsection{Co-Evolution}
+    \subsubsection{Symbiotic, Adaptive Neuro-Evolution (SANE)}
+    \subsubsection{Enforced Sub-Populations (ESP)}
+    
+    \subsection{Human interaction}

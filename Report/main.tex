@@ -1,0 +1,87 @@
+%\documentclass{article}
+\documentclass[version=last, pagesize=auto, paper=a4]{scrartcl}%{article}
+\usepackage[utf8]{inputenc}
+\usepackage{import}
+
+% Packages for Line spacing
+\linespread{1.3} % 1.5 spacing
+
+% Packages for tables
+\usepackage{longtable}
+\usepackage{float} % Improves the interface for defining floating objects such as figures and tables
+\usepackage[table,xcdraw]{xcolor}
+
+% Packages for bibliography
+\usepackage[square, numbers, comma, sort&compress]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
+\usepackage[nottoc,numbib]{tocbibind} %including bibtex into table of contents
+
+% Packages for highlighting
+\usepackage{color,soul}
+
+% Packages for title page
+\usepackage[export]{adjustbox}[2011/08/13]
+
+% Packages for algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pifont}
+
+% Packages for hyperlinks
+\usepackage{hyperref}
+
+% Unknown packages
+%\usepackage{listings}
+%\usepackage{color}
+%\usepackage{xcolor,colortbl}
+%\usepackage{pdflscape}
+%\usepackage{amsmath}
+%\usepackage{mathabx}
+%\usepackage{enumitem}
+
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\include{glossary}
+
+\begin{document}
+
+\import{chapters/}{00_TitlePage.tex}
+
+\import{chapters/}{01_Dedication.tex}
+
+\import{chapters/}{02_Abstract.tex}
+
+\import{chapters/}{03_Acknowledgement.tex}
+
+\import{chapters/}{04_TableOfContents.tex}
+
+\import{chapters/}{05_Introduction.tex}
+
+\import{chapters/}{06_Background.tex}
+
+\import{chapters/}{07_RelatedWork.tex}
+
+\import{chapters/}{08_ProblemAnalysis.tex}
+
+\import{chapters/}{09_Approach.tex}
+
+\import{chapters/}{10_Experiments.tex}
+
+\import{chapters/}{11_Results.tex}
+
+\import{chapters/}{12_Discussion.tex}
+
+\import{chapters/}{13_Conclusion.tex}
+
+\import{chapters/}{14_References.tex}
+
+\clearpage
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\import{chapters/}{15_Appendix.tex}
+
+\clearpage
+\printglossary[type=\acronymtype]
+\printglossary
+
+\end{document}
