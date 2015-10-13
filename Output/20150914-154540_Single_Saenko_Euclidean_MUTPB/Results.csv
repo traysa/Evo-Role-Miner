@@ -1,0 +1,5 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;CXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150914-154540_Single_Obj1_MUTPB;46;46;Single;Saenko_Euclidean;200;1000;0.25;0.1;10;215.647825;215.647825;False;;20150914-154540_Single_Obj1_MUTPB\healthcare_Single_Saenko_Euclidean
+20150914-154540_Single_Obj1_MUTPB;46;46;Single;Saenko_Euclidean;200;1000;0.25;0.5;10;268.587252;268.587252;False;;20150914-154540_Single_Obj1_MUTPB\healthcare_Single_Saenko_Euclidean
+20150914-154540_Single_Obj1_MUTPB;46;46;Single;Saenko_Euclidean;200;1000;0.25;0.9;10;351.955326;351.955326;False;;20150914-154540_Single_Obj1_MUTPB\healthcare_Single_Saenko_Euclidean

@@ -1,0 +1,11 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;OBJ1PB;OBJ2PBCXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;1.0;0.25;0.25;10;188.380332;188.380332;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;0.0;1.0;0.25;0.25;10;247.337979;247.337979;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;0.1;1.0;0.25;0.25;10;127.21257;127.21257;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;0.0;0.0;0.25;0.25;10;937.876062;937.876062;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;0.0;0.25;0.25;10;416.341112;416.341112;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;0.1;0.25;0.25;10;593.447896;593.447896;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;0.75;0.25;0.25;10;430.635107;430.635107;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;0.5;0.25;0.25;10;422.791627;422.791627;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted
+20150922-081510_Multi_Weighted_Weights_1000;46;46;Multi_Weighted;Normal;1000;100;1.0;0.25;0.25;0.25;10;679.867783;679.867783;False;;20150922-081510_Multi_Weighted_Weights_1000\healthcare_Multi_Weighted

@@ -1,0 +1,9 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;OBJ1PB;OBJ2PBCXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;1.0;1.0;0.25;0.25;10;53.351183;53.351183;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;0.0;1.0;0.25;0.25;10;35.088079;35.088079;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;0.0;0.0;0.25;0.25;10;320.002061;320.002061;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;1.0;0.0;0.25;0.25;10;257.180308;257.180308;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;1.0;0.75;0.25;0.25;10;148.459848;148.459848;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;1.0;0.5;0.25;0.25;10;152.563085;152.563085;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted
+20150921-171629_Multi_Fortin2013_Weighted_Weights;46;46;Multi_Fortin2013_Weighted;Normal;100;100;1.0;0.25;0.25;0.25;10;237.520202;237.520202;False;;20150921-171629_Multi_Fortin2013_Weighted_Weights\healthcare_Multi_Fortin2013_Weighted

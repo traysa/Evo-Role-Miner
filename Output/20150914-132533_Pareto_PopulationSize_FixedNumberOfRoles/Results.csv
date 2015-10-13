@@ -1,0 +1,4 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;CXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles;46;46;Multi;;100;10;0.25;0.25;1;6.538377;6.538377;False;;20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles\healthcare_Multi
+20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles;46;46;Multi;;100;100;0.25;0.25;1;63.465995;63.465995;False;;20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles\healthcare_Multi

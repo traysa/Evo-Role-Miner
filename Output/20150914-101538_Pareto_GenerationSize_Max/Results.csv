@@ -1,0 +1,6 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;CXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150914-101538_Pareto_GenerationSize_Max;46;46;Multi;;100;100;0.25;0.25;10;17.540916;17.540916;False;;20150914-101538_Pareto_GenerationSize_Max\healthcare_Multi
+20150914-101538_Pareto_GenerationSize_Max;46;46;Multi;;100;200;0.25;0.25;10;29.964701;29.964701;False;;20150914-101538_Pareto_GenerationSize_Max\healthcare_Multi
+20150914-101538_Pareto_GenerationSize_Max;46;46;Multi;;100;500;0.25;0.25;10;66.108785;66.108785;False;;20150914-101538_Pareto_GenerationSize_Max\healthcare_Multi
+20150914-101538_Pareto_GenerationSize_Max;46;46;Multi;;100;1000;0.25;0.25;10;129.177067;129.177067;False;;20150914-101538_Pareto_GenerationSize_Max\healthcare_Multi

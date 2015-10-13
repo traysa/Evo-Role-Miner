@@ -1,0 +1,6 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;CXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150909-214120_Single_Obj1_Gensize;46;46;Single;Obj1;100;100;0.25;0.25;10;40.203964;40.203964;False;;20150909-214120_Single_Obj1_Gensize\healthcare_Single_Obj1
+20150909-214120_Single_Obj1_Gensize;46;46;Single;Obj1;100;200;0.25;0.25;10;112.456762;112.456762;False;;20150909-214120_Single_Obj1_Gensize\healthcare_Single_Obj1
+20150909-214120_Single_Obj1_Gensize;46;46;Single;Obj1;100;400;0.25;0.25;10;194.181005;194.181005;False;;20150909-214120_Single_Obj1_Gensize\healthcare_Single_Obj1
+20150909-214120_Single_Obj1_Gensize;46;46;Single;Obj1;100;1000;0.25;0.25;10;241.881262;241.881262;False;;20150909-214120_Single_Obj1_Gensize\healthcare_Single_Obj1

@@ -1,0 +1,5 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;CXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150909-214120_Single_Obj1_MUTPB;46;46;Single;Obj1;200;1000;0.25;0.1;10;857.24351;857.24351;False;;20150909-214120_Single_Obj1_MUTPB\healthcare_Single_Obj1
+20150909-214120_Single_Obj1_MUTPB;46;46;Single;Obj1;200;1000;0.25;0.5;10;507.419015;507.419015;False;;20150909-214120_Single_Obj1_MUTPB\healthcare_Single_Obj1
+20150909-214120_Single_Obj1_MUTPB;46;46;Single;Obj1;200;1000;0.25;0.9;10;907.859125;907.859125;False;;20150909-214120_Single_Obj1_MUTPB\healthcare_Single_Obj1

@@ -1,0 +1,11 @@
+sep=;
+Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;OBJ1PB;OBJ2PBCXPB;MUTPB;Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;1.0;0.25;0.25;10;129.979531;129.979531;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;0.0;1.0;0.25;0.25;10;195.448387;195.448387;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;0.1;1.0;0.25;0.25;10;92.656466;92.656466;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;0.0;0.0;0.25;0.25;10;625.070823;625.070823;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;0.0;0.25;0.25;10;352.685647;352.685647;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;0.1;0.25;0.25;10;322.948499;322.948499;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;0.75;0.25;0.25;10;321.520469;321.520469;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;0.5;0.25;0.25;10;418.984736;418.984736;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted
+20150921-233514_Multi_Fortin2013_Weighted_Weights_1000;46;46;Multi_Fortin2013_Weighted;Normal;1000;100;1.0;0.25;0.25;0.25;10;528.857649;528.857649;False;;20150921-233514_Multi_Fortin2013_Weighted_Weights_1000\healthcare_Multi_Fortin2013_Weighted

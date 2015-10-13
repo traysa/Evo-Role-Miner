@@ -1,0 +1,33 @@
+{
+    "ResultFiles": "20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles\\healthcare_Multi",
+    "userCount": "46",
+    "EvoType": "Multi",
+    "Runtime": "6.538377",
+    "MUTPB": "0.25",
+    "Runtime_Sum": "6.538377",
+    "Continued": "False",
+    "permissionCount": "46",
+    "Experiment": "20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles",
+    "CXPB": "0.25",
+    "evalFunc": "",
+    "NGEN": "10",
+    "POP_SIZE": "100",
+    "PreviousCheckpoint": "",
+    "Frequency": "1"
+}{
+    "ResultFiles": "20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles\\healthcare_Multi",
+    "userCount": "46",
+    "EvoType": "Multi",
+    "Runtime": "63.465995",
+    "MUTPB": "0.25",
+    "Runtime_Sum": "63.465995",
+    "Continued": "False",
+    "permissionCount": "46",
+    "Experiment": "20150914-132533_Pareto_PopulationSize_FixedNumberOfRoles",
+    "CXPB": "0.25",
+    "evalFunc": "",
+    "NGEN": "100",
+    "POP_SIZE": "100",
+    "PreviousCheckpoint": "",
+    "Frequency": "1"
+}

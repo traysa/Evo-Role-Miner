@@ -1,0 +1,33 @@
+{
+    "Frequency": "1",
+    "Experiment": "20150914-131746_Pareto_PopulationSize_FixedViolataions",
+    "Runtime": "1.238368",
+    "EvoType": "Multi",
+    "Runtime_Sum": "1.238368",
+    "Continued": "False",
+    "MUTPB": "0.25",
+    "NGEN": "10",
+    "evalFunc": "",
+    "ResultFiles": "20150914-131746_Pareto_PopulationSize_FixedViolataions\\healthcare_Multi",
+    "POP_SIZE": "100",
+    "userCount": "46",
+    "PreviousCheckpoint": "",
+    "CXPB": "0.25",
+    "permissionCount": "46"
+}{
+    "Frequency": "1",
+    "Experiment": "20150914-131746_Pareto_PopulationSize_FixedViolataions",
+    "Runtime": "8.651976",
+    "EvoType": "Multi",
+    "Runtime_Sum": "8.651976",
+    "Continued": "False",
+    "MUTPB": "0.25",
+    "NGEN": "100",
+    "evalFunc": "",
+    "ResultFiles": "20150914-131746_Pareto_PopulationSize_FixedViolataions\\healthcare_Multi",
+    "POP_SIZE": "100",
+    "userCount": "46",
+    "PreviousCheckpoint": "",
+    "CXPB": "0.25",
+    "permissionCount": "46"
+}

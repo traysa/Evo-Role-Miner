@@ -1,0 +1,16 @@
+{
+    "timeSum": "21.689528",
+    "userCount": "46",
+    "CXPB": "0.25",
+    "generation": "100",
+    "time": "21.689528",
+    "MUTPB_All": "0.25",
+    "Freq": "10",
+    "Continued": "False",
+    "evalFunc": "",
+    "Experiment": "20150909-185016_Default_Experiment",
+    "PreviousCheckpoint": "",
+    "permissionCount": "46",
+    "population": "100",
+    "ResultFiles": "20150909-185016_Default_Experiment\\healthcare_Multi_100_100_0.25_0.25"
+}
