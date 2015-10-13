@@ -197,7 +197,8 @@ def showFitnessInPlotForMultiObjective(results, generations, freq, evolution_fil
     ax.tick_params(labelsize=14)
     ax.set_position((.1, .25, .76, .7)) # [pos from left, pos from bottom, width, height]
 
-    Z = [[0,0],[0,0]]
+    Z = [[-1,-1],[-1,-1]]
+    #Z = [[0,0],[0,0]]
     levels = range(0,generation - freq+1,freq)
     data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
     cbar_axes=fig.add_axes([0.88,.25,.02,.7])  # [pos from left, pos from bottom, width, height]

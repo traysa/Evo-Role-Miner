@@ -28,6 +28,7 @@ evolutionAsSVG = False
 evolutionAsPNG = True
 showEvolutionPNG = True
 
+numberTopRoleModels = 5
 roleModelsAsPDF = False
 roleModelsAsSVG = False
 roleModelsAsPNG = True
@@ -81,15 +82,15 @@ def startExperiment(Name, Original, DATA, POP_SIZE, CXPB,
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_single.evolution(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4, MUTPB_5,
-                         MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile)
+                         MUTPB_6, NGEN, freq, numberTopRoleModels, useCheckpoint, prevFiles, subdirectory, pickleFile)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
-                                          MUTPB_5, MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013"))
+                                          MUTPB_5, MUTPB_6, NGEN, freq, numberTopRoleModels, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013"))
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, OBJ1PB, OBJ2PB, CXPB, MUTPB_All, MUTPB_1, MUTPB_2, MUTPB_3, MUTPB_4,
-                                          MUTPB_5, MUTPB_6, NGEN, freq, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013_Weighted"))
+                                          MUTPB_5, MUTPB_6, NGEN, freq, numberTopRoleModels, useCheckpoint, prevFiles, subdirectory, pickleFile, (evolutionType=="Multi_Fortin2013_Weighted"))
     else:
         raise ValueError('Evolution type not known')
 
