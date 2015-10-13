@@ -1,0 +1,7 @@
+sep=;
+User;Attribute1;Attribute2;Attribute3;
+1;Administration;Denmark;Internal;
+2;Administration;Germany;External;
+3;Motor;Germany;Internal;
+4;Sales;Denmark;External;
+5;Sales;Denmark;Internal;

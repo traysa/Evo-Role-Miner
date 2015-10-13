@@ -1,0 +1,5 @@
+sep=;
+Role;Attribute1;Attribute2;Attribute3;
+1;Sales,Administration;Germany;;
+2;Sales,Administration;;;
+3;Motor,Administration;;;

@@ -1,0 +1,13 @@
+# Automatically generated data
+# Users: 5
+# Permissions: 7
+# UserPermissionAssignments: 19
+# Noise: True [0.01, 0.04]
+#        Less permissions than Original: 0.01
+#        More permissions than Original: 0.04
+
+u_U0 p_P1 p_P2 p_P5 p_P6
+u_U1 p_P0 p_P1 p_P3 p_P4 p_P5 p_P6
+u_U2 p_P1 p_P5
+u_U3 p_P2 p_P3 p_P5 p_P6
+u_U4 p_P2 p_P3 p_P6
