@@ -1,0 +1,58 @@
+[{
+    "Experiment": "Single_Saenko_Euclidean_Gensize",
+	"DATA": "healthcare",
+	"POP_SIZE": "100",
+    "CXPB": "0.25",
+	"MUTPB_All": "0.25",
+	"MUTPB_1": "0.25",
+	"MUTPB_2": "0.25",
+	"MUTPB_3": "0.25",
+	"MUTPB_4": "0.25",
+	"MUTPB_5": "0.25",
+	"MUTPB_6": "0.25",
+	"NGEN": "100",
+    "freq": "10",
+    "evolutionType": "Single",
+    "evalFunc": "Saenko_Euclidean"
+},
+{
+    "NGEN": "200"
+},
+{
+    "NGEN": "400"
+},
+{
+    "NGEN": "1000"
+},
+{
+	"Experiment": "Single_Saenko_Euclidean_Popsize",
+	"POP_SIZE": "200"
+},
+{
+    "POP_SIZE": "400"
+},
+{
+    "POP_SIZE": "1000"
+},
+{
+    "Experiment": "Single_Saenko_Euclidean_CXPB",
+	"POP_SIZE": "200",
+	"CXPB": "0.1"
+},
+{
+    "CXPB": "0.5"
+},
+{
+    "CXPB": "0.9"
+},
+{
+    "Experiment": "Single_Saenko_Euclidean_MUTPB",
+	"CXPB": "0.25",
+	"MUTPB_All": "0.1"
+},
+{
+    "MUTPB_All": "0.5"
+},
+{
+    "MUTPB_All": "0.9"
+}]

@@ -1,0 +1,37 @@
+[{
+    "Experiment": "Multi_Weighted_Weights",
+	"DATA": "healthcare",
+	"POP_SIZE": "100",
+	"OBJ1PB": "1.0",
+	"OBJ2PB": "1.0",
+    "CXPB": "0.25",
+	"MUTPB_All": "0.25",
+	"MUTPB_1": "0.25",
+	"MUTPB_2": "0.25",
+	"MUTPB_3": "0.25",
+	"MUTPB_4": "0.25",
+	"MUTPB_5": "0.25",
+	"MUTPB_6": "0.25",
+	"NGEN": "100",
+    "freq": "10",
+    "evolutionType": "Multi_Weighted",
+    "evalFunc": "Normal"
+},
+{
+    "OBJ1PB": "0.0"
+},
+{
+    "OBJ2PB": "0.0"
+},
+{
+    "OBJ1PB": "1.0"
+},
+{
+	"OBJ2PB": "0.75"
+},
+{
+	"OBJ2PB": "0.5"
+},
+{
+	"OBJ2PB": "0.25"
+}]
