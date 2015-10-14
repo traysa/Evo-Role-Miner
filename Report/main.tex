@@ -3,6 +3,13 @@
 \usepackage[utf8]{inputenc}
 \usepackage{import}
 
+%Packages for Watermark
+\usepackage[printwatermark]{xwatermark}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\newwatermark[allpages,color=grey!5,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
+
 % Packages for Line spacing
 \linespread{1.3} % 1.5 spacing
 
@@ -28,6 +35,9 @@
 
 % Packages for hyperlinks
 \usepackage{hyperref}
+
+% Packages for compact item lists
+\usepackage{enumitem}
 
 % Unknown packages
 %\usepackage{listings}
@@ -56,12 +66,13 @@
 
 \import{chapters/}{05_Introduction.tex}
 
-\import{chapters/}{06_Background.tex}
-\import{chapters/}{06_Background_II.tex}
+\import{chapters/}{06_Domain.tex}
+
+\import{chapters/}{08_EABackground.tex}
 
 \import{chapters/}{07_RelatedWork.tex}
 
-\import{chapters/}{08_ProblemAnalysis.tex}
+%\import{chapters/}{08_ProblemAnalysis.tex}
 
 \import{chapters/}{09_Approach.tex}
 
