@@ -46,3 +46,18 @@ def countDiffs(matrix):
     diff1 = (matrix == 1).sum()
     diff2 = (matrix == -1).sum()
     return diff1, diff2
+
+def compareMatrices(MatrixA,MatrixB):
+    diffMatrix = subtractIntMatrix(A=numpy.matrix(MatrixA,dtype=bool), B=numpy.matrix(MatrixB,dtype=bool))
+    'Violation of confidentiality and data availability'
+    conf, accs = countDiffs(diffMatrix)
+    return conf, accs
+
+# -----------------------------------------------------------------------------------
+# Data Generation for RoleMiner
+# -----------------------------------------------------------------------------------
+def generateGoalMatrix(roles, users, permissions):
+    A = createRandomMatrix(users, roles)
+    B = createRandomMatrix(roles, permissions)
+    C = multiplyBoolMatrix(A, B)
+    return C
