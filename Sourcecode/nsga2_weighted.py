@@ -184,11 +184,11 @@ def selTournamentDCD(individuals, k, probabilitiesForObjectives):
     :returns: A list of selected individuals.
     """
     def tourn(ind1, ind2):
-        #if stochasticallly_dominates(ind1.fitness,ind2.fitness, probabilitiesForObjectives):
-        if ind1.fitness.dominates(ind2.fitness):
+        if stochasticallly_dominates(ind1.fitness,ind2.fitness, probabilitiesForObjectives):
+        #if ind1.fitness.dominates(ind2.fitness):
             return ind1
-        #elif stochasticallly_dominates(ind2.fitness, ind1.fitness, probabilitiesForObjectives):
-        elif ind2.fitness.dominates(ind1.fitness):
+        elif stochasticallly_dominates(ind2.fitness, ind1.fitness, probabilitiesForObjectives):
+        #elif ind2.fitness.dominates(ind1.fitness):
             return ind2
 
         #print("Crowding distance")

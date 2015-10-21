@@ -88,8 +88,7 @@ else:
 # ----------------------------------------------------------------------------------------------------------------------
 def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
-                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[],
-                    objectives = ["Violations","RoleCnt"]):
+                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[]):
     global useCheckpoint
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -114,7 +113,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     #if (evolutionType=="Single"):
     #    subdirectory += "_"+evalFunc
 
-    fileExt = "_" + evolutionType + "_" + evalFunc + "_" + str(POP_SIZE) + "_" + str(NGEN) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt = "_" + evolutionType + "_" + str(evalFunc) + "_" + str(POP_SIZE) + "_" + str(NGEN) + "_" + str(CXPB) + "_" + str(MUTPB_All)
     if (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted" ):
         fileExt += "_" + str(obj_weights)
     checkpointSubdirectory = subdirectory+"\\Checkpoints"
@@ -128,19 +127,19 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     logbook = tools.Logbook()
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ea_single.evolution(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+            ea_single.evolution(Original, evalFunc[0], POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                 removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
                                 untilSolutionFound=untilSolutionFound, eval_weights=eval_weights)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB,
+            ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,
                                      removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
-                                     numberTopRoleModels,fortin=(evolutionType=="Multi_Fortin2013"), objectives=objectives)
+                                     numberTopRoleModels,fortin=(evolutionType=="Multi_Fortin2013"))
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, obj_weights, CXPB, MUTPB_All,
+            ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, obj_weights, CXPB,
                                                 addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
-                                                addPermissionPB, NGEN, freq, numberTopRoleModels,objectives=objectives,
+                                                addPermissionPB, NGEN, freq, numberTopRoleModels,
                                                 fortin=(evolutionType=="Multi_Fortin2013_Weighted"))
     else:
         raise ValueError('Evolution type not known')
@@ -217,7 +216,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         if (evolutionType.startswith("Multi")):
             for i in range(0,len(logbook)):
                 temp = logbook[i]
-                for o,obj in enumerate(objectives):
+                for o,obj in enumerate(evalFunc):
                     temp['fitness_'+obj] = logbook.chapters["fitnessObj"+str(o+1)][i]
         else:
             for i in range(0,len(logbook)):
@@ -237,14 +236,14 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
             with open(logfile, "a") as outfile:
                 outfile.write("sep=;\n")
                 headers = "gen;evals;"
-                for obj in objectives:
+                for obj in evalFunc:
                     headers += obj+"_Min;"+obj+"_Max;"+obj+"_Avg;"+obj+"_Std;"
                 outfile.write(headers+"\n")
                 for i in range(0,len(logbook)):
                     gen = logbook.select("gen")[i]
                     evals = logbook.select("evals")[i]
                     entry = str(gen)+";"+str(evals)
-                    for o in range(1,len(objectives)+1):
+                    for o in range(1,len(evalFunc)+1):
                         min = logbook.chapters["fitnessObj"+str(o)].select("min")[i]
                         max = logbook.chapters["fitnessObj"+str(o)].select("max")[i]
                         avg = logbook.chapters["fitnessObj"+str(o)].select("avg")[i]
@@ -296,19 +295,15 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     userCount = Original.shape[0]
     permissionCount = Original.shape[1]
     info = "Data: "+DATA+"; userCount: "+str(userCount)+"; permissionCount: "+str(permissionCount)\
-           +"\nEvoType: "+evolutionType+"; evalFunc: "+evalFunc+"; Generations: "+str(generation)+"; Population: "\
+           +"\nEvoType: "+evolutionType+"; evalFunc: "+str(evalFunc)+"; Generations: "+str(generation)+"; Population: "\
            +str(POP_SIZE)+"; Frequency: "+str(freq)\
            +"\nCXPB: "+str(CXPB)+"; MUTPB_All: "+str(MUTPB_All)+" ("+str(addRolePB)+";"+str(removeRolePB)+";"\
            +str(removeUserPB)+";"+str(removePermissionPB)+";"+str(addUserPB)+";"+str(addPermissionPB)+")"\
            +"\nRESULTS: "+resultInfo
            #+"\nPrevious Checkpoint: "+prevFile
-    if(evalFunc.startswith("Saenko") or evalFunc.startswith("WSC")):
+    if(evolutionType=="Single" and (evalFunc[0].startswith("Saenko") or evalFunc[0].startswith("WSC"))):
         index = info.find(')\n')
         info = info[:index+1] + "; eval_weights=" + str(eval_weights)+ info[index+1:]
-    if(evolutionType.startswith("Multi")):
-        index = info.find(')\n')
-        info = info[:index+1] + "; objectives=" + str(objectives)+ info[index+1:]
-        fitness_filename += "_" + str(obj_weights)
     if(evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
         index = info.find(')\n')
         info = info[:index+1] + "; obj_weights=" + str(obj_weights)+ info[index+1:]
@@ -317,21 +312,21 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     if (evolutionType=="Single"):
         stats = ["Fitness","RoleCnt","Conf","Accs"]
         visual.plotLogbook(logbook, log_filename+"_plot", stats, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
-        visual.showFitnessInPlot(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc, fitnessAsPDF, fitnessAsSVG,
+        visual.showFitnessInPlot(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc[0], fitnessAsPDF, fitnessAsSVG,
                                  fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
                               roleModelsAsPNG, showRoleModelsPNG)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
-        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, objectives, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
+        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, evalFunc, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
                                             showLogPlotPNG)
-        visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, objectives, fitnessAsPDF,
+        visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc, fitnessAsPDF,
                                                   fitnessAsSVG, fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
                               roleModelsAsPNG, showRoleModelsPNG)
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
-        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, objectives, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
+        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, evalFunc, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
                                             showLogPlotPNG)
-        visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, objectives, fitnessAsPDF,
+        visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc, fitnessAsPDF,
                                                   fitnessAsSVG, fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
                               roleModelsAsPNG, showRoleModelsPNG)
@@ -368,7 +363,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                 outfile.close()
         with open(resultCSVfile, "a") as outfile:
             outfile.write(str(experimentNumber)+";"+str(experimentCnt)+";"+Name+";"+str(userCount)+";"+str(permissionCount)+";"
-                          +evolutionType+";"+evalFunc+";"+str(len(population))+";"+str(generation)+";"+str(obj_weights)+";"
+                          +evolutionType+";"+str(evalFunc)+";"+str(len(population))+";"+str(generation)+";"+str(obj_weights)+";"
                           +str(eval_weights)+";"+str(CXPB)+";"+str(MUTPB_All)+";"+str(freq)+";"+str(time)+";"
                           +str(timeSum)+";"+str(useCheckpoint)+";"+prevFile+";"+subdirectory[10:]+"\n")
             outfile.close()

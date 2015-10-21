@@ -1,3 +1,5 @@
+__author__ = 'Theresa'
+
 import random
 import numpy
 from deap import creator, base, tools, algorithms
@@ -6,17 +8,25 @@ import os.path
 import datetime
 import fortin2013
 import nsga2_classic as nsga2
-import rm_EAOperators as ops
+import rm_EAOperators as operators
+import rm_EAInitialization as init
 import rm_EAEvaluations as evals
 from collections import defaultdict
 
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - Multi objective
 # -----------------------------------------------------------------------------------
-def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,removePermissionPB,
-                    addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, checkpoint, prevFiles, directory, pickleFile, fortin=False):
+def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeRolePB, removeUserPB,
+                    removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
+                    fortin=False, pickleFile="", checkpoint=False, prevFiles=""):
+    # Validations
+    if (len(evalFunc)<2):
+        raise ValueError("Less than 2 objectives not possible")
+    if (len(evalFunc)>3):
+        raise ValueError("More than 3 objectives not supported")
     if (not(populationSize % 4 == 0)):
         raise ValueError("Population size has to be a multiple of 4")
+
     print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
@@ -27,11 +37,31 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
     logbook = tools.Logbook()
 
     # Creator
-    creator.create("FitnessMin", base.Fitness, weights=(-1.0,1.0))
-    creator.create("Individual", list, fitness=creator.FitnessMin)
+    weights = ()
+    for obj in evalFunc:
+        if (obj=="Confidentiality"):
+            weights+=(-1.0,)
+        elif (obj=="Availability"):
+            weights+=(-1.0,)
+        elif (obj=="RoleCnt"):
+            weights+=(-1.0,)
+        elif (obj=="Violations"):
+            weights+=(-1.0,)
+        elif (obj=="Saenko"):
+            weights+=(1.0,)
+        elif (obj=="Saenko_Euclidean"):
+            weights+=(1.0,)
+        elif (obj=="WSC"):
+            weights+=(-1.0,)
+        elif (obj=="WSC_Star"):
+            weights+=(-1.0,)
+        else:
+            raise ValueError("Evaluation function for '"+obj+"' not known")
+    creator.create("FitnessMinMax", base.Fitness, weights=weights)
+    creator.create("Individual", list, fitness=creator.FitnessMinMax)
 
     # Get Checkpoint
-    if (checkpoint and len(prevFiles)!=0):
+    '''if (checkpoint and len(prevFiles)!=0):
         prevFile = prevFiles[0]
         if (os.path.isfile(prevFile)):
             print("Read checkpoint...")
@@ -50,7 +80,7 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
             print("Checkpoint file does not exit")
     else:
         print("Use checkpoint: False")
-        checkpoint = False
+        checkpoint = False'''
 
     userSize = int(Original.shape[0])
     permissionSize = int(Original.shape[1])
@@ -58,21 +88,16 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
     # Toolbox
     toolbox = base.Toolbox()
     # Chromosome generator
-    toolbox.register("chromosome", ops.generateChromosome, userSize, userSize, permissionSize)
+    toolbox.register("chromosome", init.generateChromosome, userSize, userSize, permissionSize)
     # Structure initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic Operators
-    if (evalFunc=="Normal"):
-        toolbox.register("evaluate", evals.evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original)
-    elif (evalFunc=="Euclidean"):
-        toolbox.register("evaluate", evals.evalFunc_Multi_EuclideanDistance, userSize=userSize, permissionSize=permissionSize, orig=Original)
-    else:
-        raise ValueError("Unknown Evaluation Function: "+evalFunc)
+    toolbox.register("evaluate", evals.evalFunc_Multi, userSize=userSize, permissionSize=permissionSize, orig=Original, evalFunc=evalFunc)
 
-    toolbox.register("mate", ops.mateFunc)
-    toolbox.register("mutate", ops.mutFunc, addRolePB=addRolePB,
+    toolbox.register("mate", operators.mateFunc)
+    toolbox.register("mutate", operators.mutFunc, addRolePB=addRolePB,
               removeRolePB=removeRolePB,
               removeUserPB=removeUserPB,
               removePermissionPB=removePermissionPB,
@@ -86,16 +111,22 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
         toolbox.register("select", tools.selNSGA2)
 
     # Register statistics
-    statsObj1 = tools.Statistics(key=lambda ind: ind.fitness.values[0])
-    statsObj2 = tools.Statistics(key=lambda ind: ind.fitness.values[1])
-    mstats = tools.MultiStatistics(fitnessObj1=statsObj1, fitnessObj2=statsObj2)
+    mstats = None
+    if (len(evalFunc)>=2):
+        statsObj1 = tools.Statistics(key=lambda ind: ind.fitness.values[0])
+        statsObj2 = tools.Statistics(key=lambda ind: ind.fitness.values[1])
+    if (len(evalFunc)==3):
+        statsObj3 = tools.Statistics(key=lambda ind: ind.fitness.values[2])
+        mstats = tools.MultiStatistics(fitnessObj1=statsObj1, fitnessObj2=statsObj2, fitnessObj3=statsObj3)
+    else:
+        mstats = tools.MultiStatistics(fitnessObj1=statsObj1, fitnessObj2=statsObj2)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
     mstats.register("max", numpy.max)
     logbook.header = "gen", "evals"
-    logbook.chapters["fitnessObj1"].header = "min", "avg", "max", "std"
-    logbook.chapters["fitnessObj2"].header = "min", "avg", "max", "std"
+    for o in range(1, len(evalFunc)+1):
+        logbook.chapters["fitnessObj"+str(o)].header = "min", "avg", "max", "std"
 
     # Creating the population
     if (not population):
@@ -112,11 +143,10 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
     if ((len(logbook)==0) or (logbook.pop(len(logbook)-1)["gen"] != genStart)):
         record = mstats.compile(population)
         logbook.record(gen=genStart, evals=len(invalid_ind), **record)
-        print("Generation "+str(genStart)+":\t"
-              +str(logbook.stream)+"\n"
-              +str(logbook.chapters["fitnessObj1"].stream)+"\n"
-              +str(logbook.chapters["fitnessObj2"].stream)
-              )
+        printText = "Generation "+str(genStart)+":\t"+str(logbook.stream)
+        for o in range(1, len(evalFunc)+1):
+            printText += "\n"+str(logbook.chapters["fitnessObj"+str(o)].stream)
+        print(printText)
 
     # Begin the evolution
     print("Start evolution...")
@@ -162,11 +192,10 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
             # Log statistics for generation
             record = mstats.compile(population)
             logbook.record(gen=generation, evals=len(invalid_ind), **record)
-            print("Generation "+str(generation)+":\t"
-                  +str(logbook.stream)+"\t"
-                  +str(logbook.chapters["fitnessObj1"].stream)+"\t\t"
-                  +str(logbook.chapters["fitnessObj2"].stream)
-                  )
+            printText = "Generation "+str(generation)+":\t"+str(logbook.stream)
+            for o in range(1, len(evalFunc)+1):
+                printText += "\t"+str(logbook.chapters["fitnessObj"+str(o)].stream)+"\t"
+            print(printText)
 
         generation += 1
 
@@ -180,8 +209,11 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
     print("DONE.\n")
 
     # Set Checkpoint
-    fileExt = "_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
-    if (checkpoint):
+    fileExt = "_Multi"
+    for obj in evalFunc:
+        fileExt+= "_" +obj
+    fileExt+= "_"+str(len(population)) + "_" + str(generation) + "_" + str(CXPB)
+    '''if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
         pickleFile = "Checkpoint"+fileExt+".pkl"
     print("Save checkpoint into "+str(pickleFile))
@@ -203,6 +235,6 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRole
               addPermissionPB=addPermissionPB,
               logbook=logbook)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
-    print("DONE.\n")
+    print("DONE.\n")'''
 
     return population, results, generation, time, prevFiles, tools.selBest(population, k=numberTopRoleModels), logbook, fileExt

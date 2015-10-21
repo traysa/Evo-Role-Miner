@@ -1,19 +1,23 @@
+__author__ = 'Theresa'
+
 import random
 import numpy
 from deap import creator, base, tools, algorithms
 import pickle
 import os.path
 import datetime
-import rm_EAOperators as ops
+import rm_EAOperators as operators
+import rm_EAInitialization as init
 import rm_EAEvaluations as evals
 from collections import defaultdict
-
 
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - One objective
 # -----------------------------------------------------------------------------------
 def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
-              removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, checkpoint, prevFiles, directory, pickleFile):
+              removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
+              untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles=""):
+
     print("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
@@ -23,23 +27,31 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     # Create Logbook
     logbook = tools.Logbook()
 
-    # Creator
-    if (evalFunc=="Obj1"):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0,)) #Minimization
-    elif (evalFunc=="Obj1"):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0,)) #Minimization
+    # Register Optimization
+    weights = None
+    if (evalFunc=="Confidentiality"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="Availability"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="RoleCnt"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="Violations"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
     elif (evalFunc=="Saenko"):
-        creator.create("FitnessMin", base.Fitness, weights=(1.0,)) #Maximization
+        weights=(1.0,1.0,1.0,1.0)
     elif (evalFunc=="Saenko_Euclidean"):
-        creator.create("FitnessMin", base.Fitness, weights=(1.0,)) #Maximization
+        weights=(1.0,1.0,1.0,1.0)
     elif (evalFunc=="WSC"):
-        creator.create("FitnessMin", base.Fitness, weights=(-1.0,)) #Minimization
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="WSC_Star"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
     else:
-        raise ValueError('Evaluation function not known')
-    creator.create("Individual", list, fitness=creator.FitnessMin)
+        raise ValueError("Evaluation function '"+str(evalFunc)+"' not known")
+    creator.create("FitnessMinMax", base.Fitness, weights=weights)
+    creator.create("Individual", list, fitness=creator.FitnessMinMax)
 
     # Get Checkpoint
-    if (checkpoint and len(prevFiles)!=0):
+    '''if (checkpoint and len(prevFiles)!=0):
         prevFile = prevFiles[0]
         if (os.path.isfile(prevFile)):
             print("Read checkpoint...")
@@ -58,44 +70,67 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
             raise ValueError("Checkpoint file does not exit")
     else:
         print("Use checkpoint: False")
-        checkpoint = False
+        checkpoint = False'''
 
     userSize = int(Original.shape[0])
     permissionSize = int(Original.shape[1])
 
     # Toolbox
     toolbox = base.Toolbox()
-    # Chromosome generator
-    toolbox.register("chromosome", ops.generateChromosome, maxRoles=userSize, userSize=userSize, permissionSize=permissionSize)
-    # Structure initializers
+    # Register Chromosome Generator
+    toolbox.register("chromosome", init.generateChromosome, maxRoles=userSize, userSize=userSize, permissionSize=permissionSize)
+    # Register Individual and Population Initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-    # Genetic Operators
-    if (evalFunc=="Obj1"):
-        toolbox.register("evaluate", evals.evalFunc_Obj1, userSize=userSize, permissionSize=permissionSize, orig=Original)
-    elif (evalFunc=="Obj2"):
-        toolbox.register("evaluate", evals.evalFunc_Obj2, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    # Register Evaluation Function
+    if (evalFunc=="Confidentiality"):
+        toolbox.register("evaluate", evals.evalFunc_Confidentiality, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Availability"):
+        toolbox.register("evaluate", evals.evalFunc_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="RoleCnt"):
+        toolbox.register("evaluate", evals.evalFunc_RoleCnt, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Violations"):
+        toolbox.register("evaluate", evals.evalFunc_Violations, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Saenko"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     elif (evalFunc=="Saenko_Euclidean"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     elif (evalFunc=="WSC"):
-        toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+    elif (evalFunc=="WSC_Star"):
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     else:
         raise ValueError('Evaluation function not known')
-    toolbox.register("mate", ops.mateFunc)
-    toolbox.register("mutate", ops.mutFunc, addRolePB=addRolePB, removeRolePB=removeRolePB, removeUserPB=removeUserPB,
+
+    # Register Variation Operators
+    toolbox.register("mate", operators.mateFunc)
+    toolbox.register("mutate", operators.mutFunc, addRolePB=addRolePB, removeRolePB=removeRolePB, removeUserPB=removeUserPB,
                      removePermissionPB=removePermissionPB, addUserPB=addUserPB, addPermissionPB=addPermissionPB,
                      userSize=userSize, permissionSize=permissionSize)
     toolbox.register("select", tools.selTournament, tournsize=5)
 
-    # Register statistics
+    # Register Statistics
+    '''
     stats = tools.Statistics(key=lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
     stats.register("std", numpy.std)
     stats.register("min", numpy.min)
-    stats.register("max", numpy.max)
+    stats.register("max", numpy.max)'''
+    statsFitness = tools.Statistics(key=lambda ind: ind.fitness.values[0])
+    statsConf = tools.Statistics(key=lambda ind: ind.fitness.values[1])
+    statsAccs = tools.Statistics(key=lambda ind: ind.fitness.values[2])
+    statsRoleCnt = tools.Statistics(key=lambda ind: ind.fitness.values[3])
+    mstats = tools.MultiStatistics(Fitness=statsFitness,Conf=statsConf,Accs=statsAccs,RoleCnt=statsRoleCnt)
+    mstats.register("avg", numpy.mean)
+    mstats.register("std", numpy.std)
+    mstats.register("min", numpy.min)
+    mstats.register("max", numpy.max)
+    logbook.header = "gen", "evals"
+    logbook.chapters["Fitness"].header = "min", "avg", "max", "std"
+    logbook.chapters["Conf"].header = "min", "avg", "max", "std"
+    logbook.chapters["Accs"].header = "min", "avg", "max", "std"
+    logbook.chapters["RoleCnt"].header = "min", "avg", "max", "std"
 
     # Creating the population
     if (not population):
@@ -111,9 +146,18 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
 
     # Log statistics for first generation
     if ((len(logbook)==0) or (logbook.pop(len(logbook)-1)["gen"] != genStart)):
-        record = stats.compile(population)
+        '''record = stats.compile(population)
         logbook.record(gen=genStart, evals=len(invalid_ind), **record)
-        print("Generation "+str(genStart)+":\t"+str(logbook.stream))
+        print("Generation "+str(genStart)+":\t"+str(logbook.stream))'''
+        record = mstats.compile(population)
+        logbook.record(gen=genStart, evals=len(invalid_ind), **record)
+        print("Generation "+str(genStart)+":\t"
+              +str(logbook.stream)+"\n"
+              +str(logbook.chapters["Fitness"].stream)+"\n"
+              +str(logbook.chapters["Conf"].stream)+"\n"
+              +str(logbook.chapters["Accs"].stream)+"\n"
+              +str(logbook.chapters["RoleCnt"].stream)
+              )
 
     # Begin the evolution
     print("Start evolution...")
@@ -128,26 +172,32 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
         population = toolbox.select(population, k=len(population))
         population = algorithms.varAnd(population, toolbox, cxpb=CXPB, mutpb=MUTPB_All)
 
-
-
-
         # Evaluate individuals, which need a evaluation
-        invalids = [ind for ind in population if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalids)
-        for ind, fit in zip(invalids, fitnesses):
+        invalid_ind = [ind for ind in population if not ind.fitness.valid]
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
             # Stop condition
-            #if (fit[0] == 0):
-            #    stop = True
+            if (untilSolutionFound and fit[0] == 0):
+                stop = True
 
         # Add Fitness values to results
         if generation % freq == 0:
             for ind in population:
                 results[generation].append(ind.fitness.values)
             # Log statistics for generation
-            record = stats.compile(population)
+            '''record = stats.compile(population)
             logbook.record(gen=generation, evals=len(invalids), **record)
-            print("Generation "+str(generation)+":\t"+str(logbook.stream))
+            print("Generation "+str(generation)+":\t"+str(logbook.stream))'''
+            record = mstats.compile(population)
+            logbook.record(gen=generation, evals=len(invalid_ind), **record)
+            print("Generation "+str(generation)+":\t"
+                  +str(logbook.stream)+"\t"
+                  +str(logbook.chapters["Fitness"].stream)+"\t\t"
+                  +str(logbook.chapters["Conf"].stream)+"\t\t"
+                  +str(logbook.chapters["Accs"].stream)+"\t\t"
+                  +str(logbook.chapters["RoleCnt"].stream)
+                  )
 
         generation += 1
 
@@ -161,7 +211,8 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     print("DONE.\n")
 
     # Set Checkpoint
-    fileExt = "_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt = "_Single_" + evalFunc + "_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    '''
     if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
         pickleFile = "Checkpoint"+fileExt+".pkl"
@@ -185,5 +236,6 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
               logbook=logbook)
     pickle.dump(cp, open(pickleFile, "wb"), 2)
     print("DONE.\n")
+    '''
 
     return population, results, generation, time, prevFiles, tools.selBest(population, k=numberTopRoleModels), logbook, fileExt

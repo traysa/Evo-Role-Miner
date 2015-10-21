@@ -1,8 +1,8 @@
 __author__ = 'Theresa'
 
-import rm_EvoRoleMiner as rm
+import rm_EvoRoleMinerBuilder as rm_builder
 import numpy
-import rm_MatrixOperators as matrixOps
+import MatrixOperators as matrixOps
 import rm_FileParser as parser
 import rm_EvoAlg_SANE as sane
 import datetime
@@ -119,8 +119,8 @@ def executeExperimentFromFile():
                 evolutionType = experiment["evolutionType"]
                 print("evolutionType: "+evolutionType)
             if ("evalFunc" in experiment.keys()):
-                evalFunc = experiment["evalFunc"]
-                print("evalFunc: "+evalFunc)
+                evalFunc = [o for o in experiment["evalFunc"].split(',')]
+                print("evalFunc: "+str(evalFunc))
             if ("eval_weights" in experiment.keys()):
                 if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
                     eval_weights = [float(w) for w in experiment["eval_weights"].split(',')]
@@ -144,12 +144,6 @@ def executeExperimentFromFile():
                 numberOfWeights = len(obj_weights)
                 if (numberOfWeights!=2):
                     raise ValueError("Number of weights is incorrect for evolution Type")
-            if ("obj_weights" in experiment.keys()):
-                if (evolutionType.startswith("Multi")):
-                    objectives = [o for o in experiment["objectives"].split(',')]
-                    print("objectives: "+str(objectives))
-                else:
-                    objectives = ()
             if ("numberOfTrialItems" in experiment.keys()):
                 if (evolutionType == "SANE"):
                     numberOfTrialItems = int(experiment["numberOfTrialItems"])
@@ -173,10 +167,9 @@ def executeExperimentFromFile():
                     sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                      NGEN, numberOfTrialItems, freq)
                 else:
-                    rm.startExperiment(directory,Name,experimentNumber,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All,
+                    rm_builder.startExperiment(directory,Name,experimentNumber,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All,
                                    addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
-                                   NGEN,freq,evolutionType,evalFunc,untilSolutionFound,obj_weights,eval_weights,
-                                   objectives=objectives)
+                                   NGEN,freq,evolutionType,evalFunc,untilSolutionFound,obj_weights,eval_weights)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Asks user for configuration for the experiment
@@ -294,35 +287,26 @@ def executeCustomExperiment():
                 raise ValueError('Input not valid')
 
         if (evolutionType == 'Multi' or evolutionType == 'Multi_Fortin2013'):
-            evalFuncInput = input('Choose evolution type:\n'
-                                  '(1) Normal\n'
-                                  '(2) Euclidean\n')
-            if (evalFuncInput=="1"):
-                evalFunc="Normal"
-            elif (evalFuncInput=="2"):
-                evalFunc="Euclidean"
-            else:
-                raise ValueError('Input not valid')
             objCnt = int(input('Do you want to choose 2 or 3 objectives?\n'))
             if (objCnt < 2 or objCnt > 3):
                 raise ValueError("Objective count is not valid")
-            objectives = ()
+            evalFunc = ()
             for o in range(0,objCnt):
-                print("Current objectives: "+str(objectives))
+                print("Current objectives: "+str(evalFunc))
                 objective = input('Choose an objective:\n'
                                   '(1) Confidentiality\n'
                                   '(2) Availability\n'
                                   '(3) Role Count\n'
                                   '(4) Confidentiality + Availability (normalized)\n')
                 if (objective=="1"):
-                     objectives+= ("Confidentiality",)
+                     evalFunc+= ("Confidentiality",)
                 elif (objective=="2"):
-                    objectives+= ("Availability",)
+                    evalFunc+= ("Availability",)
                 elif (objective=="3"):
-                    objectives+= ("RoleCnt",)
+                    evalFunc+= ("RoleCnt",)
                 elif (objective=="4"):
-                    objectives+= ("Violations",)
-            print("Chosen objectives: "+str(objectives))
+                    evalFunc+= ("Violations",)
+            print("Chosen objectives: "+str(evalFunc))
         if (evolutionType == 'Multi_Weighted' or evolutionType == 'Multi_Fortin2013_Weighted'):
             evalFuncInput = input('Choose evolution type:\n'
                                   '(1) Normal\n'
@@ -341,9 +325,9 @@ def executeCustomExperiment():
         untilSolutionFound = bool(input('Run until solution found? (True/False)\n'))
         directory = "..\\Output"
         for experimentCnt in range(1,repeat+1):
-            rm.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+            rm_builder.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                            removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound,
-                           obj_weights=obj_weights,eval_weights=eval_weights, objectives = objectives)
+                           obj_weights=obj_weights,eval_weights=eval_weights)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Loads configuration for experiment from configfile
@@ -366,7 +350,6 @@ def executeDefaultExperiment():
     evalFunc = 'Obj1'
     eval_weights = [1.0,1.0]
     obj_weights = [1.0,1.0]
-    objectives = ["Confidentiality","Availability"]
     numberOfTrialItems = 3
     untilSolutionFound = False
     repeat = 1
@@ -400,13 +383,11 @@ def executeDefaultExperiment():
         NGEN = config['General'].getint('NGEN')
         freq = config['General'].getint('freq')
         evolutionType = config['Algorithm']['evolutionType']
-        evalFunc = config['Algorithm']['evalFunc']
+        evalFunc = [o for o in config['Algorithm']['evalFunc'].split(',')]
         if (evolutionType == 'Multi_Weighted' or evolutionType == 'Multi_Fortin2013_Weighted'):
             obj_weights = [float(w) for w in config['Algorithm']['obj_weights'].split(',')]
         if (evalFunc == 'Saenko' or evalFunc == 'Saenko_Euclidean' or evalFunc == 'WSC' or evalFunc == 'WSC_Star'):
             eval_weights = [float(w) for w in config['Algorithm']['eval_weights'].split(',')]
-        if (evolutionType.startswith("Multi")):
-            objectives = [o for o in config['Algorithm']['objectives'].split(',')]
         if (evolutionType == "SANE"):
             numberOfTrialItems = config['Algorithm'].getint('numberOfTrialItems')
         untilSolutionFound = config['Algorithm'].getboolean('until_Solution_Found')
@@ -415,7 +396,7 @@ def executeDefaultExperiment():
             or addRolePB == None or removeRolePB == None or removeUserPB == None or removePermissionPB == None
             or addUserPB == None or addPermissionPB == None or NGEN == None or freq == None
             or evolutionType == None or evalFunc == None or obj_weights == None or eval_weights == None
-            or objectives == None or numberOfTrialItems == None or repeat == None):
+            or numberOfTrialItems == None or repeat == None):
             raise ValueError("Config file 'Experiments_config.ini' is corrupt. Create new one by deleting the old one.")
         if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
             numberOfWeights = len(eval_weights)
@@ -439,9 +420,10 @@ def executeDefaultExperiment():
             sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN,
                          numberOfTrialItems, freq)
         else:
-            rm.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
-                        removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound,
-                        obj_weights=obj_weights,eval_weights=eval_weights,objectives = objectives)
+            rm_builder.startExperiment(directory, Name, 1, experimentCnt, Original, DATA, POP_SIZE, CXPB, MUTPB_All,
+                                       addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
+                                       addPermissionPB, NGEN, freq, evolutionType, evalFunc, untilSolutionFound,
+                                       obj_weights=obj_weights, eval_weights=eval_weights)
 
 
 loadExperiment = input('Load experiment from file? (y/n)\n')

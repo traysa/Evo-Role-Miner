@@ -6,18 +6,6 @@ __author__ = 'Theresa'
 
 import random
 import numpy
-import rm_MatrixOperators as matrixOps
-
-
-# -----------------------------------------------------------------------------------
-# Data Generation for RoleMiner
-# -----------------------------------------------------------------------------------
-def generateGoalMatrix(roles, users, permissions):
-    A = matrixOps.createRandomMatrix(users, roles)
-    B = matrixOps.createRandomMatrix(roles, permissions)
-    C = matrixOps.multiplyBoolMatrix(A, B)
-    return C
-
 
 # -----------------------------------------------------------------------------------
 # Combine roles if they have the same user-lists (permission-lists)
@@ -34,23 +22,10 @@ def combineObjects(offspring, index):
                 offspring[y+1 + x][index] = set()
                 removalSet.add(y+1 + x)
     removalList = list(removalSet)
-    sorted(removalList)
-    log += "offspring: "+str(offspring)+"\n"
-    log += "offspring len: "+str(len(offspring))+"\n"
-    log += "removalList: "+str(removalList)+"\n"
-    index = 0
+    removalList.sort()
     while removalList:
-        try:
-            index = removalList.pop()
-            log += "remove index: "+str(index)+"\n"
-            del offspring[index]
-        except IndexError:
-            print("offspring: "+str(offspring))
-            print("offspring len: "+str(len(offspring)))
-            print("removalList: "+str(removalList))
-            print("Index: "+str(index))
-            print("LOG:\n"+log)
-            raise
+        index = removalList.pop()
+        del offspring[index]
     return offspring
 
 # -----------------------------------------------------------------------------------
@@ -67,9 +42,3 @@ def localOptimization(offspring):
         #'Remove similar Genes'
         #offspring = removeSimilarGenes(offspring)
     return offspring
-
-def compareMatrices(MatrixA,MatrixB):
-    diffMatrix = matrixOps.subtractIntMatrix(A=numpy.matrix(MatrixA,dtype=bool), B=numpy.matrix(MatrixB,dtype=bool))
-    'Violation of confidentiality and data availability'
-    conf, accs = matrixOps.countDiffs(diffMatrix)
-    return conf, accs

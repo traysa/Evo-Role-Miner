@@ -1,46 +1,22 @@
 __author__ = 'Theresa'
 
-
-import rm_Utils as utils
+import rm_EAInitialization as init
+import rm_EAOptimizer as optimizer
 import random
 
-# Initialization of Population
-def generateChromosome(maxRoles, userSize, permissionSize):
-    chromosome = []
-    # Create random number of genes (roles) for one chromosome
-    maxRoleCnt = random.randint(1, maxRoles)
-    #print("ROLESIZE: "+str(maxRoleCnt))
-    permissionUsage = [0 for i in range(0,permissionSize)]
-    #print("permissionUsage: "+str(permissionUsage))
-    userUsage = [0 for i in range(0,userSize)]
-    #print("userUsage: "+str(userUsage))
-    #for i in range(0, rolesize):
-    roleCnt = 0
-    while(((0 in permissionUsage) or (0 in userUsage) or roleCnt<maxRoleCnt) and (roleCnt<maxRoles)):
-    #for i in range(0, int(maxRoles/2)):
-        #gene = utils.generateGene(userSize, permissionSize)
-        gene, userUsage, permissionUsage = utils.generateGene3(userUsage, permissionUsage)
-        # Add gene to chromosome
-        chromosome.append(gene)
-        roleCnt += 1
-    #print("permissionUsage: "+str(permissionUsage))
-    if (0 in permissionUsage):
-        print("WOOP")
-    #print("userUsage: "+str(userUsage))
-    chromosome = utils.localOptimization(chromosome)
-    return chromosome
-
+# -----------------------------------------------------------------------------------
 # Mutation Function
+# -----------------------------------------------------------------------------------
 def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, userSize, permissionSize):
     #print("Mutation: "+str(individual[0]))
     if (random.random() < addRolePB) and (len(individual[0]) < userSize) and (len(individual[0]) < permissionSize):
         permissionUsage = [0 for i in range(0,permissionSize)]
         userUsage = [0 for i in range(0,userSize)]
-        gene, userUsage, permissionUsage = utils.generateGene3(userUsage, permissionUsage)
+        gene, userUsage, permissionUsage = init.generateGene_optimized(userUsage, permissionUsage)
         individual[0].append(gene)
         #print("Add role: "+str(individual[0]))
-        individual[0] = utils.combineObjects(individual[0], 1)
-        individual[0] = utils.combineObjects(individual[0], 0)
+        individual[0] = optimizer.combineObjects(individual[0], 1)
+        individual[0] = optimizer.combineObjects(individual[0], 0)
     if ((len(individual[0]) > 1) and (random.random() < removeRolePB)):
         role = random.randint(0, len(individual[0]) - 1)
         del individual[0][role]
@@ -53,7 +29,7 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
             role[0].remove(user)
             #del role[0][random.randint(0, len(role[0]) - 1)]
         #print("Remove user: "+str(individual[0]))
-        individual[0] = utils.combineObjects(individual[0], 0)
+        individual[0] = optimizer.combineObjects(individual[0], 0)
     if random.random() < removePermissionPB:
         role = individual[0][random.randint(0, len(individual[0]) - 1)]
         if (len(role[1]) > 1):
@@ -61,7 +37,7 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
             role[1].remove(random.sample(role[1],1)[0])
             #del role[1][random.randint(0, len(role[1]) - 1)]
         #print("Remove permission: "+str(individual[0]))
-        individual[0] = utils.combineObjects(individual[0], 1)
+        individual[0] = optimizer.combineObjects(individual[0], 1)
     if random.random() < addUserPB:
         # Pick random gene (role)
         role = individual[0][random.randint(0, len(individual[0]) - 1)]
@@ -75,7 +51,7 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
             role[0].add(user)
             #role[0] = list(set(role[0]) | {random.randint(1, userSize)})
         #print("Add user: "+str(individual[0]))
-        individual[0] = utils.combineObjects(individual[0], 0)
+        individual[0] = optimizer.combineObjects(individual[0], 0)
     if random.random() < addPermissionPB:
         role = individual[0][random.randint(0, len(individual[0]) - 1)]
         permissionCnt = len(role[1])
@@ -86,10 +62,12 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
             role[1].add(permission)
             #role[1] = list(set(role[1]) | {random.randint(1, permissionSize)})
         #print("Add permission: "+str(individual[0]))
-        individual[0] = utils.combineObjects(individual[0], 1)
+        individual[0] = optimizer.combineObjects(individual[0], 1)
     return individual,
 
+# -----------------------------------------------------------------------------------
 # Crossover Function
+# -----------------------------------------------------------------------------------
 def mateFunc(ind1, ind2):
     #print("Crossover")
     temp1 = ind1[0]
@@ -98,6 +76,6 @@ def mateFunc(ind1, ind2):
     if size > 1:
         cxpoint = random.randint(1, size - 1)
         temp1[cxpoint:], temp2[cxpoint:] = temp2[cxpoint:], temp1[cxpoint:]
-        temp1 = utils.localOptimization(temp1)
-        temp2 = utils.localOptimization(temp2)
+        temp1 = optimizer.localOptimization(temp1)
+        temp2 = optimizer.localOptimization(temp2)
     return ind1, ind2

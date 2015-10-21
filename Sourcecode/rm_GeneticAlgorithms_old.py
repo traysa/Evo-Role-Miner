@@ -1,3 +1,5 @@
+__author__ = 'Theresa'
+
 import random
 import numpy
 from deap import creator, base, tools, algorithms

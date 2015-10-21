@@ -39,7 +39,7 @@ def selNSGA2(individuals, k, probabilitiesForObjectives=[1.0,1.0]):
 
     return chosen
 
-def selTournamentFitnessDCD(individuals, k):
+def selTournamentFitnessDCD(individuals, k, probabilitiesForObjectives):
     """procedure UFTournSelection
     """
     def tourn(ind1, ind2):

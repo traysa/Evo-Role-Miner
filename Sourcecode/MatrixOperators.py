@@ -56,8 +56,8 @@ def compareMatrices(MatrixA,MatrixB):
 # -----------------------------------------------------------------------------------
 # Data Generation for RoleMiner
 # -----------------------------------------------------------------------------------
-def generateGoalMatrix(roles, users, permissions):
-    A = createRandomMatrix(users, roles)
-    B = createRandomMatrix(roles, permissions)
+def generateGoalMatrix(k, n, m):
+    A = createRandomMatrix(n, k)
+    B = createRandomMatrix(k, m)
     C = multiplyBoolMatrix(A, B)
     return C

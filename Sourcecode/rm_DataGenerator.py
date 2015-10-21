@@ -6,18 +6,25 @@ import datetime
 import rm_Visualization as visual
 import numpy
 
+# -----------------------------------------------------------------------------------
+# Draw a certain number of items randomly from a bucket
+# Returns the bucket and a set of items
+# -----------------------------------------------------------------------------------
+def drawFromBucket(bucket, itemCnt):
+    items = set()
+    for i in range(itemCnt):
+        item = random.randint(0,len(bucket)-1)
+        items.add(bucket.pop(item))
+    return bucket, items
 
-def drawFromBucket(permissionBucket, items):
-    permissions = set()
-    for i in range(items):
-        permission = random.randint(0,len(permissionBucket)-1)
-        #print("permission: "+str(permission))
-        permissions.add(permissionBucket.pop(permission))
-        #print("permissions: "+str(permissions))
-        #print("tempPermissionBucket: "+str(permissionBucket))
-    return permissionBucket, permissions
-
-def generateRoles(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage):
+# -----------------------------------------------------------------------------------
+# Generate Roles with:
+# - Limit of permissions per role
+# - Limit of permission usage
+# - Unused permissions possible
+# - Roles with no permissions possible --> error occurs
+# -----------------------------------------------------------------------------------
+def generateRoles(roleCnt, permissionCnt, maxPermissionForRole, maxPermissionUsage):
     roles = [{} for r in range(roleCnt)]
     #print("roles: "+str(roles))
     permissionBucket = [p for p in range(permissionCnt) for c in range(maxPermissionUsage)]
@@ -32,11 +39,20 @@ def generateRoles(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage
             roles[r] = permissions
             #print("role: "+str(roles[r]))
         else:
-            raise ValueError("An error occured")
+            raise ValueError("An error occured: Permission bucket is empty")
     #print("roles: "+str(roles))
     return roles
 
-def generateRoles2(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage):
+# -----------------------------------------------------------------------------------
+# Generate Roles with:
+# - Limit of permissions per role
+# - Limit of permission usage
+# - A permission is in at least one role
+# - No roles with no permission TODO
+# -----------------------------------------------------------------------------------
+def generateRoles2(roleCnt, permissionCnt, maxPermissionForRole, maxPermissionUsage):
+    if (permissionCnt*maxPermissionUsage) < roleCnt:
+         raise ValueError("An error occured: Not all roles can get permissions")
     roles = [set() for r in range(roleCnt)]
     #print("roles: "+str(roles))
     permissionUsage = [0 for p in range(permissionCnt)]
@@ -44,7 +60,7 @@ def generateRoles2(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsag
     permissionBucket = [p for p in range(permissionCnt) for c in range(maxPermissionUsage)]
     #print("permissionBucket: "+str(permissionBucket))
     emptySlotsinRole = [maxPermissionForRole for r in range(roleCnt)]
-    while (0 in permissionUsage and  sum(emptySlotsinRole) != 0):
+    while (0 in permissionUsage and sum(emptySlotsinRole) != 0): #TODO check
         openPermissions = [p for p in range(permissionCnt) if permissionUsage[p]<=maxPermissionUsage]
         #print("openPermissions: "+str(openPermissions))
         selectedPermission = random.sample(permissionBucket,1)[0]
@@ -60,7 +76,16 @@ def generateRoles2(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsag
         #print("emptySlotsinRole: "+str(emptySlotsinRole))
     return roles
 
-def generateRoles3(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage, RPdensity):
+# -----------------------------------------------------------------------------------
+# Generate Roles with:
+# - Limit of permissions per role
+# - Limit of permission usage
+# - A permission is in at least one role
+# - Limit of assignment density
+# -----------------------------------------------------------------------------------
+def generateRoles3(roleCnt, permissionCnt, maxPermissionForRole, maxPermissionUsage, RPdensity):
+    if (permissionCnt*maxPermissionUsage) < roleCnt:
+         raise ValueError("An error occured: Not all roles can get permissions")
     roles = [set() for r in range(roleCnt)]
     #print("roles: "+str(roles))
     permissionUsage = [0 for p in range(permissionCnt)]
@@ -89,7 +114,14 @@ def generateRoles3(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsag
         print("density: "+str(density))
     return roles
 
-def generateRoles4(roleCnt,permissionCnt, maxPermissionUsage, configPermissionsForRoles):
+# -----------------------------------------------------------------------------------
+# Generate Roles with:
+# - Limit of permissions per role
+# - Limit of permission usage
+# - A permission is in at least one role
+# - Configuration of role densities
+# -----------------------------------------------------------------------------------
+def generateRoles4(roleCnt, permissionCnt, maxPermissionUsage, configPermissionsForRoles):
     roles = [set() for r in range(roleCnt)]
     #print("roles: "+str(roles))
     permissionUsage = [0 for p in range(permissionCnt)]
@@ -156,7 +188,9 @@ def generateRoles4(roleCnt,permissionCnt, maxPermissionUsage, configPermissionsF
     roles.sort(key=lambda row: row)
     return roles
 
+# -----------------------------------------------------------------------------------
 # Remove duplicates from list
+# -----------------------------------------------------------------------------------
 def uniq(lst):
     last = object()
     for item in lst:
@@ -165,6 +199,9 @@ def uniq(lst):
         yield item
         last = item
 
+# -----------------------------------------------------------------------------------
+# Generate Users with attribute values
+# -----------------------------------------------------------------------------------
 def generateUsers(userCnt,attributes,userTypeCnt):
     userTypes = []
     while(len(userTypes) < userTypeCnt):
@@ -183,7 +220,10 @@ def generateUsers(userCnt,attributes,userTypeCnt):
     users.sort(key=lambda row: row)
     return users
 
-def generateRules(rules,roleCnt,attributes,maxRuleConditionCnt,ruleUsage):
+# -----------------------------------------------------------------------------------
+# Generate Rules for Roles
+# -----------------------------------------------------------------------------------
+def generateRules(rules, roleCnt, attributes, maxRuleConditionCnt, ruleUsage):
     #rules = [[] for r in range(roleCnt)]
     #print("rules: "+str(rules))
     for r,usage in enumerate(ruleUsage):
@@ -203,6 +243,10 @@ def generateRules(rules,roleCnt,attributes,maxRuleConditionCnt,ruleUsage):
     #print("rules: "+str(rules))
     return rules
 
+# -----------------------------------------------------------------------------------
+# Assign Users to Roles according to Rules
+# Return URMatrix
+# -----------------------------------------------------------------------------------
 def assignUsersToRoles(users, roles, rules):
     rolesCnt = len(roles)
     userCnt = len(users)
@@ -220,6 +264,11 @@ def assignUsersToRoles(users, roles, rules):
                 URMatrix[u][r] = 1
     return URMatrix
 
+# -----------------------------------------------------------------------------------
+# Assign Users to Roles according to Rules with
+# - Limit number of TODO
+# Return URMatrix
+# -----------------------------------------------------------------------------------
 def assignUsersToRoles2(users, roles, rules, density):
     rolesCnt = len(roles)
     userCnt = len(users)
@@ -238,7 +287,8 @@ def assignUsersToRoles2(users, roles, rules, density):
                 #print("match")
                 assignedRolesForUser[r] = 1
 
-        if (sum(assignedRolesForUser) >= density*len(assignedRolesForUser)):
+        if (sum(assignedRolesForUser) >= density*len(assignedRolesForUser)): #TODO check
+            # Delete all role assignments of user
             #print("sum(assignedRolesForUser): "+str(sum(assignedRolesForUser)))
             #print("density: "+str(density*len(assignedRolesForUser)))
             #print("dense")
@@ -247,7 +297,10 @@ def assignUsersToRoles2(users, roles, rules, density):
             URMatrix[u] = assignedRolesForUser
     return URMatrix
 
-def assignRolesToPermissions(roles, permissionCnt):
+# -----------------------------------------------------------------------------------
+# Assign Users to Roles according to Rules
+# -----------------------------------------------------------------------------------
+def createRPMatrix(roles, permissionCnt):
     rolesCnt = len(roles)
     RPMatrix = [[0 for p in range(permissionCnt)] for r in range(rolesCnt)]
     for r,role in enumerate(roles):
@@ -255,6 +308,9 @@ def assignRolesToPermissions(roles, permissionCnt):
             RPMatrix[r][p] = 1
     return RPMatrix
 
+# -----------------------------------------------------------------------------------
+# Add noise by bitflip in the UPMatrix
+# -----------------------------------------------------------------------------------
 def addNoise(UPmatrix, noise):
     UPMatrixWithNoise = numpy.copy(UPMatrix)
     for u,user in enumerate(UPMatrixWithNoise):
@@ -269,6 +325,9 @@ def addNoise(UPmatrix, noise):
                     UPMatrixWithNoise[u,p] = int(not(UPMatrixWithNoise[u,p]))
     return UPMatrixWithNoise
 
+# -----------------------------------------------------------------------------------
+# Print generated data into files
+# -----------------------------------------------------------------------------------
 def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoise, noise):
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -411,6 +470,9 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoi
             outfile.close()
     print("DONE.\n")
 
+# -----------------------------------------------------------------------------------
+# Configuration parameters for Data Generator
+# -----------------------------------------------------------------------------------
 attributes = [['Sales','Motor','Administration'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
 userCnt = 5 #Total number of users
 userTypeCnt = 5 #Number of different usertypes (usertype is desribed by the users attributes)
@@ -446,7 +508,7 @@ for r in rules:
 
 print("\nURMatrix: "+str(URMatrix))
 
-RPMatrix = assignRolesToPermissions(roles,permissionCnt)
+RPMatrix = createRPMatrix(roles,permissionCnt)
 print("\nRPMatrix: "+str(RPMatrix))
 
 UPMatrix = numpy.matrix(URMatrix,dtype=bool) * numpy.matrix(RPMatrix,dtype=bool)
