@@ -19,6 +19,8 @@ import shutil
 # ----------------------------------------------------------------------------------------------------------------------
 def getDataSet(DATA):
     Original = []
+    userAttributes = []
+    userAttributeValues = []
     if (DATA=="healthcare"):
         Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
     elif (DATA=="testdata"):
@@ -29,9 +31,11 @@ def getDataSet(DATA):
         Original = matrixOps.generateGoalMatrix(4, 10, 10)
     elif (DATA=="GeneratedData"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151004-191825\\testdata.rbac"))
+        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151004-191825\\users.csv")
     elif (DATA=="GeneratedData_small"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151005-194203\\testdata.rbac"))
-    return Original
+        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151005-194203\\users.csv")
+    return Original, userAttributeValues, userAttributes
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Helpmethod: Extract filename from filepath
@@ -69,6 +73,9 @@ def executeExperimentFromFile():
         if not os.path.exists(directory):
             os.makedirs(directory)
         shutil.copyfile(selectedFile, directory+"\\"+path_leaf(selectedFile)) #copy input file in output directory
+
+        eval_weights = []
+        obj_weights = []
 
         experimentNumber = 0
         for experiment in experiments:
@@ -121,29 +128,25 @@ def executeExperimentFromFile():
             if ("evalFunc" in experiment.keys()):
                 evalFunc = [o for o in experiment["evalFunc"].split(',')]
                 print("evalFunc: "+str(evalFunc))
+
             if ("eval_weights" in experiment.keys()):
-                if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
-                    eval_weights = [float(w) for w in experiment["eval_weights"].split(',')]
-                    print("eval_weights: "+str(eval_weights))
-                else:
-                    eval_weights = []
+                eval_weights = [float(w) for w in experiment["eval_weights"].split(',')]
+                print("eval_weights: "+str(eval_weights))
             if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
-                 numberOfWeights = len(eval_weights)
-                 if ((evalFunc == "Saenko" and numberOfWeights!=3)
-                    or(evalFunc == "Saenko_Euclidean" and numberOfWeights!=2)
-                    or(evalFunc == "WSC" and numberOfWeights!=4)
-                    or(evalFunc == "WSC_Star" and numberOfWeights!=5)):
+                if ((not eval_weights
+                    or evalFunc == "Saenko" and  len(eval_weights)!=3)
+                    or(evalFunc == "Saenko_Euclidean" and  len(eval_weights)!=2)
+                    or(evalFunc == "WSC" and  len(eval_weights)!=4)
+                    or(evalFunc == "WSC_Star" and  len(eval_weights)!=5)):
                     raise ValueError("Number of weights is incorrect for evaluation function")
+
             if ("obj_weights" in experiment.keys()):
-                if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
-                    obj_weights = [float(w) for w in experiment["obj_weights"].split(',')]
-                    print("obj_weights: "+str(obj_weights))
-                else:
-                    obj_weights = []
+                obj_weights = [float(w) for w in experiment["obj_weights"].split(',')]
+                print("obj_weights: "+str(obj_weights))
             if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
-                numberOfWeights = len(obj_weights)
-                if (numberOfWeights!=2):
+                if (not obj_weights or len(obj_weights)!=2):
                     raise ValueError("Number of weights is incorrect for evolution Type")
+
             if ("numberOfTrialItems" in experiment.keys()):
                 if (evolutionType == "SANE"):
                     numberOfTrialItems = int(experiment["numberOfTrialItems"])
@@ -386,7 +389,8 @@ def executeDefaultExperiment():
         evalFunc = [o for o in config['Algorithm']['evalFunc'].split(',')]
         if (evolutionType == 'Multi_Weighted' or evolutionType == 'Multi_Fortin2013_Weighted'):
             obj_weights = [float(w) for w in config['Algorithm']['obj_weights'].split(',')]
-        if (evalFunc == 'Saenko' or evalFunc == 'Saenko_Euclidean' or evalFunc == 'WSC' or evalFunc == 'WSC_Star'):
+        if (evalFunc[0] == 'Saenko' or evalFunc[0] == 'Saenko_Euclidean' or evalFunc[0] == 'WSC'
+            or evalFunc[0] == 'WSC_Star' or evalFunc[0] =='WSC_Star_RoleDis' or evalFunc[0] == "WSC_INT"):
             eval_weights = [float(w) for w in config['Algorithm']['eval_weights'].split(',')]
         if (evolutionType == "SANE"):
             numberOfTrialItems = config['Algorithm'].getint('numberOfTrialItems')
@@ -398,12 +402,15 @@ def executeDefaultExperiment():
             or evolutionType == None or evalFunc == None or obj_weights == None or eval_weights == None
             or numberOfTrialItems == None or repeat == None):
             raise ValueError("Config file 'Experiments_config.ini' is corrupt. Create new one by deleting the old one.")
-        if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
+        if (evalFunc[0] == "Saenko" or evalFunc[0] == "Saenko_Euclidean" or evalFunc[0] == "WSC" or evalFunc[0] == "WSC_Star"
+            or evalFunc[0] == "WSC_Star_RoleDis" or evalFunc[0] == "WSC_INT"):
             numberOfWeights = len(eval_weights)
             if ((evalFunc == "Saenko" and numberOfWeights!=3)
                 or(evalFunc == "Saenko_Euclidean" and numberOfWeights!=2)
                 or(evalFunc == "WSC" and numberOfWeights!=4)
-                or(evalFunc == "WSC_Star" and numberOfWeights!=5)):
+                or(evalFunc == "WSC_Star" and numberOfWeights!=5)
+                or(evalFunc == "WSC_Star_RoleDis" and numberOfWeights!=6)
+                or(evalFunc == "WSC_INT" and numberOfWeights!=6)):
                 raise ValueError("Number of weights is incorrect for evaluation function")
         if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
             numberOfWeights = len(obj_weights)
@@ -412,7 +419,7 @@ def executeDefaultExperiment():
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     Name = timestamp+"_"+experimentName
-    Original = getDataSet(DATA)
+    Original, userAttributes, userAttributeValues  = getDataSet(DATA)
 
     directory = "..\\Output"
     for experimentCnt in range(1,repeat+1):
@@ -423,7 +430,8 @@ def executeDefaultExperiment():
             rm_builder.startExperiment(directory, Name, 1, experimentCnt, Original, DATA, POP_SIZE, CXPB, MUTPB_All,
                                        addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
                                        addPermissionPB, NGEN, freq, evolutionType, evalFunc, untilSolutionFound,
-                                       obj_weights=obj_weights, eval_weights=eval_weights)
+                                       obj_weights=obj_weights, eval_weights=eval_weights,
+                                       userAttributeValues=userAttributeValues, userAttributes=userAttributes)
 
 
 loadExperiment = input('Load experiment from file? (y/n)\n')

@@ -88,7 +88,8 @@ else:
 # ----------------------------------------------------------------------------------------------------------------------
 def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
-                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[]):
+                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[],
+                    userAttributeValues=[], userAttributes=[]):
     global useCheckpoint
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -121,6 +122,10 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         os.makedirs(checkpointSubdirectory)
     pickleFile = checkpointSubdirectory+"\\"+str(experimentNumber)+"_"+str(experimentCnt)+"_Checkpoint"+fileExt+".pkl"
 
+    pop_directory = subdirectory+"\\Populations"
+    if not os.path.exists(pop_directory):
+        os.makedirs(pop_directory)
+
     # ------------------------------------------------------------------------------------------------------------------
     # EVOLUTION
     # ------------------------------------------------------------------------------------------------------------------
@@ -129,7 +134,8 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_single.evolution(Original, evalFunc[0], POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                 removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
-                                untilSolutionFound=untilSolutionFound, eval_weights=eval_weights)
+                                untilSolutionFound=untilSolutionFound, eval_weights=eval_weights,
+                                userAttributeValues=userAttributeValues, userAttributes=userAttributes, printPopulations=False, pop_directory=pop_directory)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,

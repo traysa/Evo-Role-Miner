@@ -9,6 +9,7 @@ import datetime
 import rm_EAOperators as operators
 import rm_EAInitialization as init
 import rm_EAEvaluations as evals
+import rm_Visualization as visual
 from collections import defaultdict
 
 # -----------------------------------------------------------------------------------
@@ -16,7 +17,8 @@ from collections import defaultdict
 # -----------------------------------------------------------------------------------
 def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
               removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
-              untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles=""):
+              untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
+              userAttributeValues=[],userAttributes=[], printPopulations=False, pop_directory=""):
 
     print("Prepare evolutionary algorithm...")
     time = []
@@ -37,6 +39,8 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
         weights=(-1.0,-1.0,-1.0,-1.0)
     elif (evalFunc=="Violations"):
         weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="Interpretability"):
+        weights=(1.0,-1.0,-1.0,-1.0)
     elif (evalFunc=="Saenko"):
         weights=(1.0,1.0,1.0,1.0)
     elif (evalFunc=="Saenko_Euclidean"):
@@ -44,6 +48,14 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     elif (evalFunc=="WSC"):
         weights=(-1.0,-1.0,-1.0,-1.0)
     elif (evalFunc=="WSC_Star"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="AvgRoleConf"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="AvgRoleConf_A"):
+        weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="WSC_INT"):
+         weights=(-1.0,-1.0,-1.0,-1.0)
+    elif (evalFunc=="WSC_Star_RoleDis"):
         weights=(-1.0,-1.0,-1.0,-1.0)
     else:
         raise ValueError("Evaluation function '"+str(evalFunc)+"' not known")
@@ -92,6 +104,8 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
         toolbox.register("evaluate", evals.evalFunc_RoleCnt, userSize=userSize, permissionSize=permissionSize, orig=Original)
     elif (evalFunc=="Violations"):
         toolbox.register("evaluate", evals.evalFunc_Violations, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="Interpretability"):
+       toolbox.register("evaluate", evals.evalFunc_Interpretability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues)
     elif (evalFunc=="Saenko"):
         toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     elif (evalFunc=="Saenko_Euclidean"):
@@ -100,6 +114,14 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
         toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     elif (evalFunc=="WSC_Star"):
         toolbox.register("evaluate", evals.evalFunc_WSC_Star, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+    elif (evalFunc=="AvgRoleConf"):
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="AvgRoleConf_A"):
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original)
+    elif (evalFunc=="WSC_INT"):
+        toolbox.register("evaluate", evals.evalFunc_WSC_INT, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues)
+    elif (evalFunc=="WSC_Star_RoleDis"):
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
     else:
         raise ValueError('Evaluation function not known')
 
@@ -136,11 +158,18 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     if (not population):
         print("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
-        #print(numpy.array(population))
+        if (printPopulations):
+            pop_subdirectory = pop_directory+"\\Generation_"+str(genStart)
+            if not os.path.exists(pop_subdirectory):
+                os.makedirs(pop_subdirectory)
+            visual.showBestResult(population, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(genStart), False, False, True, False)
 
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
-    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    if (evalFunc=="WSC_Star_RoleDis"):
+        fitnesses = [toolbox.evaluate(population=population, individual=ind) for ind in invalid_ind]
+    else:
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
 
@@ -174,7 +203,10 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
 
         # Evaluate individuals, which need a evaluation
         invalid_ind = [ind for ind in population if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        if (evalFunc=="WSC_Star_RoleDis"):
+            fitnesses = [toolbox.evaluate(population=population, individual=ind) for ind in invalid_ind]
+        else:
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
             # Stop condition
@@ -198,6 +230,12 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
                   +str(logbook.chapters["Accs"].stream)+"\t\t"
                   +str(logbook.chapters["RoleCnt"].stream)
                   )
+
+        if (printPopulations):
+            pop_subdirectory = pop_directory+"\\Generation_"+str(generation)
+            if not os.path.exists(pop_subdirectory):
+                os.makedirs(pop_subdirectory)
+            visual.showBestResult(population, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
 
         generation += 1
 

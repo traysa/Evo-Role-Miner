@@ -42,7 +42,7 @@ def read(filename):
 # -----------------------------------------------------------------------------------
 # Parse datasets from datagenerator
 # -----------------------------------------------------------------------------------
-def read2(filename):
+def read3(filename):
     print("Parsing file "+str(filename)+"... ")
     data = open(filename, 'r').read()
     lines = data.splitlines()
@@ -69,6 +69,73 @@ def read2(filename):
             matrix[userId][i] = attr
     print("DONE.\n")
     return matrix,userCount,attrCount,permCount
+
+# -----------------------------------------------------------------------------------
+# Parse userAttributes from datagenerator
+# -----------------------------------------------------------------------------------
+def readUserAttributes(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count users
+    userCount = len(lines)-2
+    print("userCount: "+str(userCount))
+
+    # Count attributes
+    attributesCount = max(list(map(int, re.findall('Attribute(.+?);', data))))
+    print("attributesCount: "+str(attributesCount))
+    userAttributes = []
+    for a in range(0,attributesCount):
+        userAttributes.append(set())
+
+    userAttributeValues = []
+    for line in lines[2:]:
+        parts = line.split(";")
+        userId = int(parts[0])
+        attributeValues = []
+        for i in range(0,attributesCount):
+            value = parts[i+1]
+            attributeValues.append(value)
+            userAttributes[i].add(value)
+        userAttributeValues.append(attributeValues)
+
+    userAttributes_normalized ,userAttributeValues_normalized = normalizeAttributeValues(userAttributes,userAttributeValues)
+    print("DONE.\n")
+    return userAttributes_normalized, userAttributeValues_normalized
+
+def normalizeAttributeValues(userAttributes,userAttributeValues):
+    userAttributeValues_normalized = userAttributeValues
+    for user in userAttributeValues_normalized:
+        for a,attr in enumerate(user):
+            user[a]=list(userAttributes[a]).index(attr)
+
+    userAttributes_normalized = [[] for a in range(0,len(userAttributes))]
+    for a in range(0,len(userAttributes)):
+        userAttributes_normalized[a] = list(range(0, len(userAttributes[a])))
+
+    return userAttributeValues_normalized, userAttributes_normalized
+
+# -----------------------------------------------------------------------------------
+# Parse constraints
+# -----------------------------------------------------------------------------------
+def readConstraints(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count constraints
+    constraintCount = len(lines)
+    print("constraintCount: "+str(constraintCount))
+
+    constraints = []
+    for line in lines:
+        parts = line.split(";")
+        if len(parts) > 2:
+            raise ValueError("Constraint '"+str(line)+"' is not valid")
+        constraints.append(parts)
+
+    return constraints
 
 def main():
     parser = OptionParser()

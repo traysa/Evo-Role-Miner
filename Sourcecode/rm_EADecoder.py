@@ -91,3 +91,19 @@ def resolveRoleModelChromosomeIntoIntArrays(chromosome, userSize, permissionSize
     #print(UPMatrix)
 
     return UMatrix, PMatrix, UPMatrix
+
+# -----------------------------------------------------------------------------------
+# Resolves a gene into an UR-matrix, RP-matrix and integer UP-matrix
+# -----------------------------------------------------------------------------------
+def resolveGeneIntoBoolArray(gene, userSize, permissionSize):
+    matrix = matrixOps.createEmptyMatrix(userSize, permissionSize)
+    user_set = gene[0]
+    permission_set = gene[1]
+    for user in user_set:
+        for permission in permission_set:
+            try:
+                matrix[user][permission] = 1
+            except IndexError:
+                print("An error occured: ind="+str(gene))
+                raise
+    return matrix
