@@ -7,6 +7,7 @@ Parsing of TestData and Visualization
 import numpy
 import re
 from optparse import OptionParser
+import MatrixOperators as matrixOps
 
 # -----------------------------------------------------------------------------------
 # Parse datasets from research (e.g. healthcare.rbc)
@@ -130,12 +131,70 @@ def readConstraints(filename):
 
     constraints = []
     for line in lines:
-        parts = line.split(";")
+        parts = [int(c) for c in line.split(";")]
         if len(parts) > 2:
             raise ValueError("Constraint '"+str(line)+"' is not valid")
         constraints.append(parts)
 
     return constraints
+
+# -----------------------------------------------------------------------------------
+# Parse User-Role Assignments
+# -----------------------------------------------------------------------------------
+def readURAssignments(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count constraints
+    roleCnt = len(lines[2:])
+    print("role count: "+str(roleCnt))
+
+    users = []
+    for line in lines[2:]:
+        parts = line.split(";")
+        users += [int(user) for user in parts[1].split(",")]
+    userCnt = max(users)
+    print("user count: "+str(userCnt))
+
+    URMatrix = matrixOps.createEmptyMatrix(userCnt, roleCnt)
+    for line in lines[2:]:
+        parts = line.split(";")
+        role = int(parts[0])-1
+        userList = [int(user)-1 for user in parts[1].split(",")]
+        for user in userList:
+            URMatrix[user][role]=1
+
+    return URMatrix
+
+# -----------------------------------------------------------------------------------
+# Parse Role-Permission Assignments
+# -----------------------------------------------------------------------------------
+def readRPAssignments(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count constraints
+    roleCnt = len(lines[2:])
+    print("role count: "+str(roleCnt))
+
+    permissions = []
+    for line in lines[2:]:
+        parts = line.split(";")
+        permissions += [int(permission) for permission in parts[1].split(",")]
+    permissionCnt = max(permissions)+1
+    print("permission count: "+str(permissionCnt))
+
+    RPMatrix = matrixOps.createEmptyMatrix(roleCnt, permissionCnt)
+    for line in lines[2:]:
+        parts = line.split(";")
+        role = int(parts[0])-1
+        permissionList = [int(permission) for permission in parts[1].split(",")]
+        for permission in permissionList:
+            RPMatrix[role][permission]=1
+
+    return RPMatrix
 
 def main():
     parser = OptionParser()
