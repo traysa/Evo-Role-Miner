@@ -13,40 +13,53 @@ import rm_EADecoder as decoder
 import os
 
 # -----------------------------------------------------------------------------------
+# Plot Logbook chapter into graph for single objective EAs
+# -----------------------------------------------------------------------------------
+def plotLogbookChapter(stat, logbook, ax):
+    gen = logbook.select("gen")
+    ax.set_xlabel("Generation", fontsize=16)
+    ax.set_ylabel(stat, fontsize=16)
+    #ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+
+    fit_maxs = logbook.chapters[stat].select("max")
+    fit_mins = logbook.chapters[stat].select("min")
+    fit_avgs = logbook.chapters[stat].select("avg")
+    line1 = ax.plot(gen, fit_mins, "b-", label="Minimum "+stat)
+    line2 = ax.plot(gen, fit_maxs, "r-", label="Maximum "+stat)
+    line3 = ax.plot(gen, fit_avgs, "g-", label="Average "+stat)
+    lns = line1 + line2 + line3
+
+    # Build legend
+    labs = [l.get_label() for l in lns]
+    ax.legend(lns, labs, loc="center right")
+    return ax
+
+# -----------------------------------------------------------------------------------
 # Print Logbook into graph for single objective EAs
 # -----------------------------------------------------------------------------------
 def plotLogbook(logbook, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
-    gen = logbook.select("gen")
+
     # Plot graphs
     #fig, ax = plt.subplots(figsize=(12, 8))
     #fig = plt.figure(figsize=(12, 8))
     #ax = fig.add_subplot(111)
 
-    fig, plots = plt.subplots(2, 2,figsize=(16,12))
-    s = 0
-    for ay in plots:
-        for ax in ay:
-            if (s < len(stats)):
-                stat = stats[s]
-                ax.set_xlabel("Generation", fontsize=16)
-                ax.set_ylabel(stat, fontsize=16)
-                #ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
-
-                fit_maxs = logbook.chapters[stat].select("max")
-                fit_mins = logbook.chapters[stat].select("min")
-                fit_avgs = logbook.chapters[stat].select("avg")
-                line1 = ax.plot(gen, fit_mins, "b-", label="Minimum "+stat)
-                line2 = ax.plot(gen, fit_maxs, "r-", label="Maximum "+stat)
-                line3 = ax.plot(gen, fit_avgs, "g-", label="Average "+stat)
-                lns = line1 + line2 + line3
-
-                # Build legend
-                labs = [l.get_label() for l in lns]
-                ax.legend(lns, labs, loc="center right")
-                s += 1
-
+    if (len(stats)==1):
+        fig, ax = plt.subplots(figsize=(12, 8))
+        ax = plotLogbookChapter(stats[0], logbook, ax)
+        ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+    else:
+        fig, plots = plt.subplots(3, 2,figsize=(18,16))
+        s = 0
+        for ay in plots:
+            for ax in ay:
+                if (s < len(stats)):
+                    stat = stats[s]
+                    ax = plotLogbookChapter(stat, logbook, ax)
+                    s += 1
     fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle("Fitness for: "+title, fontsize=20)
+    print("DONE.\n")
 
     if (saveAsPDF):
         print("Save logbook plot as PDF...")

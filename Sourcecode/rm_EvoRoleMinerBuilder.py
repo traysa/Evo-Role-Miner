@@ -89,7 +89,7 @@ else:
 def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                     NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[],
-                    userAttributeValues=[], userAttributes=[]):
+                    userAttributeValues=[], constraints=[]):
     global useCheckpoint
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -135,7 +135,8 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
             ea_single.evolution(Original, evalFunc[0], POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                 removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
                                 untilSolutionFound=untilSolutionFound, eval_weights=eval_weights,
-                                userAttributeValues=userAttributeValues, userAttributes=userAttributes, printPopulations=False, pop_directory=pop_directory)
+                                userAttributeValues=userAttributeValues,
+                                constraints=constraints, printPopulations=False, pop_directory=pop_directory)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,
@@ -203,6 +204,15 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     RoleCnt_Min = 0
     RoleCnt_Max = 0
     RoleCnt_Avg = 0
+    URCnt_Min = 0
+    URCnt_Max = 0
+    URCnt_Avg = 0
+    RPCnt_Min = 0
+    RPCnt_Max = 0
+    RPCnt_Avg = 0
+    Interp_Min = 0
+    Interp_Max = 0
+    Interp_Avg = 0
     logbooksSubdirectory = subdirectory+"\\Logbooks"
     if not os.path.exists(logbooksSubdirectory):
         os.makedirs(logbooksSubdirectory)
@@ -231,6 +241,9 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                 temp['Conf'] = logbook.chapters["Conf"][i]
                 temp['Accs'] = logbook.chapters["Accs"][i]
                 temp['RoleCnt'] = logbook.chapters["RoleCnt"][i]
+                temp['URCnt'] = logbook.chapters["URCnt"][i]
+                temp['RPCnt'] = logbook.chapters["RPCnt"][i]
+                temp['Interp'] = logbook.chapters["Interp"][i]
         with open(logfile, "a") as outfile:
             json.dump(temp, outfile, indent=4, cls=NumPyArangeEncoder)
             outfile.close()
@@ -262,7 +275,11 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                 outfile.write("sep=;\n")
                 outfile.write("gen;evals;Fitness_Min;Fitness_Max;Fitness_Avg;Fitness_Std"\
                               ";Conf_Min;Conf_Max;Conf_Avg;Conf_Std"\
-                              ";Accs_Min;Accs_Max;Accs_Avg;Accs_Std;RoleCnt_Min;RoleCnt_Max;RoleCnt_Avg;RoleCnt_Std"\
+                              ";Accs_Min;Accs_Max;Accs_Avg;Accs_Std"
+                              ";RoleCnt_Min;RoleCnt_Max;RoleCnt_Avg;RoleCnt_Std"
+                              ";URCnt_Min;URCnt_Max;URCnt_Avg;URCnt_Std"\
+                              ";RPCnt_Min;RPCnt_Max;RPCnt_Avg;RPCnt_Std"\
+                              ";Interp_Min;Interp_Max;Interp_Avg;Interp_Std"\
                               "\n")
                 for i in range(0,len(logbook)):
                     gen = logbook.select("gen")[i]
@@ -283,15 +300,33 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                     RoleCnt_Max = logbook.chapters["RoleCnt"].select("max")[i]
                     RoleCnt_Avg = logbook.chapters["RoleCnt"].select("avg")[i]
                     RoleCnt_Std = logbook.chapters["RoleCnt"].select("std")[i]
+                    URCnt_Min = logbook.chapters["URCnt"].select("min")[i]
+                    URCnt_Max = logbook.chapters["URCnt"].select("max")[i]
+                    URCnt_Avg = logbook.chapters["URCnt"].select("avg")[i]
+                    URCnt_Std = logbook.chapters["URCnt"].select("std")[i]
+                    RPCnt_Min = logbook.chapters["RPCnt"].select("min")[i]
+                    RPCnt_Max = logbook.chapters["RPCnt"].select("max")[i]
+                    RPCnt_Avg = logbook.chapters["RPCnt"].select("avg")[i]
+                    RPCnt_Std = logbook.chapters["RPCnt"].select("std")[i]
+                    Interp_Min = logbook.chapters["Interp"].select("min")[i]
+                    Interp_Max = logbook.chapters["Interp"].select("max")[i]
+                    Interp_Avg = logbook.chapters["Interp"].select("avg")[i]
+                    Interp_Std = logbook.chapters["Interp"].select("std")[i]
                     outfile.write(str(gen)+";"+str(evals)
                                   +";"+str(Fitness_Min)+";"+str(Fitness_Max)+";"+str(Fitness_Avg)+";"+str(Fitness_Std)
                                   +";"+str(Conf_Min)+";"+str(Conf_Max)+";"+str(Conf_Avg)+";"+str(Conf_Std)
                                   +";"+str(Accs_Min)+";"+str(Accs_Max)+";"+str(Accs_Avg)+";"+str(Accs_Std)
                                   +";"+str(RoleCnt_Min)+";"+str(RoleCnt_Max)+";"+str(RoleCnt_Avg)+";"+str(RoleCnt_Std)
+                                  +";"+str(URCnt_Min)+";"+str(URCnt_Max)+";"+str(URCnt_Avg)+";"+str(URCnt_Std)
+                                  +";"+str(RPCnt_Min)+";"+str(RPCnt_Max)+";"+str(RPCnt_Avg)+";"+str(RPCnt_Std)
+                                  +";"+str(Interp_Min)+";"+str(Interp_Max)+";"+str(Interp_Avg)+";"+str(Interp_Std)
                                   +"\n")
                 resultInfo = "Conf("+str(Conf_Min)+","+str(Conf_Avg)+","+str(Conf_Max)\
                              +"),Accs("+str(Accs_Min)+","+str(Accs_Avg)+","+str(Accs_Max)\
-                             +"),RoleCnt("+str(RoleCnt_Min)+","+str(RoleCnt_Avg)+","+str(RoleCnt_Max)+")"
+                             +"),RoleCnt("+str(RoleCnt_Min)+","+str(RoleCnt_Avg)+","+str(RoleCnt_Max)\
+                             +"),URCnt("+str(URCnt_Min)+","+str(URCnt_Avg)+","+str(URCnt_Max)\
+                             +"),RPCnt("+str(RPCnt_Min)+","+str(RPCnt_Avg)+","+str(RPCnt_Max)\
+                             +"),Interp("+"{0:.2f}".format(Interp_Min)+","+"{0:.2f}".format(Interp_Avg)+","+"{0:.2f}".format(Interp_Max)+")"
                 outfile.close()
 
 
@@ -316,8 +351,10 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         fitness_filename += "_" + str(obj_weights)
 
     if (evolutionType=="Single"):
-        stats = ["Fitness","RoleCnt","Conf","Accs"]
+        stats = ["Fitness"]
+        stats2 = ["Conf","Accs","RoleCnt","URCnt","RPCnt","Interp"]
         visual.plotLogbook(logbook, log_filename+"_plot", stats, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
+        visual.plotLogbook(logbook, log_filename+"_rmmeasures_plot", stats2, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
         visual.showFitnessInPlot(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc[0], fitnessAsPDF, fitnessAsSVG,
                                  fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,

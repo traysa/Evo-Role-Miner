@@ -18,7 +18,7 @@ from collections import defaultdict
 def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
               removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
               untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
-              userAttributeValues=[],userAttributes=[], printPopulations=False, pop_directory=""):
+              userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
 
     print("Prepare evolutionary algorithm...")
     time = []
@@ -32,31 +32,31 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     # Register Optimization
     weights = None
     if (evalFunc=="Confidentiality"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="Availability"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="RoleCnt"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="Violations"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="Interpretability"):
-        weights=(1.0,-1.0,-1.0,-1.0)
+        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)   #Maximization
     elif (evalFunc=="Saenko"):
-        weights=(1.0,1.0,1.0,1.0)
+        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)   #Maximization
     elif (evalFunc=="Saenko_Euclidean"):
-        weights=(1.0,1.0,1.0,1.0)
+        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="WSC"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="WSC_Star"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="AvgRoleConf"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="AvgRoleConf_A"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="WSC_INT"):
-         weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="WSC_Star_RoleDis"):
-        weights=(-1.0,-1.0,-1.0,-1.0)
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     else:
         raise ValueError("Evaluation function '"+str(evalFunc)+"' not known")
     creator.create("FitnessMinMax", base.Fitness, weights=weights)
@@ -97,31 +97,31 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
 
     # Register Evaluation Function
     if (evalFunc=="Confidentiality"):
-        toolbox.register("evaluate", evals.evalFunc_Confidentiality, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Confidentiality, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="Availability"):
-        toolbox.register("evaluate", evals.evalFunc_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="RoleCnt"):
-        toolbox.register("evaluate", evals.evalFunc_RoleCnt, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_RoleCnt, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="Violations"):
-        toolbox.register("evaluate", evals.evalFunc_Violations, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_Violations, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="Interpretability"):
-       toolbox.register("evaluate", evals.evalFunc_Interpretability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues)
+       toolbox.register("evaluate", evals.evalFunc_Interpretability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="Saenko"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="Saenko_Euclidean"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="WSC"):
-        toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+        toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="WSC_Star"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_Star, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="AvgRoleConf"):
-        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="AvgRoleConf_A"):
-        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original)
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="WSC_INT"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_INT, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues)
+        toolbox.register("evaluate", evals.evalFunc_WSC_INT, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="WSC_Star_RoleDis"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights)
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     else:
         raise ValueError('Evaluation function not known')
 
@@ -143,7 +143,10 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     statsConf = tools.Statistics(key=lambda ind: ind.fitness.values[1])
     statsAccs = tools.Statistics(key=lambda ind: ind.fitness.values[2])
     statsRoleCnt = tools.Statistics(key=lambda ind: ind.fitness.values[3])
-    mstats = tools.MultiStatistics(Fitness=statsFitness,Conf=statsConf,Accs=statsAccs,RoleCnt=statsRoleCnt)
+    statsURCnt = tools.Statistics(key=lambda ind: ind.fitness.values[4])
+    statsRPCnt = tools.Statistics(key=lambda ind: ind.fitness.values[5])
+    statsInterp = tools.Statistics(key=lambda ind: ind.fitness.values[6])
+    mstats = tools.MultiStatistics(Fitness=statsFitness,Conf=statsConf,Accs=statsAccs,RoleCnt=statsRoleCnt,URCnt=statsURCnt,RPCnt=statsRPCnt,Interp=statsInterp)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
     mstats.register("min", numpy.min)
@@ -153,6 +156,9 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     logbook.chapters["Conf"].header = "min", "avg", "max", "std"
     logbook.chapters["Accs"].header = "min", "avg", "max", "std"
     logbook.chapters["RoleCnt"].header = "min", "avg", "max", "std"
+    logbook.chapters["URCnt"].header = "min", "avg", "max", "std"
+    logbook.chapters["RPCnt"].header = "min", "avg", "max", "std"
+    logbook.chapters["Interp"].header = "min", "avg", "max", "std"
 
     # Creating the population
     if (not population):
@@ -185,7 +191,10 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
               +str(logbook.chapters["Fitness"].stream)+"\n"
               +str(logbook.chapters["Conf"].stream)+"\n"
               +str(logbook.chapters["Accs"].stream)+"\n"
-              +str(logbook.chapters["RoleCnt"].stream)
+              +str(logbook.chapters["RoleCnt"].stream)+"\n"
+              +str(logbook.chapters["URCnt"].stream)+"\n"
+              +str(logbook.chapters["RPCnt"].stream)+"\n"
+              +str(logbook.chapters["Interp"].stream)
               )
 
     # Begin the evolution
@@ -228,7 +237,10 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
                   +str(logbook.chapters["Fitness"].stream)+"\t\t"
                   +str(logbook.chapters["Conf"].stream)+"\t\t"
                   +str(logbook.chapters["Accs"].stream)+"\t\t"
-                  +str(logbook.chapters["RoleCnt"].stream)
+                  +str(logbook.chapters["RoleCnt"].stream)+"\t\t"
+                  +str(logbook.chapters["URCnt"].stream)+"\t\t"
+                  +str(logbook.chapters["RPCnt"].stream)+"\t\t"
+                  +str(logbook.chapters["Interp"].stream)
                   )
 
         if (printPopulations):

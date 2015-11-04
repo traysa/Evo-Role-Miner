@@ -21,6 +21,7 @@ def getDataSet(DATA):
     Original = []
     userAttributes = []
     userAttributeValues = []
+    constraints = []
     if (DATA=="healthcare"):
         Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
     elif (DATA=="testdata"):
@@ -32,10 +33,14 @@ def getDataSet(DATA):
     elif (DATA=="GeneratedData"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151004-191825\\testdata.rbac"))
         userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151004-191825\\users.csv")
+        constraints = parser.readConstraints("..\\TestData\\Data_20151004-191825\\constraints.csv")
     elif (DATA=="GeneratedData_small"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151005-194203\\testdata.rbac"))
         userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151005-194203\\users.csv")
-    return Original, userAttributeValues, userAttributes
+        #constraints = parser.readConstraints("..\\TestData\\Data_20151005-194203\\constraints.csv")
+        URMatrix = parser.readURAssignments("..\\TestData\\Data_20151005-194203\\UsersToRoles.csv")
+        RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151005-194203\\Roles.csv")
+    return Original, userAttributeValues, userAttributes, constraints
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Helpmethod: Extract filename from filepath
@@ -419,7 +424,7 @@ def executeDefaultExperiment():
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     Name = timestamp+"_"+experimentName
-    Original, userAttributes, userAttributeValues  = getDataSet(DATA)
+    Original, userAttributes, userAttributeValues, constraints = getDataSet(DATA)
 
     directory = "..\\Output"
     for experimentCnt in range(1,repeat+1):
@@ -431,7 +436,8 @@ def executeDefaultExperiment():
                                        addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
                                        addPermissionPB, NGEN, freq, evolutionType, evalFunc, untilSolutionFound,
                                        obj_weights=obj_weights, eval_weights=eval_weights,
-                                       userAttributeValues=userAttributeValues, userAttributes=userAttributes)
+                                       userAttributeValues=userAttributeValues,
+                                       constraints=constraints)
 
 
 loadExperiment = input('Load experiment from file? (y/n)\n')

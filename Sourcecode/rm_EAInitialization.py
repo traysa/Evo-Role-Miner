@@ -33,6 +33,15 @@ def generateChromosome(maxRoles, userSize, permissionSize):
         print("WARNING: Invalid Rolemodel. A user has not been used")
     #print("userUsage: "+str(userUsage))
     chromosome = optimizer.localOptimization(chromosome)
+
+
+    userUsage = []
+    for role in chromosome:
+        userUsage += [user for user in role[0]]
+    check = [u for u in range(0,userSize) if u not in userUsage]
+    if (len(check) > 0):
+        temp = 0
+
     return chromosome
 
 # -----------------------------------------------------------------------------------
