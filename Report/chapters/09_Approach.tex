@@ -66,29 +66,39 @@ Since there has not been a lot of research done up till now (see chapter \ref{se
     Which selection mechanisms are chosen is dependent on if a single-objective or a multi-objective EA is applied.\\
     For the parent selection ...\\
     For the survivor selection ...\\
+    Tournament Selection\\
     DEAP Build-in selection methods\\
     Improvements of DEAP Build-in selection methods\\
     \hl{Pseudocode?}
     
-    \subsection{Evaluation functions for Role Mining Problem Objectives}
+    \subsection{Fitness functions for Role Mining Problem Objectives}
     \hl{SECTION UNDER CONSTRUCTION}\\
     Several objectives of the role mining problem are separately implemented as evaluation function and their impact on the EA is analyzed. In \cite{saenko2012design} a weighted function is suggested which takes the number of roles, access-violations and availability-violations into account. The function is formulated as maximization function. Another commonly used objective function, the weighted structural complexity, is also implemented and compared with the first function. Different weights for the functions are tested and reveal that the objective of minimizing the number of roles has a strong influence.\\
-    To analyze the different objectives a MOEA has been implemented. The NSGA-II algorithm is applied and reveal the algorithm is not good in handling individuals with the same fitness. The Fortin improvement is applied. Since the objective of number of roles has a too strong impact, a NSGA-II algorithm with weights is implemented.\\
-    
-    \hl{Pseudocode?}
-    \begin{itemize}
-        \item{Minimizing the number of roles in role model}
-        \item{Minimizing confidentiality violations in role model}
-        \item{Minimizing availability violations in role model}
-        \item{Minimizing confidentiality and availability violations in role model}
-        \item{Minimizing the number of roles and violations in role model}
-        \item{Minimizing average confidentiality violations of roles}
-        \item{Minimizing average confidentiality violations of roles and availability violations in role model}
-        \item{Minimizing Weighted Structural Complexity (WSC) of role model}
-        \item{Maximizing average interpretability of roles}
-        \item{Minimizing WSC of role model and maximizing average interpretability of roles}
-        \item 
-    \end{itemize}
+    To analyze the different objectives a MOEA has been implemented. The NSGA-II algorithm is applied and reveal the algorithm is not good in handling individuals with the same fitness. The Fortin improvement is applied. Since the objective of number of roles has a too strong impact, a NSGA-II algorithm with weights is implemented.
+        \subsubsection{Fitness functions for Completeness}
+        \begin{itemize}
+            \item{Minimizing confidentiality violations in role model}
+            \item{Minimizing availability violations in role model}
+            \item{Minimizing confidentiality and availability violations in role model}
+            \item{Minimizing average confidentiality violations of roles}
+            \item{Minimizing average confidentiality violations of roles and availability violations in role model}
+        \end{itemize}
+        \subsubsection{Fitness functions for Complexity}
+        \begin{itemize}
+            \item{Minimizing the number of roles in role model}
+            \item{Minimizing the number of UR-Assignments in role model}
+            \item{Minimizing the number of RP-Assignments in role model}
+        \end{itemize}
+        \subsubsection{Fitness functions for Comprehension}
+        \begin{itemize}
+            \item{Maximizing average interpretability of roles}
+        \end{itemize}
+        \subsubsection{Mixed Fitness functions}
+        \begin{itemize}
+            \item{Minimizing the number of roles and violations in role model (Saenko)}
+            \item{Minimizing Weighted Structural Complexity (WSC) of role model}
+            \item{Minimizing WSC of role model and maximizing average interpretability of roles}
+        \end{itemize}
     
     \subsection{Initialization of the Population and Termination condition}
     \hl{SECTION UNDER CONSTRUCTION}\\
