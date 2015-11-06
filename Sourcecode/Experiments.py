@@ -1,5 +1,7 @@
 __author__ = 'Theresa'
 
+import logging
+
 import rm_EvoRoleMinerBuilder as rm_builder
 import numpy
 import MatrixOperators as matrixOps
@@ -13,6 +15,8 @@ import configparser
 import ntpath
 import os
 import shutil
+import Experiments_Evaluator as exp_eval
+import logging
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DATA SETS
@@ -24,6 +28,20 @@ def getDataSet(DATA):
     constraints = []
     if (DATA=="healthcare"):
         Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
+    if (DATA=="domino"):
+        Original = numpy.matrix(parser.read("..\\TestData\\domino.rbac"))
+    if (DATA=="emea"):
+        Original = numpy.matrix(parser.read("..\\TestData\\emea.rbac"))
+    if (DATA=="apj"):
+        Original = numpy.matrix(parser.read("..\\TestData\\apj.rbac"))
+    if (DATA=="firewall1"):
+        Original = numpy.matrix(parser.read("..\\TestData\\firewall1.rbac"))
+    if (DATA=="firewall2"):
+        Original = numpy.matrix(parser.read("..\\TestData\\firewall2.rbac"))
+    if (DATA=="americas_small"):
+        Original = numpy.matrix(parser.read("..\\TestData\\americas_small.rbac"))
+    if (DATA=="americas_large"):
+        Original = numpy.matrix(parser.read("..\\TestData\\americas_large.rbac"))
     elif (DATA=="testdata"):
         testdata = [[1, 1, 0, 0, 0], [1, 0, 0, 1, 1], [1, 0, 1, 1, 1], [1, 0, 0, 1, 1], [1, 0, 0, 1, 1], [1, 1, 0, 1, 1], [1, 0, 0, 1, 1]]
         testdata2 = [[3, 3, 0, 0, 0], [2, 0, 0, 2, 2], [1, 0, 1, 1, 1], [2, 0, 0, 2, 2], [2, 0, 0, 2, 2], [4, 3, 0, 2, 2], [2, 0, 0, 2, 2]]
@@ -33,7 +51,7 @@ def getDataSet(DATA):
     elif (DATA=="GeneratedData"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151004-191825\\testdata.rbac"))
         userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151004-191825\\users.csv")
-        constraints = parser.readConstraints("..\\TestData\\Data_20151004-191825\\constraints.csv")
+        #constraints = parser.readConstraints("..\\TestData\\Data_20151004-191825\\constraints.csv")
     elif (DATA=="GeneratedData_small"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151005-194203\\testdata.rbac"))
         userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151005-194203\\users.csv")
@@ -60,7 +78,7 @@ def executeExperimentFromFile():
     root.withdraw()
     selectedFile = filedialog.askopenfilename(initialdir = "..\\Input")
     if (selectedFile == ''):
-        print('Program stopped')
+        logger.info('Program stopped')
     else:
         jsonText = ""
         with open(selectedFile) as f:
@@ -71,7 +89,7 @@ def executeExperimentFromFile():
         # --------------------------------------------------------------------------------------------------------------
         # Parse Experiment File and execute experiments
         # --------------------------------------------------------------------------------------------------------------
-        print("Experiment Settings: ")
+        logger.info("Experiment Settings: ")
         timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
         directory = "..\\Output\\"+timestamp+"_ExperimentSequence_"+path_leaf(selectedFile)
@@ -88,55 +106,58 @@ def executeExperimentFromFile():
             experimentNumber += 1
             if ("Experiment" in experiment.keys()):
                 customName = experiment["Experiment"]
-                print("Name: "+customName)
+                logger.info("Name: "+customName)
                 #Name = timestamp+"_"+customName
                 Name = customName
             if ("DATA" in experiment.keys()):
                 DATA = experiment["DATA"]
-                Original = getDataSet(DATA)
+                Original, userAttributes, userAttributeValues, constraints = getDataSet(DATA)
             if ("POP_SIZE" in experiment.keys()):
                 POP_SIZE = int(experiment["POP_SIZE"])
-                print("POP_SIZE: "+str(POP_SIZE))
+                logger.info("POP_SIZE: "+str(POP_SIZE))
+            if ("tournsize" in experiment.keys()):
+                tournsize = int(experiment["tournsize"])
+                logger.info("tournsize: "+str(tournsize))
             if ("CXPB" in experiment.keys()):
                 CXPB = float(experiment["CXPB"])
-                print("CXPB: "+str(CXPB))
+                logger.info("CXPB: "+str(CXPB))
             if ("MUTPB_All" in experiment.keys()):
                 MUTPB_All = float(experiment["MUTPB_All"])
-                print("MUTPB_All: "+str(MUTPB_All))
+                logger.info("MUTPB_All: "+str(MUTPB_All))
             if ("addRolePB" in experiment.keys()):
                 addRolePB = float(experiment["addRolePB"])
-                print("addRolePB: "+str(addRolePB))
+                logger.info("addRolePB: "+str(addRolePB))
             if ("removeRolePB" in experiment.keys()):
                 removeRolePB = float(experiment["removeRolePB"])
-                print("removeRolePB: "+str(removeRolePB))
+                logger.info("removeRolePB: "+str(removeRolePB))
             if ("removeUserPB" in experiment.keys()):
                 removeUserPB = float(experiment["removeUserPB"])
-                print("removeUserPB: "+str(removeUserPB))
+                logger.info("removeUserPB: "+str(removeUserPB))
             if ("removePermissionPB" in experiment.keys()):
                 removePermissionPB = float(experiment["removePermissionPB"])
-                print("removePermissionPB: "+str(removePermissionPB))
+                logger.info("removePermissionPB: "+str(removePermissionPB))
             if ("addUserPB" in experiment.keys()):
                 addUserPB = float(experiment["addUserPB"])
-                print("addUserPB: "+str(addUserPB))
+                logger.info("addUserPB: "+str(addUserPB))
             if ("addPermissionPB" in experiment.keys()):
                 addPermissionPB = float(experiment["addPermissionPB"])
-                print("addPermissionPB: "+str(addPermissionPB))
+                logger.info("addPermissionPB: "+str(addPermissionPB))
             if ("NGEN" in experiment.keys()):
                 NGEN = int(experiment["NGEN"])
-                print("NGEN: "+str(NGEN))
+                logger.info("NGEN: "+str(NGEN))
             if ("freq" in experiment.keys()):
                 freq = int(experiment["freq"])
-                print("freq: "+str(freq))
+                logger.info("freq: "+str(freq))
             if ("evolutionType" in experiment.keys()):
                 evolutionType = experiment["evolutionType"]
-                print("evolutionType: "+evolutionType)
+                logger.info("evolutionType: "+evolutionType)
             if ("evalFunc" in experiment.keys()):
                 evalFunc = [o for o in experiment["evalFunc"].split(',')]
-                print("evalFunc: "+str(evalFunc))
+                logger.info("evalFunc: "+str(evalFunc))
 
             if ("eval_weights" in experiment.keys()):
                 eval_weights = [float(w) for w in experiment["eval_weights"].split(',')]
-                print("eval_weights: "+str(eval_weights))
+                logger.info("eval_weights: "+str(eval_weights))
             if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
                 if ((not eval_weights
                     or evalFunc == "Saenko" and  len(eval_weights)!=3)
@@ -147,7 +168,7 @@ def executeExperimentFromFile():
 
             if ("obj_weights" in experiment.keys()):
                 obj_weights = [float(w) for w in experiment["obj_weights"].split(',')]
-                print("obj_weights: "+str(obj_weights))
+                logger.info("obj_weights: "+str(obj_weights))
             if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
                 if (not obj_weights or len(obj_weights)!=2):
                     raise ValueError("Number of weights is incorrect for evolution Type")
@@ -155,29 +176,36 @@ def executeExperimentFromFile():
             if ("numberOfTrialItems" in experiment.keys()):
                 if (evolutionType == "SANE"):
                     numberOfTrialItems = int(experiment["numberOfTrialItems"])
-                    print("numberOfTrialItems: "+str(numberOfTrialItems))
+                    logger.info("numberOfTrialItems: "+str(numberOfTrialItems))
                 else:
                     numberOfTrialItems = 0
             if ("repeat" in experiment.keys()):
                 repeat = int(experiment["repeat"])
-                print("repeat: "+str(repeat))
+                logger.info("repeat: "+str(repeat))
             if ("untilSolutionFound" in experiment.keys()):
                 untilSolutionFound = experiment["untilSolutionFound"] == "True"
-                print("untilSolutionFound: "+str(untilSolutionFound))
-            print("===================================================================================================\n"
-                  "Start "+str(repeat)+" experiments of "+str(experimentNumber)+". experiment in experiment sequence named '"+customName+"'...\n"
-                  "===================================================================================================")
+                logger.info("untilSolutionFound: "+str(untilSolutionFound))
+            logger.info("===================================================================================================")
+            logger.info("Start "+str(repeat)+" experiments of "+str(experimentNumber)+". experiment in experiment sequence named '"+customName+"'...")
+            logger.info("===================================================================================================")
 
             for experimentCnt in range(1,repeat+1):
-                print("Experiment "+str(experimentCnt)+" of "+str(repeat)+"\n"
-                "---------------------------------------------------------------------------------------------------")
+                logger.info("Experiment "+str(experimentCnt)+" of "+str(repeat))
+                logger.info("---------------------------------------------------------------------------------------------------")
                 if (evolutionType == "SANE"):
                     sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                      NGEN, numberOfTrialItems, freq)
                 else:
-                    rm_builder.startExperiment(directory,Name,experimentNumber,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All,
-                                   addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
-                                   NGEN,freq,evolutionType,evalFunc,untilSolutionFound,obj_weights,eval_weights)
+                    logbooksSubsubdirectory,setupInfo,fileExt = rm_builder.startExperiment(directory, Name, experimentNumber,
+                                                        experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
+                                                        MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+                                                        removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
+                                                        evolutionType, evalFunc, untilSolutionFound,
+                                                        obj_weights=obj_weights,
+                                                        eval_weights=eval_weights,
+                                                        userAttributeValues=userAttributeValues,
+                                                        constraints=constraints)
+            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Asks user for configuration for the experiment
@@ -234,6 +262,7 @@ def executeCustomExperiment():
         raise ValueError('Input not valid')
 
     if (evolutionType!="SANE"):
+        tournsize = int(input('Tournsize?\n'))
         CXPB = float(input('Crossover probability?\n'))
         if ( not evolutionType.startswith("Multi")):
             MUTPB_All = float(input('Mutation probability?\n'))
@@ -333,7 +362,7 @@ def executeCustomExperiment():
         untilSolutionFound = bool(input('Run until solution found? (True/False)\n'))
         directory = "..\\Output"
         for experimentCnt in range(1,repeat+1):
-            rm_builder.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+            rm_builder.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,tournsize,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                            removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound,
                            obj_weights=obj_weights,eval_weights=eval_weights)
 
@@ -344,6 +373,7 @@ def executeDefaultExperiment():
     experimentName = "Default_Experiment"
     DATA="GeneratedData"
     POP_SIZE = 100
+    tournsize = 5
     CXPB = 0.25
     MUTPB_All = 0.25
     addRolePB = 0.25
@@ -365,9 +395,9 @@ def executeDefaultExperiment():
     config = configparser.ConfigParser()
     config.read('Experiments_config.ini')
     if (len(config.sections()) == 0):
-        print("Create new config file...")
+        logger.info("Create new config file...")
         config['Dataset'] = {'DATA': DATA}
-        config['General'] = {'experiment_Name': experimentName, 'POP_SIZE': POP_SIZE,'CXPB': CXPB, 'MUTPB_All': MUTPB_All,'addRolePB': addRolePB,
+        config['General'] = {'experiment_Name': experimentName, 'POP_SIZE': POP_SIZE,'tournsize': tournsize, 'CXPB': CXPB, 'MUTPB_All': MUTPB_All,'addRolePB': addRolePB,
                              'removeRolePB': removeRolePB,'removeUserPB': removeUserPB,
                              'removePermissionPB': removePermissionPB, 'addUserPB': addUserPB,
                              'addPermissionPB': addPermissionPB, 'NGEN': NGEN, 'freq': freq}
@@ -380,6 +410,7 @@ def executeDefaultExperiment():
         DATA = config['Dataset']['DATA']
         experimentName = config['General']['experiment_Name']
         POP_SIZE = config['General'].getint('POP_SIZE')
+        tournsize = config['General'].getint('tournsize')
         CXPB = config['General'].getfloat('CXPB')
         MUTPB_All = config['General'].getfloat('MUTPB_All')
         addRolePB = config['General'].getfloat('addRolePB')
@@ -401,7 +432,7 @@ def executeDefaultExperiment():
             numberOfTrialItems = config['Algorithm'].getint('numberOfTrialItems')
         untilSolutionFound = config['Algorithm'].getboolean('until_Solution_Found')
         repeat = config['Experiment'].getint('repeat')
-        if (DATA == None or experimentName == None or POP_SIZE == None or CXPB == None or MUTPB_All == None
+        if (DATA == None or experimentName == None or POP_SIZE == None or tournsize == None or CXPB == None or MUTPB_All == None
             or addRolePB == None or removeRolePB == None or removeUserPB == None or removePermissionPB == None
             or addUserPB == None or addPermissionPB == None or NGEN == None or freq == None
             or evolutionType == None or evalFunc == None or obj_weights == None or eval_weights == None
@@ -432,13 +463,34 @@ def executeDefaultExperiment():
             sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN,
                          numberOfTrialItems, freq)
         else:
-            rm_builder.startExperiment(directory, Name, 1, experimentCnt, Original, DATA, POP_SIZE, CXPB, MUTPB_All,
-                                       addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
-                                       addPermissionPB, NGEN, freq, evolutionType, evalFunc, untilSolutionFound,
-                                       obj_weights=obj_weights, eval_weights=eval_weights,
-                                       userAttributeValues=userAttributeValues,
-                                       constraints=constraints)
+            logbooksSubsubdirectory,setupInfo,fileExt = rm_builder.startExperiment(directory, Name, 1, experimentCnt,
+                                                        Original, DATA, POP_SIZE, tournsize, CXPB, MUTPB_All,
+                                                        addRolePB, removeRolePB, removeUserPB, removePermissionPB,
+                                                        addUserPB, addPermissionPB, NGEN, freq, evolutionType, evalFunc,
+                                                        untilSolutionFound,
+                                                        obj_weights=obj_weights,
+                                                        eval_weights=eval_weights,
+                                                        userAttributeValues=userAttributeValues,
+                                                        constraints=constraints)
+    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt)
 
+# create logger with 'spam_application'
+logger = logging.getLogger('root')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('logging.log')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+# create formatter and add it to the handlers
+formatterFile = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s: %(message)s')
+formatterScreen = logging.Formatter('%(message)s')
+fh.setFormatter(formatterFile)
+ch.setFormatter(formatterScreen)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 loadExperiment = input('Load experiment from file? (y/n)\n')
 if (loadExperiment=='y'):

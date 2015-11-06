@@ -1,42 +1,40 @@
 [{
-    "Experiment": "Single_Obj1_Gensize",
+    "Experiment": "S_Conf_Gen",
 	"DATA": "healthcare",
-	"POP_SIZE": "100",
+	"POP_SIZE": "10",
+	"tournsize": "5",
     "CXPB": "0.25",
 	"MUTPB_All": "0.25",
-	"MUTPB_1": "0.25",
-	"MUTPB_2": "0.25",
-	"MUTPB_3": "0.25",
-	"MUTPB_4": "0.25",
-	"MUTPB_5": "0.25",
-	"MUTPB_6": "0.25",
-	"NGEN": "100",
-    "freq": "10",
+	"addRolePB": "0.25",
+	"removeRolePB": "0.25",
+	"removeUserPB": "0.25",
+	"removePermissionPB": "0.25",
+	"addUserPB": "0.25",
+	"addPermissionPB": "0.25",
+	"NGEN": "10",
+    "freq": "1",
     "evolutionType": "Single",
-    "evalFunc": "Obj1"
+    "evalFunc": "Confidentiality",
+	"repeat": "3",
+	"untilSolutionFound": "False"
 },
 {
-    "NGEN": "200"
+    "NGEN": "20"
 },
 {
-    "NGEN": "400"
+    "NGEN": "50"
 },
 {
-    "NGEN": "1000"
+	"Experiment": "S_Conf_Pop",
+	"NGEN": "10",
+	"POP_SIZE": "20"
 },
 {
-	"Experiment": "Single_Obj1_Popsize",
-	"POP_SIZE": "200"
+    "POP_SIZE": "50"
 },
 {
-    "POP_SIZE": "400"
-},
-{
-    "POP_SIZE": "1000"
-},
-{
-    "Experiment": "Single_Obj1_CXPB",
-	"POP_SIZE": "200",
+    "Experiment": "S_Conf_CXPB",
+	"POP_SIZE": "10",
 	"CXPB": "0.1"
 },
 {
@@ -46,7 +44,7 @@
     "CXPB": "0.9"
 },
 {
-    "Experiment": "Single_Obj1_MUTPB",
+    "Experiment": "S_Conf_MUTPB",
 	"CXPB": "0.25",
 	"MUTPB_All": "0.1"
 },

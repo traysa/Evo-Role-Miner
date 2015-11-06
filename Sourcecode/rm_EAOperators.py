@@ -178,7 +178,7 @@ def addPermission(rolemodel, permissionSize, alternativeOption):
     if (not permissionAdded):
         print("No permission could be added, since all roles already contain all permissions")
         if (alternativeOption):
-            rolemodel = removePermission(rolemodel, permissionSize)
+            rolemodel = removePermission(rolemodel, permissionSize,False)
 
     return rolemodel
 

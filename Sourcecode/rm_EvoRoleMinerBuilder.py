@@ -1,5 +1,8 @@
 __author__ = 'Theresa'
 
+import logging
+logger = logging.getLogger('root')
+
 # -----------------------------------------------------------------------------------
 # EvoRoleMiner
 # -----------------------------------------------------------------------------------
@@ -45,7 +48,7 @@ saveLogFile = True
 config = configparser.ConfigParser()
 config.read('EvoRoleMiner_config.ini')
 if (len(config.sections()) == 0):
-    print("Create new config file...")
+    logger.info("Create new config file...")
     config['Checkpoint'] = {'use_Checkpoint': useCheckpoint}
     config['Results'] = {'save_In_JSON_File': saveInJSONFile,'save_In_CSV_File': saveInCSVFile}
     config['Fitness Plot'] = {'fitness_As_PDF': fitnessAsPDF,'fitness_As_SVG': fitnessAsSVG,
@@ -86,7 +89,7 @@ else:
 # ----------------------------------------------------------------------------------------------------------------------
 # SINGLE EXPERIMENT
 # ----------------------------------------------------------------------------------------------------------------------
-def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, CXPB,
+def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                     NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[],
                     userAttributeValues=[], constraints=[]):
@@ -97,7 +100,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     # ------------------------------------------------------------------------------------------------------------------
     prevFiles = []
     if (useCheckpoint):
-        print("Use checkpoint: True")
+        logger.info("Use checkpoint: True")
         root = tk.Tk()
         root.withdraw()
         selected = filedialog.askopenfilename(initialdir = "..\\Output")
@@ -114,7 +117,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     #if (evolutionType=="Single"):
     #    subdirectory += "_"+evalFunc
 
-    fileExt = "_" + evolutionType + "_" + str(evalFunc) + "_" + str(POP_SIZE) + "_" + str(NGEN) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt = "_" + evolutionType[0] + "_" + str(evalFunc) + "_" + str(POP_SIZE) + "_" + str(NGEN) + "_" + str(tournsize)+ "_" + str(CXPB) + "_" + str(MUTPB_All)
     if (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted" ):
         fileExt += "_" + str(obj_weights)
     checkpointSubdirectory = subdirectory+"\\Checkpoints"
@@ -132,7 +135,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     logbook = tools.Logbook()
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
-            ea_single.evolution(Original, evalFunc[0], POP_SIZE, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+            ea_single.evolution(Original, evalFunc[0], POP_SIZE, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                 removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
                                 untilSolutionFound=untilSolutionFound, eval_weights=eval_weights,
                                 userAttributeValues=userAttributeValues,
@@ -157,11 +160,11 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     timeSum = sum(timeArray)
     time = timeArray.pop()
-    print("Total in seconds: "+str(timeSum))
+    logger.info("Total in seconds: "+str(timeSum))
     minutes = int(timeSum/60)
     if (minutes > 0):
-        print("Minutes: "+str(minutes))
-        print("Seconds: "+str(timeSum-(minutes*60)))
+        logger.info("Minutes: "+str(minutes))
+        logger.info("Seconds: "+str(timeSum-(minutes*60)))
 
     prevFile = ""
     if (len(prevFiles)!=0):
@@ -227,30 +230,32 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
             return json.JSONEncoder.default(self, obj)
     if (saveLogFile):
         logfile = log_filename+".json"
-        print("Save logfile into "+str(logfile)+"...")
-        temp = logbook
+        logger.info("Save logfile into "+str(logfile)+"...")
+        logbookEntryList = []
         if (evolutionType.startswith("Multi")):
             for i in range(0,len(logbook)):
-                temp = logbook[i]
+                entry = logbook[i]
                 for o,obj in enumerate(evalFunc):
-                    temp['fitness_'+obj] = logbook.chapters["fitnessObj"+str(o+1)][i]
+                    entry['fitness_'+obj] = logbook.chapters["fitnessObj"+str(o+1)][i]
+                logbookEntryList.append(entry)
         else:
             for i in range(0,len(logbook)):
-                temp = logbook[i]
-                temp['Fitness'] = logbook.chapters["Fitness"][i]
-                temp['Conf'] = logbook.chapters["Conf"][i]
-                temp['Accs'] = logbook.chapters["Accs"][i]
-                temp['RoleCnt'] = logbook.chapters["RoleCnt"][i]
-                temp['URCnt'] = logbook.chapters["URCnt"][i]
-                temp['RPCnt'] = logbook.chapters["RPCnt"][i]
-                temp['Interp'] = logbook.chapters["Interp"][i]
+                entry = logbook[i]
+                entry['Fitness'] = logbook.chapters["Fitness"][i]
+                entry['Conf'] = logbook.chapters["Conf"][i]
+                entry['Accs'] = logbook.chapters["Accs"][i]
+                entry['RoleCnt'] = logbook.chapters["RoleCnt"][i]
+                entry['URCnt'] = logbook.chapters["URCnt"][i]
+                entry['RPCnt'] = logbook.chapters["RPCnt"][i]
+                entry['Interp'] = logbook.chapters["Interp"][i]
+                logbookEntryList.append(entry)
         with open(logfile, "a") as outfile:
-            json.dump(temp, outfile, indent=4, cls=NumPyArangeEncoder)
+            json.dump(logbookEntryList, outfile, indent=4, cls=NumPyArangeEncoder)
             outfile.close()
-        print("DONE.\n")
+        logger.info("DONE.\n")
 
         logfile = log_filename+".csv"
-        print("Save logfile into "+str(logfile)+"...")
+        logger.info("Save logfile into "+str(logfile)+"...")
         if (evolutionType.startswith("Multi")):
             with open(logfile, "a") as outfile:
                 outfile.write("sep=;\n")
@@ -335,12 +340,12 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     # ------------------------------------------------------------------------------------------------------------------
     userCount = Original.shape[0]
     permissionCount = Original.shape[1]
-    info = "Data: "+DATA+"; userCount: "+str(userCount)+"; permissionCount: "+str(permissionCount)\
+    setupInfo = "Data: "+DATA+"; userCount: "+str(userCount)+"; permissionCount: "+str(permissionCount)\
            +"\nEvoType: "+evolutionType+"; evalFunc: "+str(evalFunc)+"; Generations: "+str(generation)+"; Population: "\
            +str(POP_SIZE)+"; Frequency: "+str(freq)\
-           +"\nCXPB: "+str(CXPB)+"; MUTPB_All: "+str(MUTPB_All)+" ("+str(addRolePB)+";"+str(removeRolePB)+";"\
-           +str(removeUserPB)+";"+str(removePermissionPB)+";"+str(addUserPB)+";"+str(addPermissionPB)+")"\
-           +"\nRESULTS: "+resultInfo
+           +"\ntournsize: "+str(tournsize)+"; CXPB: "+str(CXPB)+"; MUTPB_All: "+str(MUTPB_All)+" ("+str(addRolePB)+";"+str(removeRolePB)+";"\
+           +str(removeUserPB)+";"+str(removePermissionPB)+";"+str(addUserPB)+";"+str(addPermissionPB)+")"
+    info = setupInfo+"\nRESULTS: "+resultInfo
            #+"\nPrevious Checkpoint: "+prevFile
     if(evolutionType=="Single" and (evalFunc[0].startswith("Saenko") or evalFunc[0].startswith("WSC"))):
         index = info.find(')\n')
@@ -383,31 +388,32 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     # ------------------------------------------------------------------------------------------------------------------
     if (saveInJSONFile):
         resultJSONfile = directory+"\\Results.json"
-        print("Write into JSON file "+str(resultJSONfile)+"...")
+        logger.info("Write into JSON file "+str(resultJSONfile)+"...")
         with open(resultJSONfile, "a") as outfile:
             json.dump({'ExperimentNumber':str(experimentNumber), 'ExperimentCount':str(experimentCnt), 'Experiment':Name,
                        'userCount':str(userCount), 'permissionCount':str(permissionCount),
                        'EvoType':evolutionType,'evalFunc':evalFunc,
-                       'POP_SIZE':str(len(population)), 'NGEN':str(generation),'obj_weights':str(obj_weights),'eval_weights':str(eval_weights),'CXPB':str(CXPB),'MUTPB':str(MUTPB_All),
+                       'POP_SIZE':str(len(population)), 'NGEN':str(generation),'obj_weights':str(obj_weights),'eval_weights':str(eval_weights),'tournsize':str(tournsize),'CXPB':str(CXPB),'MUTPB':str(MUTPB_All),
                        'Frequency':str(freq),'Runtime':str(time), 'Runtime_Sum':str(timeSum),
                        'Continued':str(useCheckpoint),'PreviousCheckpoint':prevFile,
                        'ResultFiles':str(subdirectory[10:])}, outfile, indent=4)
             outfile.close()
-        print("DONE.\n")
+        logger.info("DONE.\n")
 
     if (saveInCSVFile):
         resultCSVfile = directory+"\\Results.csv"
-        print("Write into CSV file "+str(resultCSVfile)+"...")
+        logger.info("Write into CSV file "+str(resultCSVfile)+"...")
         if not os.path.exists(resultCSVfile):
             with open(resultCSVfile, "a") as outfile:
                 outfile.write("sep=;\n")
-                outfile.write("ExperimentNumber;ExperimentCount;Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;obj_weights;eval_weights;CXPB;MUTPB;"
+                outfile.write("ExperimentNumber;ExperimentCount;Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;obj_weights;eval_weights;tournsize;CXPB;MUTPB;"
                               "Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files\n")
                 outfile.close()
         with open(resultCSVfile, "a") as outfile:
             outfile.write(str(experimentNumber)+";"+str(experimentCnt)+";"+Name+";"+str(userCount)+";"+str(permissionCount)+";"
                           +evolutionType+";"+str(evalFunc)+";"+str(len(population))+";"+str(generation)+";"+str(obj_weights)+";"
-                          +str(eval_weights)+";"+str(CXPB)+";"+str(MUTPB_All)+";"+str(freq)+";"+str(time)+";"
+                          +str(eval_weights)+";"+str(tournsize)+";"+str(CXPB)+";"+str(MUTPB_All)+";"+str(freq)+";"+str(time)+";"
                           +str(timeSum)+";"+str(useCheckpoint)+";"+prevFile+";"+subdirectory[10:]+"\n")
             outfile.close()
-        print("DONE.\n")
+        logger.info("DONE.\n")
+    return logbooksSubsubdirectory,setupInfo,fileExt

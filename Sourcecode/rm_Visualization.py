@@ -47,7 +47,13 @@ def plotLogbook(logbook, logbook_filename, stats, title, info, saveAsPDF, saveAs
     if (len(stats)==1):
         fig, ax = plt.subplots(figsize=(12, 8))
         ax = plotLogbookChapter(stats[0], logbook, ax)
+        min = ax.get_ylim()[0]
+        if (min > 0):
+            min = 0
+        max = ax.get_ylim()[1]
+        ax.set_ylim(min,max)
         ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+        pre_title = "Fitness for: "
     else:
         fig, plots = plt.subplots(3, 2,figsize=(18,16))
         s = 0
@@ -56,9 +62,15 @@ def plotLogbook(logbook, logbook_filename, stats, title, info, saveAsPDF, saveAs
                 if (s < len(stats)):
                     stat = stats[s]
                     ax = plotLogbookChapter(stat, logbook, ax)
+                    min = ax.get_ylim()[0]
+                    if (min > 0):
+                        min = 0
+                    max = ax.get_ylim()[1]
+                    ax.set_ylim(min,max)
                     s += 1
+        pre_title = "Measures for: "
     fig.text(0.1,0.01,info, fontsize=10)
-    plt.suptitle("Fitness for: "+title, fontsize=20)
+    plt.suptitle(pre_title+title, fontsize=20)
     print("DONE.\n")
 
     if (saveAsPDF):
@@ -132,6 +144,77 @@ def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFun
             os.startfile(logbook_filename+".png")
 
     plt.close('all')
+
+# -----------------------------------------------------------------------------------
+# Print Logbook AVG of several experiments into graph for single objective EAs
+# -----------------------------------------------------------------------------------
+def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+
+    # Plot graphs
+    #fig, ax = plt.subplots(figsize=(12, 8))
+    #fig = plt.figure(figsize=(12, 8))
+    #ax = fig.add_subplot(111)
+
+    if (len(stats)==1):
+        fig, ax = plt.subplots(figsize=(12, 8))
+        temp = list(numpy.array(data)[:,1])
+        ax = plotLogbookAVGData(stats[0], temp, ax)
+        min = ax.get_ylim()[0]
+        if (min > 0):
+            min = 0
+        max = ax.get_ylim()[1]
+        ax.set_ylim(min,max)
+        ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+        pre_title = "Fitness for: "
+    else:
+        fig, plots = plt.subplots(3, 2,figsize=(18,16))
+        s = 0
+        for ay in plots:
+            for ax in ay:
+                if (s < len(stats)):
+                    stat = stats[s]
+                    temp = list(numpy.array(data)[:,s+2])
+                    ax = plotLogbookAVGData(stat, temp, ax)
+                    min = ax.get_ylim()[0]
+                    if (min > 0):
+                        min = 0
+                    max = ax.get_ylim()[1]
+                    ax.set_ylim(min,max)
+                    s += 1
+        pre_title = "Measures for: "
+    fig.text(0.1,0.01,info, fontsize=10)
+    plt.suptitle(pre_title+title, fontsize=20)
+    print("DONE.\n")
+
+    if (saveAsPDF):
+        print("Save logbook plot as PDF...")
+        pp = PdfPages(logbook_filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        print("Save logbook plot as SVG...")
+        plt.savefig(logbook_filename+".svg")
+
+    if (saveAsPNG):
+        print("Save logbook plot as PNG...")
+        plt.savefig(logbook_filename+".png")
+        if (showPNG):
+            print("Show plot...")
+            #plt.show()
+            os.startfile(logbook_filename+".png")
+    plt.close('all')
+# -----------------------------------------------------------------------------------
+# Plot data into graph for single objective EAs
+# -----------------------------------------------------------------------------------
+def plotLogbookAVGData(data_name,data, ax):
+    gen = [i for i in range(0,len(data))]
+    ax.set_xlabel("Generation", fontsize=16)
+    ax.set_ylabel(data_name, fontsize=16)
+    #ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+    line = ax.plot(gen, data, "r-")
+    lns = line
+    return ax
 
 # -----------------------------------------------------------------------------------------
 # Visualize evaluation values of population in a plot over generations (Single Objective)

@@ -4,6 +4,7 @@ import MatrixOperators as matrixOps
 import rm_CoEvo_EADecoder as decoder
 import numpy
 import random
+import rm_EAEvaluations as base
 
 # -----------------------------------------------------------------------------------
 # Evaluation.
@@ -54,15 +55,21 @@ def trial(individuals, Original):
     return individuals
 
 # -----------------------------------------------------------------------------------
-# Single Objective Evaluation Functions
+# Single Objective Evaluation: Confidentiality
+# No Normalization
 # -----------------------------------------------------------------------------------
-# Violations
-def evalFunc_Violations(individuals, orig):
+def evalFunc_Confidentiality(individuals, orig):
     array = decoder.resolveRoleChromosomesIntoBoolArray(individuals,int(orig.shape[0]), int(orig.shape[1]))
     diffMatrix = matrixOps.subtractIntMatrix(A=array, B=numpy.matrix(orig,dtype=bool))
     'Violation of confidentiality and data availability'
     conf, accs = matrixOps.countDiffs(diffMatrix)
-    #numberOfRoles = len(individual[0])
-    #return conf, accs, numberOfRoles
-    violations = (conf+accs)
-    return violations
+    return conf
+
+# -----------------------------------------------------------------------------------
+# Single Objective Evaluation: Interpretability
+# Interpretability is the average Role Fitness (calculation based on Generalized Intra-Inter Silhouette Index)
+# No Normalization
+# -----------------------------------------------------------------------------------
+def evalFunc_Interpretability(individuals, userSize, permissionSize, orig, userAttributeValues):
+
+    return fitness

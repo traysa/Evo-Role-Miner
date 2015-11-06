@@ -15,7 +15,7 @@ from collections import defaultdict
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - One objective
 # -----------------------------------------------------------------------------------
-def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
+def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
               removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
               untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
               userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
@@ -130,7 +130,7 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     toolbox.register("mutate", operators.mutFunc, addRolePB=addRolePB, removeRolePB=removeRolePB, removeUserPB=removeUserPB,
                      removePermissionPB=removePermissionPB, addUserPB=addUserPB, addPermissionPB=addPermissionPB,
                      userSize=userSize, permissionSize=permissionSize)
-    toolbox.register("select", tools.selTournament, tournsize=5)
+    toolbox.register("select", tools.selTournament, tournsize=tournsize)
 
     # Register Statistics
     '''
@@ -261,7 +261,7 @@ def evolution(Original, evalFunc, populationSize, CXPB, MUTPB_All, addRolePB, re
     print("DONE.\n")
 
     # Set Checkpoint
-    fileExt = "_Single_" + evalFunc + "_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt = "_S_" + evalFunc + "_" + str(len(population)) + "_" + str(generation) + "_" + str(tournsize)+ "_" + str(CXPB) + "_" + str(MUTPB_All)
     '''
     if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
