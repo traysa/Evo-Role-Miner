@@ -5,24 +5,44 @@ Evolutionary algorithms seem to be a promising approach for role mining for seve
 Since there has not been a lot of research done up till now (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the domain-specific problem as evolutionary computation problem. The evolutionary algorithm, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described in the following sections. For handling constraints for an RBAC$_2$ role model, a penalty function and intelligent variation operators are introduced. Furthermore the multiobjective evolutionary algorithm used in this approach is described with its challenges and improvements. In order to come to an human digestible representation of individuals for human feedback in an IEC approach, an alternative approach with a different representation and a Co-Evolution technique is presented.
 
     \subsection{Overview of the Evolutionary Algorithm}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    The evolutionary algorithm for single objectives used in this thesis is based on the pseudo-code in Algorithm \ref{alg:EA}. In the following sections, the components within the algorithm are discussed more in detail.
+    The evolutionary algorithm for single objectives used in this thesis is based on the pseudo-code in Algorithm \ref{alg:EA}. The algorithm starts with the initial generation and evaluation of the parent population $P_p$. Then, for each generation, individuals from $P_p$ are selected and cloned as offspring population $P_o$. A loop over neighboring individuals in $P_o$ is mating individuals $\mathbf{x}_i$ and $\mathbf{x}_{i+1}$ by crossover probability $CXPB$. The resulting children $\mathbf{y}_i$ and $\mathbf{y}_{i+1}$ replace their respective parents in $P_o$. In a second loop over all individuals in $P_o$ the individuals get mutated by mutation probability $MUTPB$. The resulting mutation is replacing the original individual. The resulting individuals in $P_o$ can be generated from crossover only, mutation only, crossover and mutation, and reproduction according to the given probabilities $CXPB$ and $MUTPB$. The offspring population $P_o$ is then getting the parent population $P_p$ for the next generation, after each individual got evaluated.\\
+    In the following sections, the components within the algorithm are discussed more in detail.
+    
     \begin{algorithm}
         \caption{Evolutionary algorithm for single objectives}
         \label{alg:EA}
         \begin{algorithmic}[1]
-            \Procedure{eaSingle}{$var$}
-                \State $result$ = TODO
+            \Procedure{eaSingle}{$popSize$, $NGEN$, $CXPB$, $MUTPB$}
+                \State $P_p$ = generatePopulation($popSize$)
+                \State evaluateIndividuals($P_p$)
+                \State $solutionFound$ = False
+                \State $generation$ = 1
+                \While{not $solutionFound$ AND $generation <= NGEN$}
+                    \State $P_p$ = select($population$, k=length($P_p$))
+                    \State $P_o$ = clonePopulation($P_p$)
+                    \State $i$ = 0
+                    \While{ $i < length(P_o)-1$}
+                        \State $P_o$[$i$],$P_o$[$i$+1] = crossover($P_o$[$i$],$P_o$[$i$+1],$CXPB$)
+                        \State $i$ += 2
+                    \EndWhile
+                    \State $i$ = 0
+                    \While{ $i < length(P_o)$}
+                        \State $P_o$[$i$] = mutation($P_o$[$i$],$MUTPB$)
+                        \State $i$ += 1
+                    \EndWhile
+                    \State $P_p$ = $P_o$
+                    \State evaluateIndividuals($P_p$)
+                    \State $generation$ += 1
+                \EndWhile
                 \State \Return $result$
             \EndProcedure
         \end{algorithmic}
     \end{algorithm}
 
-    \subsection{Representation of a role model as individual}   
-    \hl{SECTION UNDER CONSTRUCTION}\\
+    \subsection{Representation of a role model as individual}
     The representation of individuals in an EA is crucial for the success of the EA and influences the variation operators. Finding a good representation of role models as individuals for a Role Mining EA is a challenging task, since the number of roles for a role model is not predefined. In the following one bit-string and two complex representations are introduced and evaluated. The complex representations were proposed by Saenko et al.\cite{saenko2012design}.
         \subsubsection{Representation as Bit-string}
-        The representation of individuals as bit-string is one of the simplest and is often mistakenly used in GAs\cite{Eiben}. A suggestion for a bit-string representation for a role model is derived from a combined user-role- (UA) and role-permission-matrix (PA). Figure \ref{fig:representation1} shows an example of a combined UA- and PA-Matrix and an according bit-string representation.
+        The representation of individuals as bit-string is one of the simplest and is often mistakenly used in genetic algorithms\cite{Eiben}. A suggestion for a bit-string representation for a role model is derived from a combined user-role- (UA) and role-permission-matrix (PA). Figure \ref{fig:representation1} shows an example of a combined UA- and PA-Matrix and an according bit-string representation.
         \begin{figure}
             \centering
             \includegraphics[scale=0.75]{./Figures/Representation1.png}
@@ -30,17 +50,31 @@ Since there has not been a lot of research done up till now (see chapter \ref{se
             \caption{\textit{Example of a combined UR- and RP-Matrix with its bit-string representation}}
             \label{fig:representation1}
         \end{figure}
-        The motivation of this initial idea is that the mutation operator can be easily executed by just flipping a bit within the bit-string. The mutation is therefore adding or removing a user or permission from a role. For the decoding two leading 8-bit integers can represent the number of users and permission. However, the problem with this representation is that the number of roles needs to pre-defined, such that the bit-string can be decoded again. Alternatively another leading 8-bit integer can represent the number of roles in the role model. But varying the number of roles demands adding or removing bits in the bit-string for each user-role- and role-permission relation. Furthermore the information that a user or a permission is not part of a role seems to unnecessarily lengthens the bit-string, which can consume a lot of space for high-dimensional UA- and PA-Matrices.
+        The motivation of this initial idea is that the mutation operator can be easily executed by just flipping a bit within the bit-string. The mutation is therefore adding or removing a user or permission from a role. For the decoding two leading 8-bit integers can represent the number of users and permission. However, the problem with this representation is that the number of roles needs to be pre-defined, such that the bit-string can be decoded again. Alternatively another leading 8-bit integer can represent the number of roles in the role model. But varying the number of roles demands adding or removing bits in the bit-string for each user-role- and role-permission relation. Furthermore the information that a user or a permission is not part of a role seems to unnecessarily lengthens the bit-string, which can consume a lot of space for high-dimensional UA- and PA-Matrices.
         \subsubsection{Representations as Complex Objects}
-        In Saenko et al.\cite{saenko2012design} two different representations are introduced, which are briefly described in chapter \ref{sec:relatedWork}. With the first representation the authors suggest a multi-chromosomal representation where the number of roles becomes part of the search. An example can be seen in figure \ref{fig:representation2}. A drawback of this representation are unnecessary genes (roles) like the unneccessary information in the bit-string representation. Another disadvantage of the representation are complex crossover operations\cite{saenko2012design}. The second improved representation eliminates these drawbacks by having one chromosome for an individual, where no unnecessary genes occur. The chromosome consists of a list of roles, which contain a user-set and a permission-set (see figure \ref{fig:representation3}).\\
-        \newline
+        In Saenko et al.\cite{saenko2012design} two different representations are introduced, which are briefly described in chapter \ref{sec:relatedWork}. With the first representation the authors suggest a multi-chromosomal representation where the number of roles becomes part of the search. An example can be seen in figure \ref{fig:representation2}. A drawback of this representation are unnecessary genes (roles) like the unneccessary information in the bit-string representation. Another disadvantage of the representation are complex crossover operations\cite{saenko2012design}.
+        \begin{figure}
+            \centering
+            \includegraphics[scale=0.4]{./Figures/dummy.png}
+            \rule{20em}{0.5pt}
+            \caption{\textit{Description}}
+            \label{fig:representation2}
+        \end{figure}
+        The second improved representation eliminates these drawbacks by having one chromosome for an individual, where no unnecessary genes occur. The chromosome consists of a list of roles, which contain a user-set and a permission-set (see figure \ref{fig:representation3}).\\
+        \begin{figure}
+            \centering
+            \includegraphics[scale=0.4]{./Figures/dummy.png}
+            \rule{20em}{0.5pt}
+            \caption{\textit{Description}}
+            \label{fig:representation3}
+        \end{figure}
         Due to the advantages of the improved representation of Saenko et al.\cite{saenko2012design}, their suggested representation is used for the research in this thesis.
     
     \subsection{Variation Operators on role model representation}
     \hl{SECTION UNDER CONSTRUCTION}\\
-    Dependent on the choice of the representation of individuals in the previous section, according mutation and crossover methods are created. The choice of variation operators and how much they are executed influences how much of the search space is discovered during the evolution.
+    Dependent on the choice of the representation of individuals in the previous section, according mutation and crossover methods are created. The choice of variation operators and how often they are executed influences how much of the search space is discovered during the evolution. Since the improved representation of Saenko et al.\cite{saenko2012design} has been selected for this thesis, the following variation operators are suited for this representation.
         \subsubsection{Mutation methods}
-        For the mutation six different mutation types are implemented, which are executed in the following order depending on their probability.
+        Since no further instructions for the mutation are given in Saenko et al.\cite{saenko2012design}, the mutation operations have been chosen intuitively. For the mutation six different mutation types are implemented, which are executed in the following order depending on their probability.
         \begin{itemize}
             \setlength{\itemsep}{1pt}
             \item Add a new role

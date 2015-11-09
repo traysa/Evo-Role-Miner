@@ -25,20 +25,19 @@ In this section a basic introduction to the domain is given. It is important tha
             The base model describes the minimum requirement for an RBAC model. The minimum requirement is that roles are bundles of permissions and users are assigned to these roles in order to get the according permissions. A user can be assigned to several roles and roles can be assigned to several users. The same many-to-many relation exists between roles and permissions. Therefore a user get can get the same permission several times by different roles. Figure \ref{fig:basicRBAC} demonstrates the relation between users, permissions and roles. Furthermore sessions are also considered in the base model in Sandhu et al.\cite{Sandhu:1996}. A session is a mapping of one user to many roles. With a session a user can activate a subset of roles he or she is assigned to.
             \begin{figure}[H]
                 \centering
-                \includegraphics[scale=0.4]{./Figures/dummy.png}
-                \rule{20em}{0.5pt}
+                \includegraphics[scale=0.4]{User_Role_Perm}
                 \caption{The relation between users, permission and roles in RBAC.}
                 \label{fig:basicRBAC}
             \end{figure}
+            
         \subsubsection{RBAC$_1$ - Role Hierarchies}
         \label{sec:rolehierarchies}
             The RBAC$_1$ model is based on RBAC$_0$ and introduces the concept of role hierarchies. In a role hierarchy roles can be assigned to roles and inherit their permissions to the roles they have been assigned to. The role hierarchy can be restricted as a tree or inverted tree, where a role inherits only the permissions of its child-roles, or a partially ordered set, where a role inherits the permissions from any other junior-role, which is assigned to it. It is also possible to limit inheritance in role hierarchies to control the power of impact of roles. In figure \ref{fig:rolehierarchies} shows one example of a role hierarchy.
             In Moffett\cite{Moffett:1998} role hierarchies and how they can be in conflict with some control principles, such as the Separation-of-Duty (SoD) principle, decentralisation, supervision and review, are discussed.
             \begin{figure}[H]
                 \centering
-                \includegraphics[scale=0.4]{./Figures/dummy.png}
-                \rule{20em}{0.5pt}
-                \caption{Example of a role hierarchy}
+                \includegraphics[scale=0.6]{Role_Hierarchy}
+                \caption{Example of a role hierarchy: The Helpdesk Role and the Researcher Role are inheriting all the permissions from the Workstation Role and have some additional permissions.}
                 \label{fig:rolehierarchies}
             \end{figure}
         \subsubsection{RBAC$_2$ - Constraints}
@@ -47,9 +46,8 @@ In this section a basic introduction to the domain is given. It is important tha
             The consolidated model combines RBAC$_1$ and RBAC$_2$ and therefore supports role hierarchies and constraints. Bringing these two functional capabilities together come with additional functionality. Constraints can also be applied on the role hierarchy. For example, the number of parent roles for child roles can be limited or different child roles can be constrained to have different parent roles.\\
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.45]{./Figures/rbacmodels.png}
-        \rule{20em}{0.5pt}
-        \caption{Relationship among RBAC models\cite{Sandhu:1996}}
+        \includegraphics[scale=0.45]{RBAC_Models}
+        \caption{(a) Relationship among RBAC models\cite{Sandhu:1996} (b) RBAC Definitions\cite{tassey2002economic}}
         \label{fig:rbacmodels}
     \end{figure}
     The relation of the four introduced models can be seen in figure \ref{fig:rbacmodels}. In this thesis the main focus will be on the RBAC$_0$ model. Like in Vaidya et al.\cite{Vaidya:2007} and Frank et al.\cite{Frank:2013} sessions will not be considered for simplicity reasons.\\
@@ -58,22 +56,44 @@ In this section a basic introduction to the domain is given. It is important tha
     \subsection{Role Model Quality}
     A basic role model consists of users, permissions, roles, user-role assignments and role-permission assignments. A role model is most desirable if it has a state, which best leverages the RBAC model by satisfying the business, security and regulatory drivers: Lowering the costs for the administration of access control and equip employees with necessary permissions such that they can efficiently full-fill their tasks while keeping security requirements and being compliant.
     How this goal is measured in the role model has been described by several quality criteria\cite{Kunz}\cite{Frank}. The criteria concern the role model state, individual roles or both. In this thesis the different criteria is summarized into the categories: Completeness, complexity and comprehension.
-    \subsubsection{Completeness}
-        By completeness it is meant to rebuild \hl{(FEEDBACK:different scenarios: 1. starting from scratch, 2. already have assignments)} the current user-permission assignment state by the role model. When the user-role and the permission-role assignments of the role model are resolved, it should cover all current user-permission assignments.\\
+        \subsubsection{Completeness}
+        By completeness it is meant to rebuild the current user-permission assignment state by the role model. When the user-role and the permission-role assignments of the role model are resolved, it should cover all current user-permission assignments. In figure \ref{fig:roleminingExample} an example is shown where user-permission assignments are split into user-role and the permission-role assignments. Resolving an role model would be the other way around - from user-role and permission-role assignments to user-permission assignment.
+        \iffalse
+        \hl{(FEEDBACK:different scenarios: 1. starting from scratch, 2. already have assignments)}
+        \fi
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.08]{RoleminingExample}
+            \caption{University toy example taken from Frank\cite{roleMiningExample}, which demonstrates the transformation from user-permission assignment($UPA$) to user-role assignments($UA$) and permission-role assignments($PA$)}
+            \label{fig:roleminingExample}
+        \end{figure}
         It is assumed that the current user-permission assignments are in a state, where users get the necessary access to efficiently perform their tasks and no security or compliance regulations are violated. This of course is an ideal situation, but in reality the current state often has quite some noise, especially when no IAM solution has been in place before. Users tend to have more permissions than they actually need, since it is unlikely that someone will claim that he has too many permissions. The measure of completeness of the role model state is therefore in accordance to the initial access control configuration.\\
-        A certain amount of overentitlements (users get too many permissions) or underentitlements (users get too few permissions) in the access control policies can be acceptable, if the least privilege principle is too costly to implement in practice.\\
+        A certain amount of overentitlements (users get too many permissions) or underentitlements (users get too few permissions) in the access control policies can be acceptable, if the least privilege principle is too costly to implement in practice. In figure \ref{fig:rolemodelComparison} an example of over- and underentitlements can be seen.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.4]{RoleModel_Comparison}
+            \caption{(a) Original user-permission assignments. There is a user for each row and a permission for each column. A check-mark represents the assigment of a permission to a user. (b) Resolved role model into user-permission assignments. In comparison to the original user-permission assignments one overentitlement (User 1 - Permission 3) and one underentitlement (User 3 - Permission 3) can be determined.}
+            \label{fig:rolemodelComparison}
+        \end{figure}
         The combinations of permissions within roles or the combination of user-role assignments might violate security regulations such as SoD. This measure is therefore not only taking individual roles but also the role model state into account.\\
         Constraints could also be ensured in a mechanism posterior to the role model, where individual permissions are detracted from users again, if it violates a constraint. Allowing constraint violations in the role model increases not only the processing and reliance on the posterior mechanism but also the auditing effort.
-    \subsubsection{Complexity}
-        The complexity of a role model is measured in its number of roles and the number of user-role and permission-role assignments. It is often connected to the maintenance costs of a role model.\\
+        \subsubsection{Complexity}
+        The complexity of a role model is measured in its number of roles and the number of user-role and permission-role assignments. It is often connected to the maintenance costs of a role model. For example in figure \ref{fig:rolemodelComparison} three roles, eight user-role assignments and nine role-permission assignments can be counted.\\
         The more roles the role model has, the more maintenance effort is expected. Hence, a minimal set of roles is preferable. Furthermore it should be obvious that the total number of roles should be smaller than the total number of users or total number of permissions. Otherwise there would be no use of the advantage of having RBAC in comparison to IBAC in terms of administration costs. When each user has its individual role with the according individual bundle of permissions, the abstraction layer of the role becomes obsolete.\\
         Also the more user-role and permission-role assignments are needed, the more maintenance effort is expected. Large roles with many permissions may reduce the number of user-role assignments, but may lead to more confidentiality/accessibility violations (conflicting Completeness). The same applies for if each role is used by many users. Small roles with few permissions on the other hand can lead to more administration effort as mentioned above, since many roles are necessary for achieving completeness. The same applies if each role is only used by very few users.\\
-        A role model \hl{often} consists of very general large roles and specialized small roles.\hl{(FEEDBACK: Pyramid with General roles based on OrgUnit, Int/Ext, Function)} Determining a fix boundary of how many permissions or users can be assigned to a role requires knowledge of the role model or is given by company or security regulations.
-    \subsubsection{Comprehension}
+        A role model can consists of very general large roles (e.g. a role for an organizational unit) and specialized small roles (e.g. a project-specific role). Determining a fix boundary of how many permissions or users can be assigned to a role requires knowledge of the role model or is given by company or security regulations.
+        \subsubsection{Comprehension}
         A recently more discussed topic is the "meaningfulness" of roles \cite{Xu}\cite{Frank}. It is important that the administrators, which are maintaining the role model, can logically understand the role model for maintaining the roles and assignments confidently. Otherwise it might happen that they avoid to work with the role model since they feel not confident to stay in line with security and compliance regulations. Or it will cause them extra effort and costs to work with the role model. The roles should be therefore comprehensive, which can be achieved by giving them a meaning close to business roles, e.g. a role "Employee", which contains all permissions every employee will get and is assigned to every employee-user.\\
         This criteria can loosen some of the other criteria, which rather concentrate on the compression of the access control information \cite{Frank2013}. For achieving more intuitive meaningful roles it might be necessary to allow more roles than the minimal number of roles resulting from compression. More roles might result in more assignments, which are necessary to keep the role model more comprehensive. Lowering costs by having a more comprehensive role model may contradict lowering costs by having a less complex role model.
-        \hl{see comprehensibility in chapter 1.1.1 in book Data Mining and Knowledge Discovery with Evolutionary Algorithms by Alex Freitas}
-    \end{itemize}
+        \iffalse
+        In praxis the roles can be often bundled according to the user attributes Internal or External employee, Organizational Unit and Job Function. The pyramid in figure \ref{fig:rolePyramid} demonstrates how easily user-permission assignments can be covered by roles.
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.3]{Role_Pyramid}
+            \caption{Pyramid of general roles depending on user attributes. Most often roles can be described by the user attributes Internal or External employee, Organizational Unit and Job Function.}
+            \label{fig:rolePyramid}
+        \end{figure}
+        \fi
     
     \subsection{Role Engineering}
     Role engineering \cite{coyne2011role} describes the process to create a role model for RBAC. This task is proved to be very difficult in large enterprises.\\
@@ -86,6 +106,7 @@ In this section a basic introduction to the domain is given. It is important tha
         \item \textbf{Hybrid approach}\\
         Since the advantages and disadvantages of the top-down and the bottom-up approach are mirrored, hybrid approaches have been suggested \cite{Frank}\cite{6274146}. In these approaches the business information is leveraged to guide the computational generation of a role model out of user-permission assignments.
     \end{itemize}
+    A role model is evolving over time and needs constant maintenance\cite{Montrieux:2011}. Administrators and Re-attestation processes are changing the user-permission assignments by adding and removing users and permissions to and from roles. New users are joining and others get removed, same is valid for applications and their permissions. Separate access control configurations might need to be migrated to one access control configuration. The task of role engineering is therefore not a one time task, but an on-going process. An over-the-time suboptimal role model can increase the administration costs and has to be optimized again to benefit from the advantages of RBAC.
     
     \subsection{Role Mining}
     Role Mining is a bottom-up role engineering approach. The basic input of role mining are users, permissions and the current assignments to each other. The input can be expressed as tuple $<U,P,UPA>$, where
@@ -102,26 +123,17 @@ In this section a basic introduction to the domain is given. It is important tha
         \item \textbf{$UA \subseteq U \times R$} are user-role assignments
         \item \textbf{$PA \subseteq R \times P$} are permission-role assignments
     \end{itemize}
-    Optionally a role hierarchy is also part of the role model. In some papers, such as \cite{Molloy} and \cite{DuChang}, direct user-role assignments ($DUPA \subseteq U \times P$) are added to the role model tuple in order to provide more flexibility to handle anomalous permissions which do not fit into the role structure. Alternatively a new role for each of the individual direct assignments of DUPA can be defined, although such roles are not desirable in a role model. By adding DUPA to the tuple it can be distinguished between DUPA and undiserable roles. Figure \ref{fig:rolemining} shows the inputs and outputs of the role mining process.
+    Optionally a role hierarchy is also part of the role model. In some papers, such as \cite{Molloy} and \cite{DuChang}, direct user-role assignments ($DUPA \subseteq U \times P$) are added to the role model tuple in order to provide more flexibility to handle anomalous permissions which do not fit into the role structure. Alternatively a new role for each of the individual direct assignments of DUPA can be defined, although such roles are not desirable in a role model. By adding DUPA to the tuple it can be distinguished between DUPA and undiserable roles. Figure \ref{fig:rolemining} shows the inputs and outputs of the role mining process.  A specific example in matrix representation is shown in figure \ref{fig:roleminingExample}.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.6]{./Figures/Rolemining.png}
-        \rule{20em}{0.5pt}
+        \includegraphics[scale=0.6]{Rolemining}
         \caption{The inputs and outputs of the role mining process}
         \label{fig:rolemining}
     \end{figure}
-    A specific example in matrix representation is shown in figure \ref{fig:roleminingExample}.
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.08]{./Figures/RoleminingExample.jpg}
-        \rule{20em}{0.5pt}
-        \caption{University toy example taken from Frank\cite{roleMiningExample}, which demonstrates the transformation from $UPA$ to $UA \times PA$}
-        \label{fig:roleminingExample}
-    \end{figure}
+    
     \subsubsection{Role Mining Problem Definitions}
     \label{sec:roleMiningProblems}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    There are several role-mining problem (RMP) definitions existing. The problem definitions, which will be considered in this thesis, are introduced in the following.
+    There are several role-mining problem (RMP) definitions existing. The problem definitions, which will be referred to in this thesis, are introduced in the following.
     \begin{itemize}
         \item \textbf{The Basic Role-Mining Problem}\cite{Vaidya:2007}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and does not deviate from $UPA$."}
@@ -138,8 +150,15 @@ In this section a basic introduction to the domain is given. It is important tha
         2. $RC*$ reflects top-down information ($TDI$).\\
         3. Exceptions (errors) might exist."}
     \end{itemize}
-    \subsubsection{Related Problems}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    The role-mining problems have related problems like e.g. the Boolean Decomposition Problem (BDM) or the Tiling Problem.
+    \subsubsection{Related Problem: Boolean Matrix Decomposition Problem}
+    The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem. In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
+    \begin{itemize}
+    \item \textbf{Boolean Matrix Multiplication Definition:}\\
+    $C = A \times B$ is the boolean matrix multiplication between boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$. The product $C$ is a boolean matrix with $m \times n$ dimension and is calculated with $c_{ij} = \bigvee_{l=1}^{k}(a_{ij} \wedge b_{ij})$
+     \item \textbf{Boolean Matrix Decomposition Problem Definition:}\\
+    The BMD problem is an optimization problem where given a boolean matrix $C \in \{0,1\}^{m \times n}$, the boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$ have to be found, such that $C = A \times B$ and $k$ is minimal\cite{vaidya2012boolean}. $A \times B$ is called a decomposition of $C$.
+    \end{itemize}
+    For RMP a user-permission assignment matrix ($C$) needs to be decomposed into a user-role assignments matrix ($A$) and a role-permission assignments matrix ($B$). Variable $k$ then represents the number of roles, variable $m$ and $n$ the number of users and permissions accordingly. Therefore finding the minimal $k$ in the BMD problem corresponds to finding the minimal number of roles in the basic RMP. The notion of BMD for the RMP is also used in this thesis and has been already introduced in previous sections (see Figure \ref{fig:roleminingExample} and \ref{fig:rolemodelComparison}).
 \newline
-\\In this thesis the role mining problem is tackled with evolutionary algorithms. An introduction to evolutionary algorithms is given in the next chapter.
+\newline
+In this thesis the role mining problem is tackled with evolutionary algorithms. An introduction to evolutionary algorithms is given in the next chapter.
