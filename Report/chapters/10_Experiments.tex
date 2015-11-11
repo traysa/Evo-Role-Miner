@@ -6,60 +6,50 @@ This chapter describes the setup of the experiments executed. First the data set
 \subsection{Data Sets}
 \subsubsection{Synthetic Datasets}
 \hl{SECTION UNDER CONSTRUCTION}\\
-Some papers are providing data generators for synthetic datasets for the performance evaluation of the various role mining algorithms. The data generator in \cite{Vaidya:2006:RMR:1180405.1180424} takes as input the number of users, permissions and roles to generate a pair of User-Role-Assignment and Role-Permission-Assignment matrices. Combining these two matrices, the corresponding User-Permission-Assignment matrix is obtained.
-In the data generator introduced in [Lu et al. 2014]...\\
-"In [Lu et al. 2014], several sets of synthetic data of varying parameters are used. The data gen- erator takes as input the number of users and permissions, density of 1s in the PA, density of 1s in the UA and the noise level to produce the UA and PA matrices."
+Some papers are providing data generators for synthetic datasets for the performance evaluation of the various role mining algorithms. The data generator in Vaidya et al.\cite{Vaidya:2006:RMR:1180405.1180424} takes as input the number of users, permissions and roles to generate a pair of User-Role-Assignment and Role-Permission-Assignment matrices. Combining these two matrices, the corresponding User-Permission-Assignment matrix is obtained.
+\iffalse In the data generator introduced in [Lu et al. 2014]...\\
+"In [Lu et al. 2014], several sets of synthetic data of varying parameters are used. The data gen- erator takes as input the number of users and permissions, density of 1s in the PA, density of 1s in the UA and the noise level to produce the UA and PA matrices."\fi
+These data generators only consider users, permissions and their assignment to each other. They do not consider user information. Due to this a new synthetic data generator was created for this thesis, where the dimensions of users and permissions can be defined. The data generator generates users, roles, rules, user-role matrix, role-permission matrix, user-permission matrix and a user-permission matrix with noise.
 
-These data generators only consider users, permissions and their assignment to each other. They do not consider user information. Due to this a new synthetic data generator was created for this thesis, which is described in the following.
-The data generator 
-
-\begin{algorithm}
-\caption{Algorithm for creating an synthetic dataset for testing of role mining algorithms}
-\label{alg:CreateDataSet}
-\begin{algorithmic}[1]
-\Procedure{CreateRoles}{$roleCnt$,$permissionCnt$,$maxPermissionForRole$,$maxPermissionUsage$}
-    \State $roles$ = [ ] for each $roles$[$r$] with $r$ = 0..$roleCnt$-1
-    \State $permissionBucket$ = $maxPermissionUsage$ for each $permissionBucket$[$p$] with $p$ = 0..$permissionCnt$-1
-    \For{$role$ in $roles$ }
-        \State $permissionForRoleCnt$ = pick randomly between 1..$maxPermissionForRole$
-        \State $tempPermissionBucket$ = $permissionBucket$ - $role$
-        \If{\text{length of }$tempPermissionBucket$ \textgreater 0}
-            \State $permission$ = draw randomly number of $permissionForRoleCnt$ out of $tempPermissionBucket$
-            \State $role$.add($permission$)
-        \Else
-            \State Error
-        \EndIf
-    \EndFor
-    \State \Return $roles$
-\EndProcedure
-\State
-\Procedure{CreateUsers}{$userCnt$,$attribute$}
-    \State $users$ = [ ] for each $users$[$u$] with $u$ = 0..$userCnt$-1
-    \For{$user$ in $users$ }
-        \For{$a$,$attrValues$ in $attributes$ }
-            \State $user$[$a$] = pick randomly a value of $attrValues$
-        \EndFor
-    \EndFor
-    \State \Return $users$
-\EndProcedure
-\State
-\Procedure{CreateRules}{$roleCnt$,$attributes$,$maxRuleConditionCnt$}
-    \State $rules$ = [{}] for each $rules$[$r$] with $r$ = 0..$roleCnt$-1
-    \For{$rule$ in $rules$ }
-        \State $selectedAttributes$ = pick $maxRuleConditionCnt$ random $attributes$
-        \For{$a$,$attrValues$ in $selectedAttributes$ }
-            \State $rule$[$a$] = pick randomly values of $attrValues$
-        \EndFor
-    \EndFor
-    \State \Return $rules$
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
+\begin{itemize}
+    \item \textbf{Generation of users}\\
+    Given a user count $u$ and a list of user attributes $attr$ containing a list of user attribute values each, $u$ users are generated. A user is described by a list of user attributes, which have a specific user attribute value assigned. For example:\\
+    \storestyleof{itemize}
+    \begin{listliketab}
+        \begin{tabular}{ll}
+            Given   &  $attr$ = [$OrganizationalUnit$,$Location$,$EmployeeType$]\\
+            where   &  $OrganizationalUnit$ = [$Administration$,$Sales$,$Motor$],\\
+                    &  $Location$ = [$Denmark$, $Germany$, $US$] and\\
+                    &  $EmployeeType$ = [$Internal$,$External$]\\
+        \end{tabular}
+    \end{listliketab}\\
+    An user can be generated as follows: $user_1$ = [$Sales$,$Denmark$,$Internal$]. An additional parameter for a usertype count $t$ determines how many different users can exist. This ensures that users with the same user attributes can occur several times.
+    
+    \item \textbf{Generation of roles}\\
+    Given a permission count $p$ and a role count $r$, $r$ roles are generated, which are described by a set of permissions from the range [1;$p$]. For example given $p$=7 a role can be: $role_1$ = \{$1$,$5$,$7$\}. A parameter $max_p$ limits how often a permission can occur in all $r$ roles. Additionally a configuration list $conf_p$ can regulate the density of roles. A configuration list entry contains 1) a percentage of all roles, which are affected by this configuration entry 2) the minimum count of permissions the role must have and 3) the maximum count of permissions the role must have. For example the configuration list [(0.2,10,20),(0.8,1,5)] would describe the configuration that 20\% of the $r$ roles must have between 10 and 20 permissions and the other 80\% of the $r$ roles must have between 1 and 5 permissions.
+    
+    \item \textbf{Generation of rules}\\
+    Given a role count $r$ and a list of user attributes $attr$ containing a list of user attribute values each, $r$ rules are generated (a rule for each role). A rule is a list of user attributes, which have no, one or several user attribute values assigned. For example given the user attributes $attr$ from above, $rule_1$ = [\{$Administration$\}, \{$Denmark$,$Germany$\}, \{\}] would describe the rule $Administration \wedge (Denmark \vee Germany)$. A parameter for the maximal condition count $cond_{max}$ configures how many user attributes can be filled with values. The example $rule_1$ has currently two conditions: One for $OrganizationalUnit$ and one for $Location$.\\
+    This rule is then assigned to a role. Rules are generated until:
+        \subitem \textbullet \space each role has a rule assigned
+        \subitem \textbullet \space each generated user is meeting one rule
+        \subitem \textbullet \space each rule is met by at least one user
+\end{itemize}
+Since users and roles have been generated before, the rules can be applied to create the following outputs:
+\begin{itemize}
+    \item \textbf{User-role matrix}
+    \item \textbf{Role-permission matrix}
+    \item \textbf{User-permission matrix}
+    \item \textbf{User-permission matrix with noise}
+\end{itemize}
+Furthermore the input parameters are saved in a file.
 
 \subsubsection{Real Datasets}
 \hl{SECTION UNDER CONSTRUCTION}\\
-In many research papers the same datasets are used for performance evaluation of role mining Algorithms. Table \ref{tab:realDatasets} lists some of these data sets and their components.
-\begin{table}[ht]
+In many research papers the same datasets are used for performance evaluation of role mining Algorithms. Table \ref{tab:realDatasets} lists some of these data sets and their components. The authors of \cite{Ene} obtained these datasets from Cisco firewalls and the Lotus Domino server of the Hewlett Packard (HP) networks. The healthcare dataset was collected from the US Veteran’s Administration.
+
+Also see \cite{Xu}
+\begin{table}
     \centering
     \begin{tabular}{|l|l|l|l|}
         \hline
@@ -78,9 +68,7 @@ In many research papers the same datasets are used for performance evaluation of
     \label{tab:realDatasets}
 \end{table}
 
-The authors of \cite{Ene} obtained these datasets from Cisco firewalls and the Lotus Domino server of the Hewlett Packard (HP) networks. The healthcare dataset was collected from the US Veteran’s Administration.
 
-Also see \cite{Xu}
 
 \subsection{Visualisation of the RBAC Model}
 \hl{SECTION UNDER CONSTRUCTION}\\

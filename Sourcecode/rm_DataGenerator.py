@@ -174,7 +174,7 @@ def generateRoles4(roleCnt, permissionCnt, maxPermissionUsage, configPermissions
         emptySlotsinRole[selectedRole] -= 1
         #print("emptySlotsinRole: "+str(emptySlotsinRole))
     if (0 in permissionUsage):
-        #print("WARNING: There are unused permissions")
+        print("WARNING: There are unused permissions")
         while (0 in permissionUsage):
             unusedPermissions = [p for p in range(permissionCnt) if permissionUsage[p]==0]
             for unusedPermission in unusedPermissions:
@@ -223,23 +223,28 @@ def generateUsers(userCnt,attributes,userTypeCnt):
 # -----------------------------------------------------------------------------------
 # Generate Rules for Roles
 # -----------------------------------------------------------------------------------
-def generateRules(rules, roleCnt, attributes, maxRuleConditionCnt, ruleUsage):
+def generateRules(rules, roleCnt, attributes, maxRuleConditionCnt, ruleUsage, userUsage):
     #rules = [[] for r in range(roleCnt)]
     #print("rules: "+str(rules))
-    for r,usage in enumerate(ruleUsage):
-        if (usage == 0):
-            selectedAttributes = random.sample(range(0,len(attributes)),random.randint(1,maxRuleConditionCnt))
-            #print("selectedAttributes: "+str(selectedAttributes))
-            attrSet = []
-            for a in range(len(attributes)):
-                attrValueSet = []
-                if (a in selectedAttributes):
-                    attrValues = attributes[a]
-                    numberOfValues = random.randint(1,len(attrValues)-1)
-                    attrValueSet = random.sample(attrValues,numberOfValues)
-                attrSet.append(attrValueSet)
-            #print("attrSet: "+str(attrSet))
-            rules[r] = attrSet
+    if (0 not in ruleUsage):
+        r_list = [random.randint(0,roleCnt-1)]
+    else:
+        r_list = [i for i, j in enumerate(ruleUsage) if j == 0]
+
+    for r in r_list:
+        selectedAttributes = random.sample(range(0,len(attributes)),random.randint(1,maxRuleConditionCnt))
+        #print("selectedAttributes: "+str(selectedAttributes))
+        attrSet = []
+        for a in range(len(attributes)):
+            attrValueSet = []
+            if (a in selectedAttributes):
+                attrValues = attributes[a]
+                numberOfValues = random.randint(1,len(attrValues)-1)
+                attrValueSet = random.sample(attrValues,numberOfValues)
+            attrSet.append(attrValueSet)
+        #print("attrSet: "+str(attrSet))
+        rules[r] = attrSet
+
     #print("rules: "+str(rules))
     return rules
 
@@ -328,7 +333,7 @@ def addNoise(UPmatrix, noise):
 # -----------------------------------------------------------------------------------
 # Print generated data into files
 # -----------------------------------------------------------------------------------
-def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoise, noise):
+def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules, UPMatrixWithNoise, noise):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -364,8 +369,46 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoi
     with open(upmatrixCSVfile, "a") as outfile:
         for u,user in enumerate(users):
             outfile.write(str(u+1)+";")
-            for p in range(0,UPMatrix.shape[1]):
-                 outfile.write(str(UPMatrix[u,p])+";")
+            for r in range(0,UPMatrix.shape[1]):
+                 outfile.write(str(UPMatrix[u,r])+";")
+            outfile.write("\n")
+        outfile.close()
+    print("DONE.\n")
+
+    urmatrixCSVfile = directory+"\\URMatrix.csv"
+    print("Write into CSV file "+str(urmatrixCSVfile)+"...")
+    if not os.path.exists(urmatrixCSVfile):
+        with open(urmatrixCSVfile, "a") as outfile:
+            outfile.write("sep=;\n")
+            outfile.write("User;")
+            for r in range(0,URMatrix.shape[1]):
+                 outfile.write("Role"+str(r+1)+";")
+            outfile.write("\n")
+            outfile.close()
+    with open(urmatrixCSVfile, "a") as outfile:
+        for u,user in enumerate(users):
+            outfile.write(str(u+1)+";")
+            for r in range(0,URMatrix.shape[1]):
+                 outfile.write(str(URMatrix[u,r])+";")
+            outfile.write("\n")
+        outfile.close()
+    print("DONE.\n")
+
+    rpmatrixCSVfile = directory+"\\RPMatrix.csv"
+    print("Write into CSV file "+str(rpmatrixCSVfile)+"...")
+    if not os.path.exists(rpmatrixCSVfile):
+        with open(rpmatrixCSVfile, "a") as outfile:
+            outfile.write("sep=;\n")
+            outfile.write("Role;")
+            for p in range(0,RPMatrix.shape[1]):
+                 outfile.write("Permission"+str(p+1)+";")
+            outfile.write("\n")
+            outfile.close()
+    with open(rpmatrixCSVfile, "a") as outfile:
+        for r,role in enumerate(roles):
+            outfile.write(str(r+1)+";")
+            for p in range(0,RPMatrix.shape[1]):
+                 outfile.write(str(RPMatrix[r,p])+";")
             outfile.write("\n")
         outfile.close()
     print("DONE.\n")
@@ -474,10 +517,10 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoi
 # Configuration parameters for Data Generator
 # -----------------------------------------------------------------------------------
 attributes = [['Sales','Motor','Administration'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
-userCnt = 5 #Total number of users
-userTypeCnt = 5 #Number of different usertypes (usertype is desribed by the users attributes)
-permissionCnt = 7 #Total number of permissions
-roleCnt = 3 #Total number of roles
+userCnt = 15 #Total number of users
+userTypeCnt = 5 #Number of different usertypes (usertype is described by the users attributes)
+permissionCnt = 10 #Total number of permissions
+roleCnt = 5 #Total number of roles
 configPermissionsForRoles = [(0.2,10,20),(0.8,1,5)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
 #RPdensity = 0.8
 #maxPermissionForRole = 46
@@ -498,10 +541,13 @@ for u in users:
 
 rules = [[] for r in range(roleCnt)]
 ruleUsage = [0 for i in range(roleCnt)]
-while (0 in ruleUsage):
-    rules = generateRules(rules,roleCnt,attributes,maxRuleConditionCnt,ruleUsage)
+userUsage = [0 for i in range(userCnt)]
+while (0 in userUsage):
+    rules = generateRules(rules,roleCnt,attributes,maxRuleConditionCnt,ruleUsage,userUsage)
     URMatrix = assignUsersToRoles(users,roles,rules)
+    userUsage = [ sum(x) for x in URMatrix]
     ruleUsage = [ sum(x) for x in zip(*URMatrix)]
+URMatrix = numpy.matrix(URMatrix,dtype=int)
 print("\nRULES:")
 for r in rules:
     print(r)
@@ -509,6 +555,7 @@ for r in rules:
 print("\nURMatrix: "+str(URMatrix))
 
 RPMatrix = createRPMatrix(roles,permissionCnt)
+RPMatrix = numpy.matrix(RPMatrix,dtype=int)
 print("\nRPMatrix: "+str(RPMatrix))
 
 UPMatrix = numpy.matrix(URMatrix,dtype=bool) * numpy.matrix(RPMatrix,dtype=bool)
@@ -520,10 +567,27 @@ print(UPMatrix)
 UPMatrixWithNoise = addNoise(URMatrix, noise)
 
 timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-directory = "..\\TestData\\Data_"+timestamp
+directory = "..\\TestData\\Data_"+timestamp+"_"+str(userCnt)+"x"+str(permissionCnt)
 if not os.path.exists(directory):
     os.makedirs(directory)
-printDataIntoFiles(directory, users, roles, UPMatrix, rules, UPMatrixWithNoise, noise)
+
+configCSVfile = directory+"\\config.csv"
+print("Write into CSV file "+str(configCSVfile)+"...")
+if not os.path.exists(configCSVfile):
+    with open(configCSVfile, "a") as outfile:
+        outfile.write("sep=;\n")
+        outfile.write("userCnt;"+str(userCnt)+"\n")
+        outfile.write("userTypeCnt;"+str(userTypeCnt)+"\n")
+        outfile.write("permissionCnt;"+str(permissionCnt)+"\n")
+        outfile.write("roleCnt;"+str(roleCnt)+"\n")
+        outfile.write("configPermissionsForRoles;"+str(configPermissionsForRoles)+"\n")
+        outfile.write("maxPermissionUsage;"+str(maxPermissionUsage)+"\n")
+        outfile.write("maxRuleConditionCnt;"+str(maxRuleConditionCnt)+"\n")
+        outfile.write("noise;"+str(noise)+"\n")
+        outfile.close()
+print("DONE.\n")
+
+printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules, UPMatrixWithNoise, noise)
 visual.showRoleModel(URMatrix, RPMatrix, UPMatrix, UPMatrixWithNoise, directory+"\\graphic", False, False, True, True)
 
 #visual.showAllRoles(population,0,Original, directory+"\\mytest_best", False, False, True, True)

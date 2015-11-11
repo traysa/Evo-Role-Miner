@@ -2,3 +2,46 @@
 \section{Appendix}
 
 Implementation with the DEAP Framework for Python \cite{DeRainville:2012}
+
+\begin{algorithm}
+\caption{Algorithm for creating an synthetic dataset for testing of role mining algorithms}
+\label{alg:CreateDataSet}
+\begin{algorithmic}[1]
+\Procedure{CreateRoles}{$roleCnt$,$permissionCnt$,$maxPermissionForRole$,$maxPermissionUsage$}
+    \State $roles$ = [ ] for each $roles$[$r$] with $r$ = 0..$roleCnt$-1
+    \State $permissionBucket$ = $maxPermissionUsage$ for each $permissionBucket$[$p$] with $p$ = 0..$permissionCnt$-1
+    \For{$role$ in $roles$ }
+        \State $permissionForRoleCnt$ = pick randomly between 1..$maxPermissionForRole$
+        \State $tempPermissionBucket$ = $permissionBucket$ - $role$
+        \If{\text{length of }$tempPermissionBucket$ \textgreater 0}
+            \State $permission$ = draw randomly number of $permissionForRoleCnt$ out of $tempPermissionBucket$
+            \State $role$.add($permission$)
+        \Else
+            \State Error
+        \EndIf
+    \EndFor
+    \State \Return $roles$
+\EndProcedure
+\State
+\Procedure{CreateUsers}{$userCnt$,$attribute$}
+    \State $users$ = [ ] for each $users$[$u$] with $u$ = 0..$userCnt$-1
+    \For{$user$ in $users$ }
+        \For{$a$,$attrValues$ in $attributes$ }
+            \State $user$[$a$] = pick randomly a value of $attrValues$
+        \EndFor
+    \EndFor
+    \State \Return $users$
+\EndProcedure
+\State
+\Procedure{CreateRules}{$roleCnt$,$attributes$,$maxRuleConditionCnt$}
+    \State $rules$ = [{}] for each $rules$[$r$] with $r$ = 0..$roleCnt$-1
+    \For{$rule$ in $rules$ }
+        \State $selectedAttributes$ = pick $maxRuleConditionCnt$ random $attributes$
+        \For{$a$,$attrValues$ in $selectedAttributes$ }
+            \State $rule$[$a$] = pick randomly values of $attrValues$
+        \EndFor
+    \EndFor
+    \State \Return $rules$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
