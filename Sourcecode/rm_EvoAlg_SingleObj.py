@@ -11,6 +11,8 @@ import rm_EAInitialization as init
 import rm_EAEvaluations as evals
 import rm_Visualization as visual
 from collections import defaultdict
+import logging
+logger = logging.getLogger('root')
 
 # -----------------------------------------------------------------------------------
 # Evolutionary algorithm - One objective
@@ -20,7 +22,7 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
               untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
               userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
 
-    print("Prepare evolutionary algorithm...")
+    logger.info("Prepare evolutionary algorithm...")
     time = []
     results = defaultdict(list)
     genStart = 0
@@ -162,7 +164,7 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
 
     # Creating the population
     if (not population):
-        print("Generate new population of "+str(populationSize)+" individuals")
+        logger.info("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
         if (printPopulations):
             pop_subdirectory = pop_directory+"\\Generation_"+str(genStart)
@@ -183,10 +185,10 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     if ((len(logbook)==0) or (logbook.pop(len(logbook)-1)["gen"] != genStart)):
         '''record = stats.compile(population)
         logbook.record(gen=genStart, evals=len(invalid_ind), **record)
-        print("Generation "+str(genStart)+":\t"+str(logbook.stream))'''
+        logger.info("Generation "+str(genStart)+":\t"+str(logbook.stream))'''
         record = mstats.compile(population)
         logbook.record(gen=genStart, evals=len(invalid_ind), **record)
-        print("Generation "+str(genStart)+":\t"
+        logger.info("Generation "+str(genStart)+":\t"
               +str(logbook.stream)+"\n"
               +str(logbook.chapters["Fitness"].stream)+"\n"
               +str(logbook.chapters["Conf"].stream)+"\n"
@@ -198,22 +200,22 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
               )
 
     # Begin the evolution
-    print("Start evolution...")
+    logger.info("Start evolution...")
     start = datetime.datetime.now()
-    print("Start time: "+str(start))
+    logger.info("Start time: "+str(start))
     #hof = tools.HallOfFame(maxsize=1)
 
     generation = genStart+1
     stop = False
-    print("Start evolution with Generation "+str(genStart))
+    logger.info("Start evolution with Generation "+str(genStart))
     while ((not stop) and (generation <= genStart+NGEN)):
         population = toolbox.select(population, k=len(population))
-        population = algorithms.varAnd(population, toolbox, cxpb=CXPB, mutpb=MUTPB_All)
+        offspring = algorithms.varAnd(population, toolbox, cxpb=CXPB, mutpb=MUTPB_All)
 
         # Evaluate individuals, which need a evaluation
-        invalid_ind = [ind for ind in population if not ind.fitness.valid]
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         if (evalFunc=="WSC_Star_RoleDis"):
-            fitnesses = [toolbox.evaluate(population=population, individual=ind) for ind in invalid_ind]
+            fitnesses = [toolbox.evaluate(population=offspring, individual=ind) for ind in invalid_ind]
         else:
             fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
@@ -224,15 +226,15 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
 
         # Add Fitness values to results
         if generation % freq == 0:
-            for ind in population:
+            for ind in offspring:
                 results[generation].append(ind.fitness.values)
             # Log statistics for generation
-            '''record = stats.compile(population)
+            '''record = stats.compile(offspring)
             logbook.record(gen=generation, evals=len(invalids), **record)
-            print("Generation "+str(generation)+":\t"+str(logbook.stream))'''
-            record = mstats.compile(population)
+            logger.info("Generation "+str(generation)+":\t"+str(logbook.stream))'''
+            record = mstats.compile(offspring)
             logbook.record(gen=generation, evals=len(invalid_ind), **record)
-            print("Generation "+str(generation)+":\t"
+            logger.info("Generation "+str(generation)+":\t"
                   +str(logbook.stream)+"\t"
                   +str(logbook.chapters["Fitness"].stream)+"\t\t"
                   +str(logbook.chapters["Conf"].stream)+"\t\t"
@@ -247,8 +249,9 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
             pop_subdirectory = pop_directory+"\\Generation_"+str(generation)
             if not os.path.exists(pop_subdirectory):
                 os.makedirs(pop_subdirectory)
-            visual.showBestResult(population, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
+            visual.showBestResult(offspring, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
 
+        population = offspring
         generation += 1
 
     end = datetime.datetime.now()
@@ -257,8 +260,8 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     generation -= 1
     # Print final population
     #visual.printpopulation(population)
-    print("==> Generation "+str(generation))
-    print("DONE.\n")
+    logger.info("==> Generation "+str(generation))
+    logger.info("DONE.\n")
 
     # Set Checkpoint
     fileExt = "_S_" + evalFunc + "_" + str(len(population)) + "_" + str(generation) + "_" + str(tournsize)+ "_" + str(CXPB) + "_" + str(MUTPB_All)

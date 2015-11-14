@@ -7,6 +7,8 @@ import MatrixOperators as matrixOps
 import random
 import numpy
 from collections import Counter
+import logging
+logger = logging.getLogger('root')
 
 # -----------------------------------------------------------------------------------
 # Adds a role to a rolemodel
@@ -20,7 +22,7 @@ def addRole(rolemodel, userSize, permissionSize, alternativeOption):
         rolemodel = optimizer.combineObjects(rolemodel, 1)
         rolemodel = optimizer.combineObjects(rolemodel, 0)
     else:
-        print("No role could be added, since max. role number is already achieved")
+        logger.info("No role could be added, since max. role number is already achieved")
         if (alternativeOption):
             rolemodel = removeRole(rolemodel, userSize, permissionSize, False)
     return rolemodel
@@ -56,11 +58,11 @@ def removeRole(rolemodel, userSize, permissionSize, alternativeOption):
             role = selectedRoles[random.randint(0, len(selectedRoles)-1)]
             rolemodel.remove(role)
         else:
-            print("No role could be removed, since all roles contain at least one user, which does not occur in other roles")
+            logger.info("No role could be removed, since all roles contain at least one user, which does not occur in other roles")
             if (alternativeOption):
                 rolemodel = addRole(rolemodel, userSize, permissionSize, False)
     else:
-        print("No role could be removed, since the rolemodel only contains one role")
+        logger.info("No role could be removed, since the rolemodel only contains one role")
         if (alternativeOption):
             rolemodel = addRole(rolemodel, userSize, permissionSize, False)
     return rolemodel
@@ -91,7 +93,7 @@ def removeUser(rolemodel, userSize, alternativeOption):
             userRemoved = True
 
     if (not userRemoved):
-        print("No user could be removed, since all roles only contain one user or users, which only occur once in the rolemodel")
+        logger.info("No user could be removed, since all roles only contain one user or users, which only occur once in the rolemodel")
         if (alternativeOption):
             rolemodel = addUser(rolemodel, userSize, False)
 
@@ -124,7 +126,7 @@ def removePermission(rolemodel, permissionSize, alternativeOption):
             permissionRemoved = True
 
     if (not permissionRemoved):
-        print("No permission could be removed, since all roles only contain one permission or permissions, which only occur once in the rolemodel")
+        logger.info("No permission could be removed, since all roles only contain one permission or permissions, which only occur once in the rolemodel")
         if (alternativeOption):
             rolemodel = addPermission(rolemodel, permissionSize, False)
 
@@ -150,7 +152,7 @@ def addUser(rolemodel, userSize, alternativeOption):
             userAdded = True
 
     if (not userAdded):
-        print("No user could be added, since all roles already contain all users")
+        logger.info("No user could be added, since all roles already contain all users")
         if (alternativeOption):
             rolemodel = removeUser(rolemodel, userSize)
 
@@ -176,7 +178,7 @@ def addPermission(rolemodel, permissionSize, alternativeOption):
             permissionAdded = True
 
     if (not permissionAdded):
-        print("No permission could be added, since all roles already contain all permissions")
+        logger.info("No permission could be added, since all roles already contain all permissions")
         if (alternativeOption):
             rolemodel = removePermission(rolemodel, permissionSize,False)
 
@@ -220,7 +222,7 @@ def mutFunc(individual, addRolePB, removeRolePB, removeUserPB, removePermissionP
 # Crossover Function
 # -----------------------------------------------------------------------------------
 def mateFunc(ind1, ind2):
-    print("Crossover")
+    logger.debug("Crossover")
     temp1 = ind1[0]
     temp2 = ind2[0]
     size = min(len(temp1), len(temp2))
@@ -235,7 +237,7 @@ def mateFunc(ind1, ind2):
 # Crossover Function
 # -----------------------------------------------------------------------------------
 def mateFunc_old(ind1, ind2):
-    print("Crossover")
+    logger.debug("Crossover")
     temp1 = ind1[0]
     temp2 = ind2[0]
     size = min(len(temp1), len(temp2))
