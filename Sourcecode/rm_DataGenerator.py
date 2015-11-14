@@ -516,17 +516,17 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, ru
 # -----------------------------------------------------------------------------------
 # Configuration parameters for Data Generator
 # -----------------------------------------------------------------------------------
-attributes = [['Sales','Motor','Administration'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
-userCnt = 15 #Total number of users
+attributes = [['Sales','Motor','HumanResources'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
+userCnt = 10 #Total number of users
 userTypeCnt = 5 #Number of different usertypes (usertype is described by the users attributes)
 permissionCnt = 10 #Total number of permissions
-roleCnt = 5 #Total number of roles
-configPermissionsForRoles = [(0.2,10,20),(0.8,1,5)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
+roleCnt = 4 #Total number of roles
+configPermissionsForRoles = [(0.2,8,10),(0.8,1,4)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
 #RPdensity = 0.8
 #maxPermissionForRole = 46
 maxPermissionUsage = 3 #How often a permission can occur in different roles
 maxRuleConditionCnt = 2 #
-noise = [0.01,0.04] #Artificial noise (bit-flip in UP-Matrix):[users with to few permissions, users with too many permissions]
+noise = [0.02,0.04] #Artificial noise (bit-flip in UP-Matrix):[users with to few permissions, users with too many permissions]
 
 #roles = generateRoles3(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage, RPdensity)
 roles = generateRoles4(roleCnt,permissionCnt, maxPermissionUsage, configPermissionsForRoles)
@@ -588,6 +588,6 @@ if not os.path.exists(configCSVfile):
 print("DONE.\n")
 
 printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules, UPMatrixWithNoise, noise)
-visual.showRoleModel(URMatrix, RPMatrix, UPMatrix, UPMatrixWithNoise, directory+"\\graphic", False, False, True, True)
+visual.showRoleModel(URMatrix, RPMatrix, UPMatrix, UPMatrixWithNoise, directory+"\\role_model", True, False, True, True)
 
 #visual.showAllRoles(population,0,Original, directory+"\\mytest_best", False, False, True, True)

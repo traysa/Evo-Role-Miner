@@ -168,6 +168,29 @@ def readURAssignments(filename):
     return URMatrix
 
 # -----------------------------------------------------------------------------------
+# Parse User-Role Assignments
+# -----------------------------------------------------------------------------------
+def readURAssignments2(filename):
+    print("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count users
+    userCnt = len(lines[2:])
+    print("user count: "+str(userCnt))
+
+    roleCnt = len(lines[2:][0].split(";")[1:])-1
+    print("role count: "+str(roleCnt))
+
+    URMatrix = matrixOps.createEmptyMatrix(userCnt, roleCnt)
+    for user,u in enumerate(lines[2:]):
+        roles = u.split(";")[1:len(u.split(";"))-1]
+        for role,r in enumerate(roles):
+            URMatrix[user][role]=int(r)
+
+    return URMatrix
+
+# -----------------------------------------------------------------------------------
 # Parse Role-Permission Assignments
 # -----------------------------------------------------------------------------------
 def readRPAssignments(filename):
