@@ -1,6 +1,7 @@
 __author__ = 'Theresa'
 
 import logging
+import rm_Utils as utils
 logger = logging.getLogger('root')
 
 # -----------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ else:
 # ----------------------------------------------------------------------------------------------------------------------
 def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
-                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, obj_weights=[],eval_weights=[],
+                    NGEN, freq, evolutionType, evalFunc, untilSolutionFound, optimization, obj_weights=[],eval_weights=[],
                     userAttributeValues=[], constraints=[]):
     global useCheckpoint
 
@@ -117,9 +118,9 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     #if (evolutionType=="Single"):
     #    subdirectory += "_"+evalFunc
 
-    fileExt = "_" + evolutionType[0] + "_" + str(evalFunc) + "_" + str(POP_SIZE) + "_" + str(NGEN) + "_" + str(tournsize)+ "_" + str(CXPB) + "_" + str(MUTPB_All)
-    if (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted" ):
-        fileExt += "_" + str(obj_weights)
+    fileExt = "_" + evolutionType[0] + "_" + str(evalFunc) + "_" + str(POP_SIZE) + "_" + str(NGEN)
+    #if (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted" ):
+    #    fileExt += "_" + str(obj_weights)
     checkpointSubdirectory = subdirectory+"\\Checkpoints"
     if not os.path.exists(checkpointSubdirectory):
         os.makedirs(checkpointSubdirectory)
@@ -128,6 +129,9 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     pop_directory = subdirectory+"\\Populations"
     if not os.path.exists(pop_directory):
         os.makedirs(pop_directory)
+    pop_subdirectory = pop_directory+"\\"+str(experimentNumber)+"_"+str(experimentCnt)+"_Populations"
+    if not os.path.exists(pop_subdirectory):
+        os.makedirs(pop_subdirectory)
 
     # ------------------------------------------------------------------------------------------------------------------
     # EVOLUTION
@@ -136,10 +140,10 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_single.evolution(Original, evalFunc[0], POP_SIZE, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
-                                removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
+                                removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
                                 untilSolutionFound=untilSolutionFound, eval_weights=eval_weights,
                                 userAttributeValues=userAttributeValues,
-                                constraints=constraints, printPopulations=False, pop_directory=pop_directory)
+                                constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,
@@ -186,7 +190,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     roleModelsSubsubdirectory = roleModelsSubdirectory+"\\"+str(experimentNumber)+"_RM"+fileExt
     if not os.path.exists(roleModelsSubsubdirectory):
         os.makedirs(roleModelsSubsubdirectory)
-    roleModelsSubsubsubdirectory = roleModelsSubsubdirectory+"\\"+str(experimentNumber)+"_"+str(experimentCnt)+"_RM"+fileExt
+    roleModelsSubsubsubdirectory = roleModelsSubsubdirectory+"\\"+str(experimentNumber)+"_"+str(experimentCnt)+"_RoleModels"
     if not os.path.exists(roleModelsSubsubsubdirectory):
         os.makedirs(roleModelsSubsubsubdirectory)
     roleModel_filename = roleModelsSubsubsubdirectory+"\\RoleModel"
@@ -333,6 +337,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                              +"),RPCnt("+str(RPCnt_Min)+","+str(RPCnt_Avg)+","+str(RPCnt_Max)\
                              +"),Interp("+"{0:.2f}".format(Interp_Min)+","+"{0:.2f}".format(Interp_Avg)+","+"{0:.2f}".format(Interp_Max)+")"
                 outfile.close()
+        logger.info("DONE.\n")
 
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -359,7 +364,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         stats = ["Fitness"]
         stats2 = ["Conf","Accs","RoleCnt","URCnt","RPCnt","Interp"]
         visual.plotLogbook(logbook, log_filename+"_plot", stats, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
-        visual.plotLogbook(logbook, log_filename+"_rmmeasures_plot", stats2, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
+        visual.plotLogbook(logbook, log_filename+"_rmmeasures", stats2, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
         visual.showFitnessInPlot(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc[0], fitnessAsPDF, fitnessAsSVG,
                                  fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
@@ -388,7 +393,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     # ------------------------------------------------------------------------------------------------------------------
     if (saveInJSONFile):
         resultJSONfile = directory+"\\Results.json"
-        logger.info("Write into JSON file "+str(resultJSONfile)+"...")
+        logger.info("Write results into JSON file "+str(resultJSONfile)+"...")
         with open(resultJSONfile, "a") as outfile:
             json.dump({'ExperimentNumber':str(experimentNumber), 'ExperimentCount':str(experimentCnt), 'Experiment':Name,
                        'userCount':str(userCount), 'permissionCount':str(permissionCount),
@@ -402,7 +407,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
 
     if (saveInCSVFile):
         resultCSVfile = directory+"\\Results.csv"
-        logger.info("Write into CSV file "+str(resultCSVfile)+"...")
+        logger.info("Write results into CSV file "+str(resultCSVfile)+"...")
         if not os.path.exists(resultCSVfile):
             with open(resultCSVfile, "a") as outfile:
                 outfile.write("sep=;\n")

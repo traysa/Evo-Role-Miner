@@ -16,7 +16,9 @@ import ntpath
 import os
 import shutil
 import Experiments_Evaluator as exp_eval
+import rm_Utils as utils
 import logging
+import rm_EAEvaluations as eval
 
 # ----------------------------------------------------------------------------------------------------------------------
 # DATA SETS
@@ -28,19 +30,20 @@ def getDataSet(DATA):
     constraints = []
     if (DATA=="healthcare"):
         Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
-    if (DATA=="domino"):
+        userAttributeValues = parser.readUserAttributes2("..\\TestData\\healthcare_5_cust.attr",Original.shape[0])
+    elif (DATA=="domino"):
         Original = numpy.matrix(parser.read("..\\TestData\\domino.rbac"))
-    if (DATA=="emea"):
+    elif (DATA=="emea"):
         Original = numpy.matrix(parser.read("..\\TestData\\emea.rbac"))
-    if (DATA=="apj"):
+    elif (DATA=="apj"):
         Original = numpy.matrix(parser.read("..\\TestData\\apj.rbac"))
-    if (DATA=="firewall1"):
+    elif (DATA=="firewall1"):
         Original = numpy.matrix(parser.read("..\\TestData\\firewall1.rbac"))
-    if (DATA=="firewall2"):
+    elif (DATA=="firewall2"):
         Original = numpy.matrix(parser.read("..\\TestData\\firewall2.rbac"))
-    if (DATA=="americas_small"):
+    elif (DATA=="americas_small"):
         Original = numpy.matrix(parser.read("..\\TestData\\americas_small.rbac"))
-    if (DATA=="americas_large"):
+    elif (DATA=="americas_large"):
         Original = numpy.matrix(parser.read("..\\TestData\\americas_large.rbac"))
     elif (DATA=="testdata"):
         testdata = [[1, 1, 0, 0, 0], [1, 0, 0, 1, 1], [1, 0, 1, 1, 1], [1, 0, 0, 1, 1], [1, 0, 0, 1, 1], [1, 1, 0, 1, 1], [1, 0, 0, 1, 1]]
@@ -50,14 +53,24 @@ def getDataSet(DATA):
         Original = matrixOps.generateGoalMatrix(4, 10, 10)
     elif (DATA=="GeneratedData"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151004-191825\\testdata.rbac"))
-        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151004-191825\\users.csv")
+        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\Data_20151004-191825\\users.csv")
         #constraints = parser.readConstraints("..\\TestData\\Data_20151004-191825\\constraints.csv")
     elif (DATA=="GeneratedData_small"):
         Original = numpy.matrix(parser.read("..\\TestData\\Data_20151005-194203\\testdata.rbac"))
-        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151005-194203\\users.csv")
+        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\Data_20151005-194203\\users.csv")
         #constraints = parser.readConstraints("..\\TestData\\Data_20151005-194203\\constraints.csv")
         URMatrix = parser.readURAssignments("..\\TestData\\Data_20151005-194203\\UsersToRoles.csv")
         RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151005-194203\\Roles.csv")
+    elif (DATA=="GeneratedData_Set1"):
+        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151116-150651_10x10\\testdata.rbac"))
+        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\Data_20151116-150651_10x10\\users.csv")
+        #constraints = parser.readConstraints("..\\TestData\\Data_20151116-150651_10x10\\constraints.csv")
+        URMatrix = parser.readURMatrix("..\\TestData\\Data_20151116-150651_10x10\\URMatrix.csv")
+        RPMatrix = parser.readRPMatrix("..\\TestData\\Data_20151116-150651_10x10\\RPMatrix.csv")
+        individual = utils.buildIndividual(URMatrix,RPMatrix)
+        fitness = eval.evalFunc_WSC_INT([individual], Original.shape[0], Original.shape[1], Original, [0,1,1,0.5,0.5,0.8], userAttributeValues, constraints=[])
+        logger.info("VALIDATION OF DATASET")
+        logger.info("Fitness of solution of dataset: "+str(fitness))
     return Original, userAttributeValues, userAttributes, constraints
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -90,9 +103,9 @@ def executeExperimentFromFile():
         # Parse Experiment File and execute experiments
         # --------------------------------------------------------------------------------------------------------------
         logger.info("Experiment Settings: ")
-        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M")
 
-        directory = "..\\Output\\"+timestamp+"_ExperimentSequence_"+path_leaf(selectedFile)
+        directory = "..\\Output\\"+timestamp+"_EXP_"+path_leaf(selectedFile).split(".")[0]
         if not os.path.exists(directory):
             os.makedirs(directory)
         shutil.copyfile(selectedFile, directory+"\\"+path_leaf(selectedFile)) #copy input file in output directory
@@ -111,7 +124,7 @@ def executeExperimentFromFile():
                 Name = customName
             if ("DATA" in experiment.keys()):
                 DATA = experiment["DATA"]
-                Original, userAttributes, userAttributeValues, constraints = getDataSet(DATA)
+                Original, userAttributeValues, userAttributes, constraints = getDataSet(DATA)
             if ("POP_SIZE" in experiment.keys()):
                 POP_SIZE = int(experiment["POP_SIZE"])
                 logger.info("POP_SIZE: "+str(POP_SIZE))
@@ -185,6 +198,9 @@ def executeExperimentFromFile():
             if ("untilSolutionFound" in experiment.keys()):
                 untilSolutionFound = experiment["untilSolutionFound"] == "True"
                 logger.info("untilSolutionFound: "+str(untilSolutionFound))
+            if ("optimization" in experiment.keys()):
+                optimization = experiment["optimization"] == "True"
+                logger.info("optimization: "+str(optimization))
             logger.info("===================================================================================================")
             logger.info("Start "+str(repeat)+" experiments of "+str(experimentNumber)+". experiment in experiment sequence named '"+customName+"'...")
             logger.info("===================================================================================================")
@@ -200,12 +216,12 @@ def executeExperimentFromFile():
                                                         experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
                                                         MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                                         removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
-                                                        evolutionType, evalFunc, untilSolutionFound,
+                                                        evolutionType, evalFunc, untilSolutionFound, optimization,
                                                         obj_weights=obj_weights,
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt)
+            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Asks user for configuration for the experiment
@@ -360,10 +376,11 @@ def executeCustomExperiment():
 
         repeat = int(input('How often shall the experiment be repeated\n'))
         untilSolutionFound = bool(input('Run until solution found? (True/False)\n'))
+        optimization = bool(input('Use local optimization after mutation/mating? (True/False)\n'))
         directory = "..\\Output"
         for experimentCnt in range(1,repeat+1):
             rm_builder.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,tournsize,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
-                           removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound,
+                           removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound, optimization,
                            obj_weights=obj_weights,eval_weights=eval_weights)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -390,6 +407,7 @@ def executeDefaultExperiment():
     obj_weights = [1.0,1.0]
     numberOfTrialItems = 3
     untilSolutionFound = False
+    optimization = True
     repeat = 1
 
     config = configparser.ConfigParser()
@@ -402,7 +420,7 @@ def executeDefaultExperiment():
                              'removePermissionPB': removePermissionPB, 'addUserPB': addUserPB,
                              'addPermissionPB': addPermissionPB, 'NGEN': NGEN, 'freq': freq}
         config['Algorithm'] = {'evolutionType': evolutionType, 'evalFunc': evalFunc, 'eval_weights': eval_weights, 'obj_weights': obj_weights,
-                               'until_Solution_Found': untilSolutionFound}
+                               'until_Solution_Found': untilSolutionFound, 'optimization': optimization}
         config['Experiment'] = {'repeat': repeat}
         with open('Experiments_config.ini', 'w') as configfile:
             config.write(configfile)
@@ -431,6 +449,7 @@ def executeDefaultExperiment():
         if (evolutionType == "SANE"):
             numberOfTrialItems = config['Algorithm'].getint('numberOfTrialItems')
         untilSolutionFound = config['Algorithm'].getboolean('until_Solution_Found')
+        optimization = config['Algorithm'].getboolean('optimization')
         repeat = config['Experiment'].getint('repeat')
         if (DATA == None or experimentName == None or POP_SIZE == None or tournsize == None or CXPB == None or MUTPB_All == None
             or addRolePB == None or removeRolePB == None or removeUserPB == None or removePermissionPB == None
@@ -455,7 +474,7 @@ def executeDefaultExperiment():
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     Name = timestamp+"_"+experimentName
-    Original, userAttributes, userAttributeValues, constraints = getDataSet(DATA)
+    Original, userAttributeValues, userAttributes, constraints = getDataSet(DATA)
 
     directory = "..\\Output"
     for experimentCnt in range(1,repeat+1):
@@ -467,12 +486,12 @@ def executeDefaultExperiment():
                                                         Original, DATA, POP_SIZE, tournsize, CXPB, MUTPB_All,
                                                         addRolePB, removeRolePB, removeUserPB, removePermissionPB,
                                                         addUserPB, addPermissionPB, NGEN, freq, evolutionType, evalFunc,
-                                                        untilSolutionFound,
+                                                        untilSolutionFound, optimization,
                                                         obj_weights=obj_weights,
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt)
+    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq)
 
 # create logger with 'spam_application'
 logger = logging.getLogger('root')
@@ -482,7 +501,7 @@ fh = logging.FileHandler('logging.log')
 fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
 ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 # create formatter and add it to the handlers
 formatterFile = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s: %(message)s')
 formatterScreen = logging.Formatter('%(message)s')

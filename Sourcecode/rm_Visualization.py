@@ -73,23 +73,23 @@ def plotLogbook(logbook, logbook_filename, stats, title, info, saveAsPDF, saveAs
         pre_title = "Measures for: "
     fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle(pre_title+title, fontsize=20)
-    logger.debug("DONE.\n")
+    logger.info("DONE.\n")
 
     if (saveAsPDF):
-        logger.debug("Save logbook plot as PDF...")
+        logger.info("Save logbook plot as PDF...")
         pp = PdfPages(logbook_filename+".pdf")
         pp.savefig(fig)
         pp.close()
 
     if (saveAsSVG):
-        logger.debug("Save logbook plot as SVG...")
+        logger.info("Save logbook plot as SVG...")
         plt.savefig(logbook_filename+".svg")
 
     if (saveAsPNG):
-        logger.debug("Save logbook plot as PNG...")
+        logger.info("Save logbook plot as PNG...")
         plt.savefig(logbook_filename+".png")
         if (showPNG):
-            logger.debug("Show plot...")
+            logger.info("Show plot...")
             #plt.show()
             os.startfile(logbook_filename+".png")
     plt.close('all')
@@ -128,20 +128,20 @@ def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFun
     plt.suptitle("Fitness for: "+title, fontsize=20)
 
     if (saveAsPDF):
-        logger.debug("Save logbook plot as PDF...")
+        logger.info("Save logbook plot as PDF...")
         pp = PdfPages(logbook_filename+".pdf")
         pp.savefig(fig)
         pp.close()
 
     if (saveAsSVG):
-        logger.debug("Save logbook plot as SVG...")
+        logger.info("Save logbook plot as SVG...")
         plt.savefig(logbook_filename+".svg")
 
     if (saveAsPNG):
-        logger.debug("Save logbook plot as PNG...")
+        logger.info("Save logbook plot as PNG...")
         plt.savefig(logbook_filename+".png")
         if (showPNG):
-            logger.debug("Show plot...")
+            logger.info("Show plot...")
             #plt.show()
             os.startfile(logbook_filename+".png")
 
@@ -176,7 +176,11 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
                 if (s < len(stats)):
                     stat = stats[s]
                     temp = list(numpy.array(data)[:,s+2])
-                    ax = plotLogbookAVGData(stat, temp, ax)
+                    if (s==2):
+                        temp2 = list(numpy.array(data)[:,-1])
+                        ax = plotLogbookAVGData(stat, temp, ax, data2=temp2)
+                    else:
+                        ax = plotLogbookAVGData(stat, temp, ax)
                     min = ax.get_ylim()[0]
                     if (min > 0):
                         min = 0
@@ -186,43 +190,48 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
         pre_title = "Measures for: "
     fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle(pre_title+title, fontsize=20)
-    logger.debug("DONE.\n")
+    logger.info("DONE.\n")
 
     if (saveAsPDF):
-        logger.debug("Save logbook plot as PDF...")
+        logger.info("Save logbook plot as PDF...")
         pp = PdfPages(logbook_filename+".pdf")
         pp.savefig(fig)
         pp.close()
 
     if (saveAsSVG):
-        logger.debug("Save logbook plot as SVG...")
+        logger.info("Save logbook plot as SVG...")
         plt.savefig(logbook_filename+".svg")
 
     if (saveAsPNG):
-        logger.debug("Save logbook plot as PNG...")
+        logger.info("Save logbook plot as PNG...")
         plt.savefig(logbook_filename+".png")
         if (showPNG):
-            logger.debug("Show plot...")
+            logger.info("Show plot...")
             #plt.show()
             os.startfile(logbook_filename+".png")
     plt.close('all')
 # -----------------------------------------------------------------------------------
 # Plot data into graph for single objective EAs
 # -----------------------------------------------------------------------------------
-def plotLogbookAVGData(data_name,data, ax):
+def plotLogbookAVGData(data_name,data, ax, data2=None):
     gen = [i for i in range(0,len(data))]
     ax.set_xlabel("Generation", fontsize=16)
     ax.set_ylabel(data_name, fontsize=16)
     #ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
-    line = ax.plot(gen, data, "r-")
-    lns = line
+    line = ax.plot(gen, data, "r-", label="Avg. Optimum")
+    if data2:
+        line2 = ax.plot(gen, data2, "g-", label="Avg. Standard Deviation")
+        lns = line + line2
+        # Build legend
+        labs = [l.get_label() for l in lns]
+        ax.legend(lns, labs, loc="center right")
     return ax
 
 # -----------------------------------------------------------------------------------------
 # Visualize evaluation values of population in a plot over generations (Single Objective)
 # -----------------------------------------------------------------------------------------
 def showFitnessInPlot(results, generations, freq, filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
-    logger.debug("\nCreate plot...")
+    logger.info("\nCreate plot...")
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111)
     # Plot a scatter graph of all results
@@ -241,8 +250,14 @@ def showFitnessInPlot(results, generations, freq, filename, title, info, evalFun
             #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
             i += 1
         generation += freq
+
+
+    min = ax.get_ylim()[0]
+    if (min > 0):
+        min = 0
+    max = ax.get_ylim()[1]
+    ax.set_ylim(min,max)
     ax.set_xlim(0,generation - freq + 0.5)
-    ax.set_ylim(0)
     ax.set_xlabel('Generation', fontsize=16)
     ax.set_ylabel('Objective: '+evalFunc, fontsize=16)
     ax.tick_params(labelsize=14)
@@ -259,23 +274,23 @@ def showFitnessInPlot(results, generations, freq, filename, title, info, evalFun
 
     fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle("Fitness for: "+title, fontsize=20)
-    logger.debug("DONE.\n")
+    logger.info("DONE.\n")
 
     if (saveAsPDF):
-        logger.debug("Save plot as PDF...")
+        logger.info("Save plot as PDF...")
         pp = PdfPages(filename+".pdf")
         pp.savefig(fig)
         pp.close()
 
     if (saveAsSVG):
-        logger.debug("Save plot as SVG...")
+        logger.info("Save plot as SVG...")
         plt.savefig(filename+".svg")
 
     if (saveAsPNG):
-        logger.debug("Save plot as PNG...")
+        logger.info("Save plot as PNG...")
         plt.savefig(filename+".png")
         if (showPNG):
-            logger.debug("Show plot...")
+            logger.info("Show plot...")
             os.startfile(filename+".png")
 
     #plt.show(block=False)
@@ -285,7 +300,7 @@ def showFitnessInPlot(results, generations, freq, filename, title, info, evalFun
 # Visualize evaluation values of population in a plot (Multi Objective)
 # -----------------------------------------------------------------------------------------
 def showFitnessInPlotForMultiObjective(results, generations, freq, filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
-    logger.debug("\nCreate plot...")
+    logger.info("\nCreate plot...")
     if (len(evalFunc)==2):
         fig = plt.figure(figsize=(12, 8))
         ax = fig.add_subplot(111)
@@ -326,28 +341,28 @@ def showFitnessInPlotForMultiObjective(results, generations, freq, filename, tit
 
         fig.text(0.1,0.01, info, fontsize=10)
         plt.suptitle("Fitness for: "+title, fontsize=20)
-        logger.debug("DONE.\n")
+        logger.info("DONE.\n")
 
         if (saveAsPDF):
-            logger.debug("Save plot as PDF...")
+            logger.info("Save plot as PDF...")
             pp = PdfPages(filename+".pdf")
             pp.savefig(fig)
             pp.close()
 
         if (saveAsSVG):
-            logger.debug("Save plot as SVG...")
+            logger.info("Save plot as SVG...")
             plt.savefig(filename+".svg")
 
         if (saveAsPNG):
-            logger.debug("Save plot as PNG...")
+            logger.info("Save plot as PNG...")
             plt.savefig(filename+".png")
             if (showPNG):
-                logger.debug("Show plot...")
+                logger.info("Show plot...")
                 os.startfile(filename+".png")
 
         plt.close('all')
     else:
-        logger.debug("Number of objectives not supported")
+        logger.warn("Number of objectives not supported")
 
 # -----------------------------------------------------------------------------------------
 #
@@ -444,20 +459,20 @@ def showBestResult(top_pop, generation, Original, filename, title, info, saveAsP
         plt.suptitle("RoleModel for: "+title, fontsize=20)
 
         if (saveAsPDF):
-            logger.debug("Save plot for Top "+str(i)+" as PDF...")
+            logger.info("Save plot for Top "+str(i)+" as PDF...")
             pp = PdfPages(filename+"_"+str(i)+".pdf")
             pp.savefig(fig)
             pp.close()
 
         if (saveAsSVG):
-            logger.debug("Save plot for Top "+str(i)+" as SVG...")
+            logger.info("Save plot for Top "+str(i)+" as SVG...")
             plt.savefig(filename+"_"+str(i)+".svg")
 
         if (saveAsPNG):
-            logger.debug("Save plot for Top "+str(i)+" as PNG...")
+            logger.info("Save plot for Top "+str(i)+" as PNG...")
             plt.savefig(filename+"_"+str(i)+".png")
             if (showPNG):
-                logger.debug("Show plot...")
+                logger.info("Show plot...")
                 #plt.show()
                 os.startfile(filename+"_"+str(i)+".png")
 
@@ -527,20 +542,20 @@ def showRoleModel(UMatrix, PMatrix, UPMatrix, UPMatrixWithNoise, filename, saveA
     fig.set_tight_layout(True)
 
     if (saveAsPDF):
-        logger.debug("Save plot as PDF...")
+        logger.info("Save plot as PDF...")
         pp = PdfPages(filename+".pdf")
         pp.savefig(fig)
         pp.close()
 
     if (saveAsSVG):
-        logger.debug("Save plot as SVG...")
+        logger.info("Save plot as SVG...")
         plt.savefig(filename+".svg")
 
     if (saveAsPNG):
-        logger.debug("Save plot as PNG...")
+        logger.info("Save plot as PNG...")
         plt.savefig(filename+".png")
         if (showPNG):
-            logger.debug("Show plot...")
+            logger.info("Show plot...")
             #plt.show()
             os.startfile(filename+".png")
 
@@ -598,7 +613,7 @@ def addBestIndividualToPlot(pop, generation, Original, results):
 def printPopulation(pop):
     i = 1
     for ind in pop:
-        logger.debug(str(i) + " -- " + str(ind.fitness.values) + " -- " + str(ind[0]))
+        logger.info(str(i) + " -- " + str(ind.fitness.values) + " -- " + str(ind[0]))
         i += 1
 
 
@@ -626,3 +641,34 @@ def pareto_frontier(Xs, Ys, maxX = True, maxY = True):
     p_frontX = [pair[0] for pair in p_front]
     p_frontY = [pair[1] for pair in p_front]
     return p_frontX, p_frontY
+
+# -----------------------------------------------------------------------------------------
+# Create boxplot of role count
+# -----------------------------------------------------------------------------------------
+def diversityBoxplot(labels,data, filename, saveAsPDF=True, saveAsSVG=False, saveAsPNG=True, showPNG=False):
+    fig, ax = plt.subplots(figsize=(12, 8))
+    plt.suptitle("Diversity of Role Count in Role Models per Generation", fontsize=20)
+    ax.set_xlabel("Generation", fontsize=16)
+    ax.set_ylabel("Role Count", fontsize=16)
+    ax.boxplot(data)
+    ax.set_xticklabels(labels)
+
+    if (saveAsPDF):
+        logger.info("Save plot as PDF...")
+        pp = PdfPages(filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        logger.info("Save plot as SVG...")
+        plt.savefig(filename+".svg")
+
+    if (saveAsPNG):
+        logger.info("Save plot as PNG...")
+        plt.savefig(filename+".png")
+        if (showPNG):
+            logger.info("Show plot...")
+            #plt.show()
+            os.startfile(filename+".png")
+
+    plt.close('all')

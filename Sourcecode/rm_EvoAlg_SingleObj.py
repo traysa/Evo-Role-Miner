@@ -10,6 +10,7 @@ import rm_EAOperators as operators
 import rm_EAInitialization as init
 import rm_EAEvaluations as evals
 import rm_Visualization as visual
+import rm_Utils as utils
 from collections import defaultdict
 import logging
 logger = logging.getLogger('root')
@@ -18,7 +19,7 @@ logger = logging.getLogger('root')
 # Evolutionary algorithm - One objective
 # -----------------------------------------------------------------------------------
 def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
-              removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels,
+              removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
               untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
               userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
 
@@ -58,6 +59,8 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     elif (evalFunc=="WSC_INT"):
         weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     elif (evalFunc=="WSC_Star_RoleDis"):
+        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
+    elif (evalFunc=="URandRPCnt"):
         weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
     else:
         raise ValueError("Evaluation function '"+str(evalFunc)+"' not known")
@@ -124,14 +127,16 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
         toolbox.register("evaluate", evals.evalFunc_WSC_INT, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
     elif (evalFunc=="WSC_Star_RoleDis"):
         toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+    elif (evalFunc=="URandRPCnt"):
+        toolbox.register("evaluate", evals.evalFunc_URandRPCnt, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
     else:
         raise ValueError('Evaluation function not known')
 
     # Register Variation Operators
-    toolbox.register("mate", operators.mateFunc)
+    toolbox.register("mate", operators.mateFunc, optimization=optimization)
     toolbox.register("mutate", operators.mutFunc, addRolePB=addRolePB, removeRolePB=removeRolePB, removeUserPB=removeUserPB,
                      removePermissionPB=removePermissionPB, addUserPB=addUserPB, addPermissionPB=addPermissionPB,
-                     userSize=userSize, permissionSize=permissionSize)
+                     userSize=userSize, permissionSize=permissionSize, optimization=[optimization,optimization])
     toolbox.register("select", tools.selTournament, tournsize=tournsize)
 
     # Register Statistics
@@ -166,11 +171,6 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     if (not population):
         logger.info("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
-        if (printPopulations):
-            pop_subdirectory = pop_directory+"\\Generation_"+str(genStart)
-            if not os.path.exists(pop_subdirectory):
-                os.makedirs(pop_subdirectory)
-            visual.showBestResult(population, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(genStart), False, False, True, False)
 
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
@@ -180,6 +180,15 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
+
+    # Save population in JSON file
+    if (printPopulations):
+        pop_subdirectory = pop_directory+"\\Generation_"+str(genStart)
+        #if not os.path.exists(pop_subdirectory):
+        #    os.makedirs(pop_subdirectory)
+        utils.saveDiversity(genStart,population,pop_subdirectory+"_diversity.json")
+        utils.savePopulation(genStart,population,pop_subdirectory+"_population.pkl")
+        #visual.showBestResult(population, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(genStart), False, False, True, False)
 
     # Log statistics for first generation
     if ((len(logbook)==0) or (logbook.pop(len(logbook)-1)["gen"] != genStart)):
@@ -244,15 +253,18 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
                   +str(logbook.chapters["RPCnt"].stream)+"\t\t"
                   +str(logbook.chapters["Interp"].stream)
                   )
-
-        if (printPopulations):
-            pop_subdirectory = pop_directory+"\\Generation_"+str(generation)
-            if not os.path.exists(pop_subdirectory):
-                os.makedirs(pop_subdirectory)
-            visual.showBestResult(offspring, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
+            if (printPopulations):
+                pop_subdirectory = pop_directory+"\\Generation_"+str(generation)
+                #if not os.path.exists(pop_subdirectory):
+                #    os.makedirs(pop_subdirectory)
+                utils.saveDiversity(generation,population,pop_subdirectory+"_diversity.json")
+                utils.savePopulation(generation,population,pop_subdirectory+"_population.pkl")
+                #visual.showBestResult(offspring, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
 
         population = offspring
         generation += 1
+
+    utils.printDiversity(pop_directory)
 
     end = datetime.datetime.now()
     timediff = end-start
@@ -264,7 +276,7 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     logger.info("DONE.\n")
 
     # Set Checkpoint
-    fileExt = "_S_" + evalFunc + "_" + str(len(population)) + "_" + str(generation) + "_" + str(tournsize)+ "_" + str(CXPB) + "_" + str(MUTPB_All)
+    fileExt = "_S_" + evalFunc + "_" + str(len(population)) + "_" + str(generation)
     '''
     if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)

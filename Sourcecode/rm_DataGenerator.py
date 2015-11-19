@@ -223,15 +223,16 @@ def generateUsers(userCnt,attributes,userTypeCnt):
 # -----------------------------------------------------------------------------------
 # Generate Rules for Roles
 # -----------------------------------------------------------------------------------
-def generateRules(rules, roleCnt, attributes, maxRuleConditionCnt, ruleUsage, userUsage):
+def generateRules(rules_AND, roleCnt, attributes, maxRuleConditionCnt, ruleUsage, userUsage):
     #rules = [[] for r in range(roleCnt)]
     #print("rules: "+str(rules))
     if (0 not in ruleUsage):
-        r_list = [random.randint(0,roleCnt-1)]
+        roleList = [random.randint(0,roleCnt-1)]
     else:
-        r_list = [i for i, j in enumerate(ruleUsage) if j == 0]
+        roleList = [i for i, j in enumerate(ruleUsage) if j == 0]
 
-    for r in r_list:
+    for role in roleList:
+        rules_OR = []
         selectedAttributes = random.sample(range(0,len(attributes)),random.randint(1,maxRuleConditionCnt))
         #print("selectedAttributes: "+str(selectedAttributes))
         attrSet = []
@@ -239,34 +240,73 @@ def generateRules(rules, roleCnt, attributes, maxRuleConditionCnt, ruleUsage, us
             attrValueSet = []
             if (a in selectedAttributes):
                 attrValues = attributes[a]
-                numberOfValues = random.randint(1,len(attrValues)-1)
-                attrValueSet = random.sample(attrValues,numberOfValues)
+                #numberOfValues = random.randint(1,len(attrValues)-1)
+                #attrValueSet = random.sample(attrValues,numberOfValues)
+                attrValueSet = random.sample(attrValues,1)
             attrSet.append(attrValueSet)
         #print("attrSet: "+str(attrSet))
-        rules[r] = attrSet
+        if (attrSet not in rules_OR):
+            rules_OR.append(attrSet)
+        rules_AND[role] = rules_OR
 
     #print("rules: "+str(rules))
-    return rules
+    return rules_AND
+
+# -----------------------------------------------------------------------------------
+# Generate advanced Rules for Roles
+# -----------------------------------------------------------------------------------
+def generateAdvancedRules(rules_AND, roleCnt, attributes, maxRuleConditionCnt, ruleUsage, userUsage):
+    #rules = [[] for r in range(roleCnt)]
+    #print("rules: "+str(rules))
+    if (0 not in ruleUsage):
+        roleList = [random.randint(0,roleCnt-1)]
+    else:
+        roleList = [i for i, j in enumerate(ruleUsage) if j == 0]
+
+    for role in roleList:
+        rules_OR = []
+        rule_OR_Size = random.randint(1,2)
+        while rule_OR_Size > 0:
+            selectedAttributes = random.sample(range(0,len(attributes)),random.randint(1,maxRuleConditionCnt))
+            #print("selectedAttributes: "+str(selectedAttributes))
+            attrSet = []
+            for a in range(len(attributes)):
+                attrValueSet = []
+                if (a in selectedAttributes):
+                    attrValues = attributes[a]
+                    #numberOfValues = random.randint(1,len(attrValues)-1)
+                    #attrValueSet = random.sample(attrValues,numberOfValues)
+                    attrValueSet = random.sample(attrValues,1)
+                attrSet.append(attrValueSet)
+            #print("attrSet: "+str(attrSet))
+            if (attrSet not in rules_OR):
+                rules_OR.append(attrSet)
+            rule_OR_Size -= 1
+        rules_AND[role] = rules_OR
+
+    #print("rules: "+str(rules))
+    return rules_AND
 
 # -----------------------------------------------------------------------------------
 # Assign Users to Roles according to Rules
 # Return URMatrix
 # -----------------------------------------------------------------------------------
-def assignUsersToRoles(users, roles, rules):
+def assignUsersToRoles(users, roles, rules_AND):
     rolesCnt = len(roles)
     userCnt = len(users)
     URMatrix = [[0 for r in range(rolesCnt)] for u in range(userCnt)]
-    for r,rule in enumerate(rules):
-        #print("rule: "+str(rule))
-        for u,user in enumerate(users):
-            #print("user: "+str(user))
-            match = True
-            for attr in range(len(rule)):
-                if ((len(rule[attr]) != 0) and (user[attr] not in rule[attr])):
-                    match = False
-            if (match):
-                #print("match")
-                URMatrix[u][r] = 1
+    for r_AND,rule_AND in enumerate(rules_AND):
+        for r_OR,rule_OR in enumerate(rule_AND):
+            #print("rule: "+str(rule))
+            for u,user in enumerate(users):
+                #print("user: "+str(user))
+                match = True
+                for attr in range(len(rule_OR)):
+                    if ((len(rule_OR[attr]) != 0) and (user[attr] not in rule_OR[attr])):
+                        match = False
+                if (match):
+                    #print("match")
+                    URMatrix[u][r_AND] = 1
     return URMatrix
 
 # -----------------------------------------------------------------------------------
@@ -333,7 +373,7 @@ def addNoise(UPmatrix, noise):
 # -----------------------------------------------------------------------------------
 # Print generated data into files
 # -----------------------------------------------------------------------------------
-def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules, UPMatrixWithNoise, noise):
+def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules_AND, UPMatrixWithNoise, noise):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
@@ -443,14 +483,15 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, ru
             outfile.write("\n")
             outfile.close()
     with open(rulesCSVfile, "a") as outfile:
-        for r,rule in enumerate(rules):
-            outfile.write(str(r+1)+";")
-            for attr in range(0,len(rules[0])):
-                tmp = ""
-                for v in rules[r][attr]:
-                    tmp += str(v)+","
-                outfile.write(str(tmp[:-1])+";")
-            outfile.write("\n")
+        for r_AND,rule_AND in enumerate(rules_AND):
+            for r_OR,rule_OR in enumerate(rule_AND):
+                outfile.write(str(r_AND+1)+";")
+                for attr in range(0,len(rule_OR)):
+                    tmp = ""
+                    for value in rule_OR[attr]:
+                        tmp += str(value)+","
+                    outfile.write(str(tmp[:-1])+";")
+                outfile.write("\n")
         outfile.close()
     print("DONE.\n")
 
@@ -539,17 +580,17 @@ print("\nUSERS:")
 for u in users:
     print(u)
 
-rules = [[] for r in range(roleCnt)]
+rules_AND = [[] for r in range(roleCnt)]
 ruleUsage = [0 for i in range(roleCnt)]
 userUsage = [0 for i in range(userCnt)]
 while (0 in userUsage):
-    rules = generateRules(rules,roleCnt,attributes,maxRuleConditionCnt,ruleUsage,userUsage)
-    URMatrix = assignUsersToRoles(users,roles,rules)
+    rules_AND = generateRules(rules_AND,roleCnt,attributes,maxRuleConditionCnt,ruleUsage,userUsage)
+    URMatrix = assignUsersToRoles(users,roles,rules_AND)
     userUsage = [ sum(x) for x in URMatrix]
     ruleUsage = [ sum(x) for x in zip(*URMatrix)]
 URMatrix = numpy.matrix(URMatrix,dtype=int)
 print("\nRULES:")
-for r in rules:
+for r in rules_AND:
     print(r)
 
 print("\nURMatrix: "+str(URMatrix))
@@ -587,7 +628,7 @@ if not os.path.exists(configCSVfile):
         outfile.close()
 print("DONE.\n")
 
-printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules, UPMatrixWithNoise, noise)
+printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, rules_AND, UPMatrixWithNoise, noise)
 visual.showRoleModel(URMatrix, RPMatrix, UPMatrix, UPMatrixWithNoise, directory+"\\role_model", True, False, True, True)
 
 #visual.showAllRoles(population,0,Original, directory+"\\mytest_best", False, False, True, True)
