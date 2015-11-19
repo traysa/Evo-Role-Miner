@@ -1,5 +1,5 @@
 %\documentclass{article}
-\documentclass[version=last, pagesize=auto, paper=a4]{scrartcl}%{article}
+\documentclass[version=last, pagesize=auto, paper=a4]{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{import}
 
@@ -23,6 +23,8 @@
 \usepackage{float} % Improves the interface for defining floating objects such as figures and tables
 %\usepackage[table,xcdraw]{xcolor}
 \usepackage{listliketab}
+\usepackage{color, colortbl}
+\definecolor{myGray}{gray}{0.9}
 
 % Packages for bibliography
 \usepackage[square, numbers, comma, sort&compress]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
@@ -40,17 +42,20 @@
 \usepackage{pifont}
 
 % Packages for hyperlinks
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 
 % Packages for compact item lists
 \usepackage{enumitem}
+
+% Packages for equations
+\usepackage{amsmath}
+\numberwithin{equation}{section}
 
 % Unknown packages
 %\usepackage{listings}
 %\usepackage{color}
 %\usepackage{xcolor,colortbl}
 %\usepackage{pdflscape}
-%\usepackage{amsmath}
 %\usepackage{mathabx}
 %\usepackage{enumitem}
 

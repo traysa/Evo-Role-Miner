@@ -41,6 +41,7 @@ In this section a basic introduction to the domain is given. It is important tha
                 \label{fig:rolehierarchies}
             \end{figure}
         \subsubsection{RBAC$_2$ - Constraints}
+        \label{sec:rbac2}
             The RBAC$_2$ model is based on RBAC$_0$ and introduces the concept of constraints. With the help of constraints Separation-of-Duty (SoD), also known as Segregation-of-duty, can be achieved. SoD is a security principle for preventing fraud and errors by splitting tasks and associated permissions among multiple users. For example a user who has the permission to request the purchase of goods or services should not have the permission of approving the purchase. Roles in an RBAC model should therefore not have permissions bundled, which violate each other due to SoD. But also user assignments to multiple roles should not violate the SoD requirements.
         \subsubsection{RBAC$_3$ - Consolidated Model}
             The consolidated model combines RBAC$_1$ and RBAC$_2$ and therefore supports role hierarchies and constraints. Bringing these two functional capabilities together come with additional functionality. Constraints can also be applied on the role hierarchy. For example, the number of parent roles for child roles can be limited or different child roles can be constrained to have different parent roles.\\
@@ -54,6 +55,7 @@ In this section a basic introduction to the domain is given. It is important tha
     The NIST RBAC model \cite{sandhu2000nist} distinguished between four levels of RBAC models: Flat, Hierarchical, Constrained and Symmetric RBAC. Each level introduces an additional functional capability to the previous level. In terms of the NIST RBAC model the Flat RBAC model will be the focus of the thesis.
     
     \subsection{Role Model Quality}
+    \label{sec:rmQuality}
     A basic role model consists of users, permissions, roles, user-role assignments and role-permission assignments. A role model is most desirable if it has a state, which best leverages the RBAC model by satisfying the business, security and regulatory drivers: Lowering the costs for the administration of access control and equip employees with necessary permissions such that they can efficiently full-fill their tasks while keeping security requirements and being compliant.
     How this goal is measured in the role model has been described by several quality criteria\cite{Kunz}\cite{Frank}. The criteria concern the role model state, individual roles or both. In this thesis the different criteria is summarized into the categories: Completeness, complexity and comprehension.
         \subsubsection{Completeness}
