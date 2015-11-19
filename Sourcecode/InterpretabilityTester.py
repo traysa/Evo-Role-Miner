@@ -39,11 +39,17 @@ def getDataSet(DATA):
         URMatrix = parser.readURAssignments("..\\TestData\\Data_20151005-194203\\UsersToRoles.csv")
         RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151005-194203\\Roles.csv")
     elif (DATA=="GeneratedData_Set1"):
-        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151113-143930_10x10\\testdata.rbac"))
-        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151113-143930_10x10\\users.csv")
-        #constraints = parser.readConstraints("..\\TestData\\Data_20151113-143930_10x10\\constraints.csv")
-        URMatrix = parser.readURAssignments2("..\\TestData\\Data_20151113-143930_10x10\\URMatrix.csv")
-        RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151113-143930_10x10\\RPMatrix.csv")
+        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151116-112139_10x10\\testdata.rbac"))
+        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151116-112139_10x10\\users.csv")
+        #constraints = parser.readConstraints("..\\TestData\\Data_20151116-112139_10x10\\constraints.csv")
+        URMatrix = parser.readURAssignments2("..\\TestData\\Data_20151116-112139_10x10\\URMatrix.csv")
+        RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151116-112139_10x10\\RPMatrix.csv")
+    elif (DATA=="GeneratedData_Set2"):
+        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151116-150651_10x10\\testdata.rbac"))
+        userAttributes, userAttributeValues = parser.readUserAttributes("..\\TestData\\Data_20151116-150651_10x10\\users.csv")
+        #constraints = parser.readConstraints("..\\TestData\\Data_20151116-150651_10x10\\constraints.csv")
+        URMatrix = parser.readURAssignments2("..\\TestData\\Data_20151116-150651_10x10\\URMatrix.csv")
+        RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151116-150651_10x10\\RPMatrix.csv")
     return Original, URMatrix, RPMatrix, userAttributeValues, userAttributes, constraints
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -119,7 +125,7 @@ def avgRoleFitness(roles, userSize, userAttributeValues):
 # ----------------------------------------------------------------------------------------------------------------------
 # Role-Classifier-Rule
 # ----------------------------------------------------------------------------------------------------------------------
-def measureRule(rule, D):
+'''def measureRule(rule, D):
     pos = 0
     neg = 0
     cnt = 0
@@ -209,7 +215,6 @@ def sequentialCovering(D, Att_vals, prevRule):
         stop = NoMoreTuplesInDWithClassC
     return ruleSet
 
-
 def sequentialCoveringK(D, Att_vals, rule):
     ruleSet = []
     stop = True
@@ -229,82 +234,71 @@ def sequentialCoveringK(D, Att_vals, rule):
             else:
                 ruleSet.append(ruleChain)
     return ruleSet
-
+'''
 
 def calculateProbabilityInClass(classMembers,rule):
     numberOfMembers = len(classMembers)
     disqualifiedMembers = list()
     counter = 0
     for member in classMembers:
-        allAttrSatisfied = True
-        attr = 0
-        while (allAttrSatisfied and attr < len(rule)):
-            if (len(rule[attr])>0):
-                if (member[attr] not in rule[attr]):
-                    allAttrSatisfied = False
-            attr += 1
-        if (allAttrSatisfied):
+        oneRuleSatisfied = False
+        r_OR = 0
+        while (not oneRuleSatisfied and r_OR < len(rule)):
+            attr = 0
+            rule_OR = rule[r_OR]
+            allAttrSatisfied = True
+            while(allAttrSatisfied and attr < len(rule_OR)):
+                if (len(rule_OR[attr])>0):
+                    if (member[attr] not in rule_OR[attr]):
+                        allAttrSatisfied = False
+                attr += 1
+            if (allAttrSatisfied):
+                oneRuleSatisfied = True
+            r_OR += 1
+        if (oneRuleSatisfied):
             counter += 1
         else:
             disqualifiedMembers.append(member)
     return counter/numberOfMembers,disqualifiedMembers
 
-def calculateRules(roleMembers,notRoleMembers,allAttrSets):
-    ruleSet = list()
-    for member in roleMembers:
-        memberAttrValueResults = dict()
-        for attrSet in allAttrSets:
-            stop = False
-            for attr in attrSet:
-                if ((attr,) in list(memberAttrValueResults.keys()) and memberAttrValueResults[(attr,)][1] <= 0.0):
-                    memberAttrValueResults[attrSet] = (None,0.0)
-                    stop = True
-            if (not stop):
-                attrValues = [None,None,None]
-                for attr in attrSet:
-                    attrValues[attr] = member[attr]
-                probabilityInsideRole, disqualifiedMembers = calculateProbabilityInClass(roleMembers,attrValues)
-                probabilityOutsideRole = calculateProbabilityInClass(notRoleMembers,attrValues)[0]
-                memberAttrValueResults[attrSet] = (probabilityInsideRole,probabilityOutsideRole)
-                if (probabilityOutsideRole <= 0.0):
-                    if (probabilityInsideRole < 1.0):
-                        ruleSet.append(calculateRules(disqualifiedMembers,notRoleMembers,allAttrSets))
-                    else:
-                        ruleSet.append(tuple(attrValues))
-    return ruleSet
-
-def calculateRules2(membersNotConsideredInRule,roleMembers,notRoleMembers,allAttrSets,rule,level):
-    print("Level: "+str(level))
+def ruleInduction(membersNotConsideredInRule,roleMembers,notRoleMembers,current_rule,current_ruleSize,max_ruleSize):
+    attrSize = len(roleMembers[0])-1
+    allAttrSets = []
+    for ruleSize in range(1,attrSize+1):
+        allAttrSets += list(itertools.combinations(range(0,attrSize), ruleSize))
+    allAttrSets.sort(key=lambda t: len(t), reverse=True)
     ruleSet = list()
     while (len(membersNotConsideredInRule) > 0):
         member = membersNotConsideredInRule.pop()
         while (len(allAttrSets) > 0):
             attrSet = allAttrSets.pop()
             # Create new rule with current attribute combination
-            newRule = [set(),set(),set()]
+            rule_AND = []
+            newRule_OR = [set(),set(),set()]
             for attr in attrSet:
-                newRule[attr].add(member[attr])
-            # Join previous executed rule with new rule
-            for attr,attrValue in enumerate(rule):
-                newRule[attr].update(attrValue)
-            if (newRule != rule):
-                # Get probability of members inside role, when rule is executed
+                newRule_OR[attr].add(member[attr])
+            if (len(current_rule) > 0):
+                for rule_OR in current_rule:
+                    rule_AND.append(rule_OR)
+            rule_AND.append(newRule_OR)
+            # Get probability of none-members outside role, which fulfill the rule
+            probabilityOutsideRole = calculateProbabilityInClass(notRoleMembers,rule_AND)[0]
+            # If only few outside the role fulfills the rule
+            if (probabilityOutsideRole <= 0.34):
+                # Get probability of members inside role, which fulfill the rule
                 # Get members from role, which do not fulfill the rule
-                probabilityInsideRole, membersNotConsideredInRule = calculateProbabilityInClass(roleMembers,newRule)
-                # Get probability of not members outside role, when rule is executed
-                probabilityOutsideRole = calculateProbabilityInClass(notRoleMembers,newRule)[0]
-                # If no one outside the role fulfills rule
-                if (probabilityOutsideRole <= 0.34):
-                    # If not everyone inside the role fulfills the rule
-                    if (probabilityInsideRole < 0.65):
+                probabilityInsideRole, membersNotConsideredInRule = calculateProbabilityInClass(roleMembers,rule_AND)
+                # If not everyone inside the role fulfills the rule, search for another OR-Rule
+                if (probabilityInsideRole < 0.65):
+                    if (current_ruleSize < max_ruleSize):
                         # Try to extend current rule
-                        extendedRules = calculateRules2(membersNotConsideredInRule,roleMembers,notRoleMembers,[attrSet],newRule,level+1)
+                        extendedRules = ruleInduction(membersNotConsideredInRule,roleMembers,notRoleMembers,rule_AND,current_ruleSize+1,max_ruleSize)
                         if (len(extendedRules)>0):
                             for extendedRule in extendedRules:
-                                # If extended rule can be found, which is not fulfilled by one not-member, add the generated rule to result
+                                # If extended rule can be found, which is not fulfilled by one none-member, add the generated rule to result
                                 ruleSet.append(extendedRule)
                                 # To avoid unnecessary rules, remove attribute combinations, which contain all attributes of an existing rule
-                                if (probabilityOutsideRole == 0.0 and probabilityInsideRole == 1.0):
+                                if (extendedRule[2] == 0.0 and extendedRule[1] == 1.0):
                                     i = 0
                                     while (len(allAttrSets)>0 and i < len(allAttrSets)):
                                         x = allAttrSets[i]
@@ -312,34 +306,29 @@ def calculateRules2(membersNotConsideredInRule,roleMembers,notRoleMembers,allAtt
                                             allAttrSets.remove(x)
                                         else:
                                             i+=1
-                    else:
-                        # If everyone inside the role fulfills rule, add the generated rule to result
-                        ruleSet.append((newRule,probabilityInsideRole,probabilityOutsideRole))
-                        # To avoid unnecessary rules, remove attribute combinations, which contain all attributes of an existing rule
-                        if (probabilityOutsideRole == 0.0 and probabilityInsideRole == 1.0):
-                            i = 0
-                            while (len(allAttrSets)>0 and i < len(allAttrSets)):
-                                x = allAttrSets[i]
-                                if set(attrSet).issubset(set(x)):
-                                    allAttrSets.remove(x)
-                                else:
-                                    i+=1
+                else:
+                    # If everyone inside the role fulfills rule, add the generated rule to result
+                    ruleSet.append((rule_AND,probabilityInsideRole,probabilityOutsideRole))
+                    #print("Add rule: "+str(rule_AND))
+                    # To avoid unnecessary rules, remove attribute combinations, which contain all attributes of an existing rule
+                    if (probabilityOutsideRole == 0.0 and probabilityInsideRole == 1.0):
+                        i = 0
+                        while (len(allAttrSets)>0 and i < len(allAttrSets)):
+                            x = allAttrSets[i]
+                            if set(attrSet).issubset(set(x)):
+                                allAttrSets.remove(x)
+                            else:
+                                i+=1
+            else:
+                # If too many outside the role fulfill the rule, the rule is discarded
+                # and membersNotConsideredInRule is resetted #
+                rule_AND.remove(newRule_OR)
 
     return ruleSet
 
-def myAlgorithm(D):
-    roleMembers = [user for user in D if user[-1]]
-    roleMembers2 = [user for user in D if user[-1]]
-    notRoleMembers = [user for user in D if not user[-1]]
-    ruleSize = 1
-    attrSize = len(roleMembers[0])-1
-    allAttrSets = []
-    for ruleSize in range(1,attrSize+1):
-        allAttrSets += list(itertools.combinations(range(0,attrSize), ruleSize))
-    allAttrSets.sort(key=lambda t: len(t), reverse=True)
-
-    return roleMembers,calculateRules2(roleMembers2,roleMembers,notRoleMembers,allAttrSets,[set(),set(),set()],0)
-
+# ----------------------------------------------------------------------------------------------------------------------
+# Rule Measures
+# ----------------------------------------------------------------------------------------------------------------------
 def calculateAccuracy(rule, roleMembers, userCnt):
     P = len(roleMembers)
     print("P: "+str(P))
@@ -384,21 +373,28 @@ def calculatePrecision(rule, roleMembers, userCnt):
 # ----------------------------------------------------------------------------------------------------------------------
 # MAIN
 # ----------------------------------------------------------------------------------------------------------------------
-Original, URMatrix, RPMatrix, userAttributes, userAttributeValues, constraints = getDataSet("GeneratedData_small")
+Original, URMatrix, RPMatrix, userAttributes, userAttributeValues, constraints = getDataSet("GeneratedData_Set2")
 
 # Role-Classifier-Rule
 print("Role-Classifier-Rule")
 for user in userAttributeValues:
     user.append(False)
-for role in range(0,3):
+for role in range(0,len(RPMatrix)):
     print("===================================================================")
     for u, user in enumerate(userAttributeValues):
         if (URMatrix[u][role] == 1):
             user[-1] = True
         else:
             user[-1] = False
-    #ruleSet = sequentialCovering(userAttributeValues,userAttributes,rule=(None,None,None,True))
-    roleMembers,ruleSet = myAlgorithm(userAttributeValues)
+
+    roleMembers = [user for user in userAttributeValues if user[-1]]
+    roleMembers2 = [user for user in userAttributeValues if user[-1]]
+    notRoleMembers = [user for user in userAttributeValues if not user[-1]]
+    max_ruleSize = 0
+    current_ruleSize = 0
+    current_rule = []
+    ruleSet = ruleInduction(roleMembers2,roleMembers,notRoleMembers,current_rule,current_ruleSize,max_ruleSize)
+
     print("ROLE "+str(role)+": "+str(roleMembers))
     for r in ruleSet:
         print("---------------------------------------------------------------")
