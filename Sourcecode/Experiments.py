@@ -62,13 +62,13 @@ def getDataSet(DATA):
         URMatrix = parser.readURAssignments("..\\TestData\\Data_20151005-194203\\UsersToRoles.csv")
         RPMatrix = parser.readRPAssignments("..\\TestData\\Data_20151005-194203\\Roles.csv")
     elif (DATA=="GeneratedData_Set1"):
-        Original = numpy.matrix(parser.read("..\\TestData\\Data_20151116-150651_10x10\\testdata.rbac"))
-        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\Data_20151116-150651_10x10\\users.csv")
-        #constraints = parser.readConstraints("..\\TestData\\Data_20151116-150651_10x10\\constraints.csv")
-        URMatrix = parser.readURMatrix("..\\TestData\\Data_20151116-150651_10x10\\URMatrix.csv")
-        RPMatrix = parser.readRPMatrix("..\\TestData\\Data_20151116-150651_10x10\\RPMatrix.csv")
+        Original = numpy.matrix(parser.read("..\\TestData\\GeneratedData_Set1\\testdata.rbac"))
+        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\GeneratedData_Set1\\users.csv")
+        #constraints = parser.readConstraints("..\\TestData\\GeneratedData_Set1\\constraints.csv")
+        URMatrix = parser.readURMatrix("..\\TestData\\GeneratedData_Set1\\URMatrix.csv")
+        RPMatrix = parser.readRPMatrix("..\\TestData\\GeneratedData_Set1\\RPMatrix.csv")
         individual = utils.buildIndividual(URMatrix,RPMatrix)
-        fitness = eval.evalFunc_WSC_INT([individual], Original.shape[0], Original.shape[1], Original, [0,1,1,0.5,0.5,0.8], userAttributeValues, constraints=[])
+        fitness = eval.evalFunc_FEdgeMin_INT([individual], Original, [0,1,1,0.5,0.5,0.8], userAttributeValues, constraints=[])
         logger.info("VALIDATION OF DATASET")
         logger.info("Fitness of solution of dataset: "+str(fitness))
     return Original, userAttributeValues, userAttributes, constraints
@@ -167,16 +167,23 @@ def executeExperimentFromFile():
             if ("evalFunc" in experiment.keys()):
                 evalFunc = [o for o in experiment["evalFunc"].split(',')]
                 logger.info("evalFunc: "+str(evalFunc))
-
             if ("eval_weights" in experiment.keys()):
                 eval_weights = [float(w) for w in experiment["eval_weights"].split(',')]
                 logger.info("eval_weights: "+str(eval_weights))
-            if (evalFunc == "Saenko" or evalFunc == "Saenko_Euclidean" or evalFunc == "WSC" or evalFunc == "WSC_Star"):
-                if ((not eval_weights
-                    or evalFunc == "Saenko" and  len(eval_weights)!=3)
-                    or(evalFunc == "Saenko_Euclidean" and  len(eval_weights)!=2)
-                    or(evalFunc == "WSC" and  len(eval_weights)!=4)
-                    or(evalFunc == "WSC_Star" and  len(eval_weights)!=5)):
+
+            if (evalFunc[0] == "FBasic" or evalFunc[0] == "FEdge"
+                or evalFunc[0] == "FBasicMin" or evalFunc[0] == "FEdgeMin"
+                or evalFunc[0] == "FBasicMin_INT" or evalFunc[0] == "FEdgeMin_INT"
+                or evalFunc[0] == "WSC" or evalFunc[0] == "WSC_Star"
+                or evalFunc[0] == "WSC_Star_RoleDis" or evalFunc[0] == "Saenko_Euclidean"):
+                numberOfWeights = len(eval_weights)
+                if (((evalFunc[0] == "FBasic" or evalFunc[0] == "FEdge") and numberOfWeights!=3)
+                    or((evalFunc[0] == "FBasicMin" or evalFunc[0] == "FEdgeMin") and numberOfWeights!=3)
+                    or((evalFunc[0] == "FBasicMin_INT" or evalFunc[0] == "FEdgeMin_INT") and numberOfWeights!=4)
+                    or(evalFunc == "Saenko_Euclidean" and numberOfWeights!=2)
+                    or(evalFunc == "WSC" and numberOfWeights!=4)
+                    or(evalFunc == "WSC_Star" and numberOfWeights!=5)
+                    or(evalFunc == "WSC_Star_RoleDis" and numberOfWeights!=6)):
                     raise ValueError("Number of weights is incorrect for evaluation function")
 
             if ("obj_weights" in experiment.keys()):
@@ -444,7 +451,7 @@ def executeDefaultExperiment():
         if (evolutionType == 'Multi_Weighted' or evolutionType == 'Multi_Fortin2013_Weighted'):
             obj_weights = [float(w) for w in config['Algorithm']['obj_weights'].split(',')]
         if (evalFunc[0] == 'Saenko' or evalFunc[0] == 'Saenko_Euclidean' or evalFunc[0] == 'WSC'
-            or evalFunc[0] == 'WSC_Star' or evalFunc[0] =='WSC_Star_RoleDis' or evalFunc[0] == "WSC_INT"):
+            or evalFunc[0] == 'WSC_Star' or evalFunc[0] =='WSC_Star_RoleDis'):
             eval_weights = [float(w) for w in config['Algorithm']['eval_weights'].split(',')]
         if (evolutionType == "SANE"):
             numberOfTrialItems = config['Algorithm'].getint('numberOfTrialItems')
@@ -457,16 +464,22 @@ def executeDefaultExperiment():
             or evolutionType == None or evalFunc == None or obj_weights == None or eval_weights == None
             or numberOfTrialItems == None or repeat == None):
             raise ValueError("Config file 'Experiments_config.ini' is corrupt. Create new one by deleting the old one.")
-        if (evalFunc[0] == "Saenko" or evalFunc[0] == "Saenko_Euclidean" or evalFunc[0] == "WSC" or evalFunc[0] == "WSC_Star"
-            or evalFunc[0] == "WSC_Star_RoleDis" or evalFunc[0] == "WSC_INT"):
+
+        if (evalFunc[0] == "FBasic" or evalFunc[0] == "FEdge"
+            or evalFunc[0] == "FBasicMin" or evalFunc[0] == "FEdgeMin"
+            or evalFunc[0] == "FBasicMin_INT" or evalFunc[0] == "FEdgeMin_INT"
+            or evalFunc[0] == "WSC" or evalFunc[0] == "WSC_Star"
+            or evalFunc[0] == "WSC_Star_RoleDis" or evalFunc[0] == "Saenko_Euclidean"):
             numberOfWeights = len(eval_weights)
-            if ((evalFunc == "Saenko" and numberOfWeights!=3)
+            if (((evalFunc[0] == "FBasic" or evalFunc[0] == "FEdge") and numberOfWeights!=3)
+                or((evalFunc[0] == "FBasicMin" or evalFunc[0] == "FEdgeMin") and numberOfWeights!=3)
+                or((evalFunc[0] == "FBasicMin_INT" or evalFunc[0] == "FEdgeMin_INT") and numberOfWeights!=4)
                 or(evalFunc == "Saenko_Euclidean" and numberOfWeights!=2)
                 or(evalFunc == "WSC" and numberOfWeights!=4)
                 or(evalFunc == "WSC_Star" and numberOfWeights!=5)
-                or(evalFunc == "WSC_Star_RoleDis" and numberOfWeights!=6)
-                or(evalFunc == "WSC_INT" and numberOfWeights!=6)):
+                or(evalFunc == "WSC_Star_RoleDis" and numberOfWeights!=6)):
                 raise ValueError("Number of weights is incorrect for evaluation function")
+
         if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
             numberOfWeights = len(obj_weights)
             if (numberOfWeights!=2):

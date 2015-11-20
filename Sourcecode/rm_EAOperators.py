@@ -159,7 +159,7 @@ def addUser(rolemodel, userSize, alternativeOption,optimization):
     if (not userAdded):
         logger.debug("No user could be added, since all roles already contain all users")
         if (alternativeOption):
-            rolemodel = removeUser(rolemodel, userSize, optimization)
+            rolemodel = removeUser(rolemodel, userSize, False, optimization)
 
     return rolemodel
 

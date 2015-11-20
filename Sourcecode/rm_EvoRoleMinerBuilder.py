@@ -229,8 +229,12 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     log_filename = logbooksSubsubdirectory+"\\"+str(experimentNumber)+"_"+str(experimentCnt)+"_Log"+fileExt
     class NumPyArangeEncoder(json.JSONEncoder):
         def default(self, obj):
-            if isinstance(obj, numpy.ndarray):
-                return obj.tolist() # or map(int, obj)
+            if isinstance(obj, numpy.integer):
+                return int(obj)
+            elif isinstance(obj, numpy.floating):
+                return float(obj)
+            elif isinstance(obj, numpy.ndarray):
+                return obj.tolist()
             return json.JSONEncoder.default(self, obj)
     if (saveLogFile):
         logfile = log_filename+".json"

@@ -11,6 +11,7 @@ import rm_EAInitialization as init
 import rm_EAEvaluations as evals
 import rm_Visualization as visual
 import rm_Utils as utils
+import rm_Statistics as statistics
 from collections import defaultdict
 import logging
 logger = logging.getLogger('root')
@@ -33,38 +34,10 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     logbook = tools.Logbook()
 
     # Register Optimization
-    weights = None
-    if (evalFunc=="Confidentiality"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="Availability"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="RoleCnt"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="Violations"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="Interpretability"):
-        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)   #Maximization
-    elif (evalFunc=="Saenko"):
-        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)   #Maximization
-    elif (evalFunc=="Saenko_Euclidean"):
-        weights=(1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="WSC"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="WSC_Star"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="AvgRoleConf"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="AvgRoleConf_A"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="WSC_INT"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="WSC_Star_RoleDis"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
-    elif (evalFunc=="URandRPCnt"):
-        weights=(-1.0, -1.0,-1.0,-1.0,-1.0,-1.0,1.0)
+    if (evalFunc=="FBasic" or evalFunc=="FEdge"):
+        creator.create("FitnessMinMax", base.Fitness, weights=(1.0,))   # MAXIMIZATION
     else:
-        raise ValueError("Evaluation function '"+str(evalFunc)+"' not known")
-    creator.create("FitnessMinMax", base.Fitness, weights=weights)
+        creator.create("FitnessMinMax", base.Fitness, weights=(-1.0,))  # MINIMIZATION
     creator.create("Individual", list, fitness=creator.FitnessMinMax)
 
     # Get Checkpoint
@@ -101,34 +74,48 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Register Evaluation Function
-    if (evalFunc=="Confidentiality"):
-        toolbox.register("evaluate", evals.evalFunc_Confidentiality, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="Availability"):
-        toolbox.register("evaluate", evals.evalFunc_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="RoleCnt"):
-        toolbox.register("evaluate", evals.evalFunc_RoleCnt, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="Violations"):
-        toolbox.register("evaluate", evals.evalFunc_Violations, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="Interpretability"):
-       toolbox.register("evaluate", evals.evalFunc_Interpretability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="Saenko"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="Saenko_Euclidean"):
-        toolbox.register("evaluate", evals.evalFunc_Saenko_Euclidean, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+    if (evalFunc=="FBasic"):
+        toolbox.register("evaluate", evals.evalFunc_FBasic, Original=Original, weights=eval_weights, constraints=constraints)
+    elif (evalFunc=="FEdge"):
+        toolbox.register("evaluate", evals.evalFunc_FEdge, Original=Original, weights=eval_weights, constraints=constraints)
+
+    elif (evalFunc=="FBasicMin"):
+        toolbox.register("evaluate", evals.evalFunc_FBasicMin, Original=Original, weights=eval_weights, constraints=constraints)
+    elif (evalFunc=="FEdgeMin"):
+        toolbox.register("evaluate", evals.evalFunc_FEdgeMin, Original=Original, weights=eval_weights, constraints=constraints)
+
+    elif (evalFunc=="FBasicMin_INT"):
+        toolbox.register("evaluate", evals.evalFunc_FBasicMin_INT, Original=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+    elif (evalFunc=="FEdgeMin_INT"):
+        toolbox.register("evaluate", evals.evalFunc_FEdgeMin_INT, Original=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+
     elif (evalFunc=="WSC"):
-        toolbox.register("evaluate", evals.evalFunc_WSC, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+        toolbox.register("evaluate", evals.evalFunc_WSC, Original=Original, weights=eval_weights, constraints=constraints)
     elif (evalFunc=="WSC_Star"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_Star, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="AvgRoleConf"):
-        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="AvgRoleConf_A"):
-        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations_Availability, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="WSC_INT"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_INT, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star, Original=Original, weights=eval_weights, constraints=constraints)
     elif (evalFunc=="WSC_Star_RoleDis"):
-        toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, userSize=userSize, permissionSize=permissionSize, orig=Original, weights=eval_weights, userAttributeValues=userAttributeValues, constraints=constraints)
-    elif (evalFunc=="URandRPCnt"):
-        toolbox.register("evaluate", evals.evalFunc_URandRPCnt, userSize=userSize, permissionSize=permissionSize, orig=Original, userAttributeValues=userAttributeValues, constraints=constraints)
+        toolbox.register("evaluate", evals.evalFunc_WSC_Star_RoleDis, Original=Original, weights=eval_weights, constraints=constraints)
+
+    elif (evalFunc=="Violations"):
+        toolbox.register("evaluate", evals.evalFunc_Violations, Original=Original, constraints=constraints)
+    elif (evalFunc=="AvgRoleConf_A"):
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations_Availability, Original=Original, constraints=constraints)
+
+    elif (evalFunc=="Confidentiality"):
+        toolbox.register("evaluate", evals.evalFunc_Confidentiality, Original=Original, constraints=constraints)
+    elif (evalFunc=="Availability"):
+        toolbox.register("evaluate", evals.evalFunc_Availability, Original=Original, constraints=constraints)
+    elif (evalFunc=="RoleCnt"):
+        toolbox.register("evaluate", evals.evalFunc_RoleCnt, Original=Original, constraints=constraints)
+    elif (evalFunc=="URCnt"):
+        toolbox.register("evaluate", evals.evalFunc_URCnt, Original=Original, constraints=constraints)
+    elif (evalFunc=="RPCnt"):
+        toolbox.register("evaluate", evals.evalFunc_RPCnt, Original=Original, constraints=constraints)
+    elif (evalFunc=="AvgRoleConf"):
+        toolbox.register("evaluate", evals.evalFunc_AvgRoleConfViolations, Original=Original, constraints=constraints)
+    elif (evalFunc=="Interpretability"):
+       toolbox.register("evaluate", evals.evalFunc_Interpretability, Original=Original, userAttributeValues=userAttributeValues, constraints=constraints)
+
     else:
         raise ValueError('Evaluation function not known')
 
@@ -140,19 +127,13 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     toolbox.register("select", tools.selTournament, tournsize=tournsize)
 
     # Register Statistics
-    '''
-    stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-    stats.register("avg", numpy.mean)
-    stats.register("std", numpy.std)
-    stats.register("min", numpy.min)
-    stats.register("max", numpy.max)'''
     statsFitness = tools.Statistics(key=lambda ind: ind.fitness.values[0])
-    statsConf = tools.Statistics(key=lambda ind: ind.fitness.values[1])
-    statsAccs = tools.Statistics(key=lambda ind: ind.fitness.values[2])
-    statsRoleCnt = tools.Statistics(key=lambda ind: ind.fitness.values[3])
-    statsURCnt = tools.Statistics(key=lambda ind: ind.fitness.values[4])
-    statsRPCnt = tools.Statistics(key=lambda ind: ind.fitness.values[5])
-    statsInterp = tools.Statistics(key=lambda ind: ind.fitness.values[6])
+    statsConf = tools.Statistics(key=lambda ind: statistics.Conf(ind[0],Original))
+    statsAccs = tools.Statistics(key=lambda ind: statistics.Accs(ind[0],Original))
+    statsRoleCnt = tools.Statistics(key=lambda ind: statistics.RoleCnt(ind[0]))
+    statsURCnt = tools.Statistics(key=lambda ind: statistics.URCnt(ind[0]))
+    statsRPCnt = tools.Statistics(key=lambda ind: statistics.RPCnt(ind[0]))
+    statsInterp = tools.Statistics(key=lambda ind: statistics.Interp(ind[0],userAttributeValues))
     mstats = tools.MultiStatistics(Fitness=statsFitness,Conf=statsConf,Accs=statsAccs,RoleCnt=statsRoleCnt,URCnt=statsURCnt,RPCnt=statsRPCnt,Interp=statsInterp)
     mstats.register("avg", numpy.mean)
     mstats.register("std", numpy.std)
@@ -192,9 +173,6 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
 
     # Log statistics for first generation
     if ((len(logbook)==0) or (logbook.pop(len(logbook)-1)["gen"] != genStart)):
-        '''record = stats.compile(population)
-        logbook.record(gen=genStart, evals=len(invalid_ind), **record)
-        logger.info("Generation "+str(genStart)+":\t"+str(logbook.stream))'''
         record = mstats.compile(population)
         logbook.record(gen=genStart, evals=len(invalid_ind), **record)
         logger.info("Generation "+str(genStart)+":\t"
@@ -264,7 +242,7 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
         population = offspring
         generation += 1
 
-    utils.printDiversity(pop_directory)
+    utils.printDiversity(pop_directory, freq)
 
     end = datetime.datetime.now()
     timediff = end-start
