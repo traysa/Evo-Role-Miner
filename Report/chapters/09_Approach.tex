@@ -2,66 +2,35 @@
 \chapter{Approach}
 \label{sec:approach}
 The role mining problems (see section \ref{sec:roleMiningProblems}) have been approached with different problem formulations, techniques and algorithms. In this thesis the approach of solving role mining with an evolutionary algorithms is investigated.\\
-Evolutionary algorithms seem to be a promising approach for role mining for several reasons. Role mining is following several objectives, e.g. minimizing the number of roles and minimizing the number of confidentiality and availability violations, which can be in conflict with each other. With multiobjective evolutionary algorithms pareto-optimal solutions, a set of optimal trade-offs solutions, can be found in a single run instead of several runs, which is necessary for some of the conventional stochastic processes, like simulated annealing and tabu search\cite{abraham2005evolutionary}. Previous research in the role mining field are using scalarisation, where several objectives are weighted and summarized in one single objective, like the Weighted Structural Complexity (WSC) in Molloy et al.\cite{Molloy} or the fitness function for the basic RMP in Saenko \& Kotenko\cite{saenko2012design}. The trade-offs between the objectives are not apparent in these approaches. Furthermore the task of role engineering is an on-going process. After an initial role model is created, the user-permission relation can change over time and therefore the roles in the role model can become suboptimal. Evolutionary algorithms can adapt solutions to changing circumstances\cite{Fogel:1997}. A current role model state can be used as starting population and the evolutionary algorithm will optimize towards the formulated objective in the fitness functions. At last role engineering is still a process, which requires human interaction. The role mining results are evaluated by humans and modified to an extend that it is accepted by the business. Interactive evolutionary computation (IEC)\cite{949485} could include human feedback to the algorithm to navigate the evolutionary algorithm to an optimal result. In IEC the fitness function is replaced by an human user.\\
-Since there has not been a lot of research done up till now (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the domain-specific problem as evolutionary computation problem. The evolutionary algorithm, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described in the following sections. For handling constraints for an RBAC$_2$ role model, a penalty function and intelligent variation operators are introduced. Furthermore the multiobjective evolutionary algorithm used in this approach is described with its challenges and improvements. In order to come to an human digestible representation of individuals for human feedback in an IEC approach, an alternative approach with a different representation and a Co-Evolution technique is presented.\\
-In this thesis a single- and a multi-objective EA for Role Mining has been constructed, where the objectives can be exchanged in regard to the considered Role Mining Problem. In the following the algorithms will be called Evo-RoleMiner and Evo-RoleMiner$M$ accordingly. 
+\hl{Evolutionary algorithms seem to be a promising approach for role mining for several reasons.} Role mining is following several objectives, e.g. minimizing the number of roles and minimizing the number of confidentiality and availability violations (over- and underentitlements), which can be in conflict with each other. With multiobjective evolutionary algorithms pareto-optimal solutions, a set of optimal trade-offs solutions, can be found in a single run instead of several runs, which is necessary for some of the conventional stochastic processes, like simulated annealing and tabu search\cite{abraham2005evolutionary}. Previous research in the role mining field are using scalarisation, where several objectives are weighted and summarized in one single objective, like the Weighted Structural Complexity (WSC) in Molloy et al.\cite{Molloy} or the fitness function for the basic RMP in Saenko \& Kotenko\cite{saenko2012design}. The trade-offs between the objectives are not apparent in these approaches.\\
+Furthermore the task of role engineering is an on-going process. After an initial role model is created, the user-permission relation can change over time and therefore the roles in the role model can become suboptimal. Evolutionary algorithms can adapt solutions to changing circumstances\cite{Fogel:1997}. A current role model state can be used as starting population and the evolutionary algorithm will optimize towards the formulated objective in the fitness functions.\\
+At last role engineering is still a process, which requires human interaction. The role mining results are evaluated by humans and modified to an extend that it is accepted by the business. Interactive evolutionary computation (IEC)\cite{949485} could include human feedback to the algorithm to navigate the evolutionary algorithm to an optimal result. In IEC the fitness function is replaced by an human user.\\\fi
 
-    \section{Evolutionary Algorithm "Evo-RoleMiner"}
-    The EA for single objectives used in this thesis is based on the pseudo-code in Algorithm \ref{alg:EA}. The algorithm starts with the initial generation and evaluation of the parent population $P_p$. Then, for each generation, individuals from $P_p$ are selected and cloned as offspring population $P_o$. A loop over neighboring individuals in $P_o$ is mating individuals $\mathbf{x}_i$ and $\mathbf{x}_{i+1}$ by crossover probability $CXPB$. The resulting children $\mathbf{y}_i$ and $\mathbf{y}_{i+1}$ replace their respective parents in $P_o$. In a second loop over all individuals in $P_o$ the individuals get mutated by mutation probability $MUTPB$. The resulting mutation is replacing the original individual. The resulting individuals in $P_o$ can be generated from crossover only, mutation only, crossover and mutation, and reproduction according to the given probabilities $CXPB$ and $MUTPB$. The offspring population $P_o$ is then getting the parent population $P_p$ for the next generation, after each individual got evaluated.\\
-    In the following sections, the components within the algorithm are discussed more in detail.
+Since there has not been a lot of research done up till now (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the domain-specific problem as evolutionary computation problem. The evolutionary algorithm, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described in the following sections. \hl{For handling constraints for an RBAC$_2$ role model, a penalty function and intelligent variation operators are introduced. Furthermore the multiobjective evolutionary algorithm used in this approach is described with its challenges and improvements. In order to come to an human digestible representation of individuals for human feedback in an IEC approach, an alternative approach with a different representation and a Co-Evolution technique is presented.}\\
+The EA for single objectives is based on the evolutionary algorithm process described in chapter \ref{sec:EA}. A pseudo-code is outlined in Algorithm \ref{alg:EA} in the Appendix.\\
+In this thesis a single- and a multi-objective EA for Role Mining has been constructed, where the objectives can be exchanged in regard to the considered Role Mining Problem. In the following the algorithms will be called Evo-RoleMiner and Evo-RoleMiner$M$ accordingly.
     
-    \begin{algorithm}
-        \caption{Evolutionary algorithm for single objectives}
-        \label{alg:EA}
-        \begin{algorithmic}[1]
-            \Procedure{eaSingle}{$popSize$, $NGEN$, $CXPB$, $MUTPB$}
-                \State $P_p$ = generatePopulation($popSize$)
-                \State evaluateIndividuals($P_p$)
-                \State $solutionFound$ = False
-                \State $generation$ = 1
-                \While{not $solutionFound$ AND $generation <= NGEN$}
-                    \State $P_p$ = select($population$, k=length($P_p$))
-                    \State $P_o$ = clonePopulation($P_p$)
-                    \State $i$ = 0
-                    \While{ $i < length(P_o)-1$}
-                        \State $P_o$[$i$],$P_o$[$i$+1] = crossover($P_o$[$i$],$P_o$[$i$+1],$CXPB$)
-                        \State $i$ += 2
-                    \EndWhile
-                    \State $i$ = 0
-                    \While{ $i < length(P_o)$}
-                        \State $P_o$[$i$] = mutation($P_o$[$i$],$MUTPB$)
-                        \State $i$ += 1
-                    \EndWhile
-                    \State $P_p$ = $P_o$
-                    \State evaluateIndividuals($P_p$)
-                    \State $generation$ += 1
-                \EndWhile
-                \State \Return $result$
-            \EndProcedure
-        \end{algorithmic}
-    \end{algorithm}
-
     \section{Representation of a Role Model as Individual}
     The representation of individuals in an EA is crucial for the success of the EA and influences the variation operators. Finding a good representation of role models as individuals for a Role Mining EA is a challenging task, since the number of roles for a role model is not predefined. In the following one bit-string and two complex representations are introduced and evaluated. The complex representations were proposed by Saenko \& Kotenko\cite{saenko2012design}.
         \subsection{Representation as Bit-string}
         The representation of individuals as bit-string is one of the simplest and is often mistakenly used in genetic algorithms\cite{Eiben}. A suggestion for a bit-string representation for a role model is derived from a combined user-role- (UA) and role-permission-matrix (PA). Figure \ref{fig:representation1} shows an example of a combined UA- and PA-Matrix and an according bit-string representation.
-        \begin{figure}
+        \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.5]{./Figures/BitstringRepresentation}
+            \includegraphics[scale=0.4]{./Figures/BitstringRepresentation}
             \caption{\textit{Example of a UA- and PA-Matrix with its bit-string representation}}
             \label{fig:representation1}
         \end{figure}
         The motivation of this initial idea is that the mutation operator can be easily executed by just flipping a bit within the bit-string. The mutation is therefore adding or removing a user or permission from a role. For the decoding two leading 8-bit integers can represent the number of users and permission. However, the problem with this representation is that the number of roles needs to be pre-defined, such that the bit-string can be decoded again. Alternatively another leading 8-bit integer can represent the number of roles in the role model. But varying the number of roles demands adding or removing bits in the bit-string for each user-role- and role-permission relation. Furthermore the information that a user or a permission is not part of a role seems to unnecessarily lengthens the bit-string, which can consume a lot of space for high-dimensional UA- and PA-Matrices.
         \subsection{Representations as Complex Objects}
         In Saenko \& Kotenko\cite{saenko2012design} two different representations are introduced, which are briefly described in section \ref{sec:relatedWork3}. With the first representation the authors suggest a multi-chromosomal representation where the number of roles becomes part of the search. An example can be seen in figure \ref{fig:representation2}. A drawback of this representation are unnecessary genes (roles) like the unnecessary information in the bit-string representation. Another disadvantage of the representation are complex crossover operations\cite{saenko2012design}.
-        \begin{figure}
+        \begin{figure}[H]
             \centering
             \includegraphics[scale=0.5]{./Figures/ComplexRepresentation1}
             \caption{Example of a multi-chromosomal representation. Chromosome X represents the UA-Informationa and Chromosome Y the PA-Information. Chromosome Z determines if a role is active or passive. The columns in all chromosomes are consistent to roles. In this example roles 1, 3 and 5 are active.}
             \label{fig:representation2}
         \end{figure}
         The second improved representation eliminates these drawbacks by having one chromosome for an individual, where no unnecessary genes (roles) occur. The chromosome consists of a list of roles, which contain a user-list and a permission-list (see figure \ref{fig:representation3}).\\
-        \begin{figure}
+        \begin{figure}[H]
             \centering
             \includegraphics[scale=0.4]{./Figures/ComplexRepresentation2}
             \caption{Example of a role model representation suggested in Saenko \& Kotenko\cite{saenko2012design}. A row represents a role (gene). In the column $L^X$ are user lists and in the column $L^Y$ are permission lists.}
@@ -84,15 +53,15 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
         \end{itemize}
         Examples can be seen in Figure \ref{fig:mutationOperations}. If an individual gets mutated is determined by a fixed probability $MUTPB$. In addition fixed probabilities for each mutation method is dictating how the individual gets mutated. The probabilities allow to influence how often a certain mutation should be executed and can therefore influence how much new solutions are discovered and how likely good solutions are lost. The mutation operations are implemented in such a way that it is ensured that all users and permissions are assigned to at least one role. This prevents that incomplete role models with missing users or permissions can occur.
         \iffalse Hence the search is restricted to a feasible region\cite{Eiben}.\fi
-        \begin{figure}
+        \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.3]{./Figures/Mutations}
+            \includegraphics[scale=0.27]{./Figures/Mutations}
             \caption{Examples for the six different mutation operators}
             \label{fig:mutationOperations}
         \end{figure}
         \subsection{Crossover methods}
-        The recombination is like in Saenko \& Kotenko\cite{saenko2012design} executed on two individuals with a traditional one-point crossover. Both individuals are keeping their first $x$ roles, while the rest of the roles get exchanged as shown in figure \ref{fig:crossover}. The points of crossover ($x$) of the two individuals are randomly chosen.
-        \begin{figure}
+        The recombination is like in Saenko \& Kotenko\cite{saenko2012design} executed on two individuals with a traditional one-point crossover. Both individuals are keeping their first $x$ roles, while the rest of the roles get exchanged as shown in figure \ref{fig:crossover}. The points of crossover (after $x$ roles) of the two individuals are randomly chosen.
+        \begin{figure}[H]
             \centering
             \includegraphics[scale=0.8]{./Figures/crossover.png}
             \caption{Examples of the crossover in the improved GA for the RMP by Saenko \& Kotenko\cite{saenko2012design}}
@@ -102,9 +71,9 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
         \subsection{Local optimization}
         \label{sec:localOptimization}
         A mutation and crossover is always followed by a local optimization on the individual. Like in Saenko \& Kotenko\cite{saenko2012design} the individual is compressed by the rule of User combining and/or Permission combining. If there are roles with the same user sets, they get combined by merging the permissions sets (User combing). Accordingly roles get combined by merging user sets when the same permission sets are present (Permission combining). It should be noted that by this compression the number of roles in the role model can shrink. Furthermore the order of first user combining and then permission combining might not necessarily optimize the individual the best possible way (see example in Figure \ref{fig:localOptimization}b).
-        \begin{figure}
+        \begin{figure}[H]
             \centering
-            \includegraphics[scale=0.27]{./Figures/LocalOptimization}
+            \includegraphics[scale=0.3]{./Figures/LocalOptimization}
             \caption{Examples of local optimizations. In (a) a case for user- and a separate case for permission-combining is detected and executed. In (b) an overlapping user- and permission-combining is detected, but only the user-combining is executed.}
             \label{fig:localOptimization}
         \end{figure}
@@ -131,12 +100,12 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
     \iffalse
     A similar approach is followed in Xu \& Stoller\cite{Xu}, but they calculate an attribute mismatch of roles, which does not consider the heterogeneity of users in different roles as well as homogeneity of users in the same role. In the following sections two approaches are discussed theoretically and one of the approaches is implemented.\\
     \fi
-    Two approaches have been considered to measure how well a role can be described by the user attribute values of its user-members. In the following both approaches are introduced, where the later one got implemented.\\
+    Two approaches have been considered to measure how well a role can be described by the user attribute values of its user-members. In the following both approaches are introduced, where the later one got implemented.
     
         \subsection{Role Cluster Approach}
         One approach is to treat roles like clusters where the users and their attribute values are objects. A role-cluster is considered good if the user-objects within the role-cluster are compact and the user-objects between role-clusters are separated. This means that the user attribute values considered describe all users within a role (compactness), but no users not in the role (separation). The compactness and separation of a role-cluster can be measured with the average silhouette coefficients of the user-objects of a role-cluster\cite{Han}. If the silhouette coefficient of an user-object approaches 1, the role-cluster, the user is assigned to, is considered compact and the user-object is far away from other role-clusters. A negative silhouette coefficient says that the user-object is closer to user-objects of other role-clusters than to user-objects of the same role-clusters.\\
         This measure of the average silhouette coefficients requires the role-clusters to be crisp, which means a user-object can be only in one role-cluster. But since the users can have several roles the role-clusters are fuzzy. Furthermore the measure has to be executed for every user attribute combination. Therefore an altered calculation of silhouette coefficients has to be used or a different measure has to be used to evaluate the role-clusters. To evaluate fuzzy clusters the sum of the squared error (SSE) can be used\cite{Han}. It measures how well a fuzzy clustering fits a data set. In Rawashdeh \& Ralescu\cite{rawashdeh2012fuzzy} the authors suggest an algorithm for the silhouette coefficient in fuzzy clusters.\\
-        The role-cluster approach has not been followed further.\\
+        The role-cluster approach has not been followed further.
         \subsection{Role Classifier-Rule Approach}
         \label{sec:classifierRule}
         Another approach is to generate classifier-rules for roles and measure the accuracy of these rules. Additionally the rule should be simple and not too complex (e.g. many conditions, which identify exactly one user). For this supervised-learning approach, all users in a role get classified as being in the role, while all other users are classified as being not in the role. Hence for each role a binary classification problem has to be solved. Rules can be extracted from a decision tree or can obtained directly using a Sequential Covering algorithm\cite{Han}. In traditional decision tree construction like ID3 or C4.5 the dataset gets repeatedly splitted based on the attribute which most effectively splits the dataset in one class or the other. The depth of the tree could be used as the complexity measure of a rule. The split by information gain is not necessarily wanted for the rules describing a role, since permissions originally have not been assigned to users which share the most common user attribute values, but rather because users gained legitimation through other specific attribute values. For example although users in a generated role are all located in $Denmark$, while users not in the role are located elsewhere, the reason that users of the role got assigned to the permission set the generated role is grouping could be due to the Departments they are in, which could be diverging. The information gain for the location would be higher, but not necessary the legitimation, why a user gets the permission set assigned through the role. Also the measure used for splitting the data in a decision tree is often biased towards class imbalances or multivalued attributes\cite{Han}. Furthermore classifier-rules for both classes are discovered, while for the measuring of the role only the rules for class "\textit{In the role}" are from interest. Therefore an application-specific algorithm has been created to discover the most descriptive rules for a role (class "\textit{In the role}"). The algorithm got inspired by Sequential Covering algorithms, which directly learns rules for classification by repeatedly removing a portion of the dataset.\\
@@ -212,10 +181,10 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
         
     \section{Fitness Functions for Role Mining Problem Objectives}
     \label{sec:optimizationFunctions}
-    Several optimization functions for objectives of the role mining problems (see section \ref{sec:roleMiningProblems}) are separately implemented as fitness functions, such that their impact on the solutions of the Evo-RoleMiner and Evo-RoleMner$M$ can be analyzed. The implemented optimization functions introduced in the following are organized in the according role model categories (see section \ref{sec:rmQuality}). Finally fitness functions are introduced, which can combine several objectives by scalarisation of the optimization functions. A fitness function is executed on a role model (individual) in the Evo-RoleMiner and Evo-RoleMiner$M$.
+    Several optimization functions for objectives of the role mining problems (see section \ref{sec:roleMiningProblems}) are separately implemented as fitness functions, such that their impact on the solutions of the Evo-RoleMiner and Evo-RoleMner$M$ can be analyzed. The implemented optimization functions introduced in the following are organized in the according role model categories: Completeness, Complexity and Comprehension (see section \ref{sec:rmQuality}). Finally fitness functions are introduced, which can combine several objectives by scalarisation of the optimization functions. A fitness function is executed on a role model (individual) in the Evo-RoleMiner and Evo-RoleMiner$M$.
         \subsection{Optimization Functions for Completeness}
         \label{sec:optimizationCompleteness}
-        To measure the completeness different fitness functions can be created. All of them need the original access control policies $UPA$ for measuring how complete the current considered role model is.
+        To measure the completeness (see section \ref{sec:completeness}) different fitness functions can be created. All of them need the original access control policies $UPA$ for measuring how complete the current considered role model is.
         \begin{itemize}
             \item \textbf{Minimizing Confidentiality Violations}\\
             Confidentiality violations exist when users get more permissions in the generated role model, than they had in the original access control policies (overentitlements). These violations are measured by counting the additional set positive bits ("1") in the resulting matrix of $UA \times PA$ with $UPA$. The worst case of confidentiality violations is the count of all negative bits in $UPA$, meaning that everyone gets all permissions. The best case is to have zero confidentiality violations.
@@ -230,7 +199,7 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
         \end{itemize}
         \subsection{Optimization Functions for Complexity}
         \label{sec:optimizationComplexity}
-        To measure the complexity of a role model three different objectives are considered, where no additional information is needed.
+        To measure the complexity of a role model (see section \ref{sec:complexity}) three different objectives are considered, where no additional information is needed.
         \begin{itemize}
             \item \textbf{Minimizing the Number of Roles}\\
             In the often researched Basic-RMP one objective is the count of roles in the role model, since it is often connected with less administration effort. The goal is to have as little roles as possible. In the used representation of a role model as individual, the number of genes represents the number of roles. The worst case can be determined as having a role for each user or for each permission and is therefore determined as $min(|U|,|P|)$.The best case can be set to one role, although it might be an unrealistic solution.
@@ -241,7 +210,7 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
         \end{itemize}
         \subsection{Optimization Functions for Comprehension}
         \label{sec:optimizationComprehension}
-        To measure how comprehensive a role model is, a measure had to be found. The approach in this thesis is to measure how "meaningful" the roles of a role model are (see section \ref{sec:meaningfulness}). By having this measure for the role interpretability an optimization function for the objective of comprehension can be formulated as follows. Required is the information of user attribute values, which might not always be at hand.
+        To measure how comprehensive a role model is (see section \ref{sec:comprehension}), a measure had to be found. The approach in this thesis is to measure how "meaningful" the roles of a role model are (see section \ref{sec:meaningfulness}). By having this measure for the role interpretability an optimization function for the objective of comprehension can be formulated as follows. Required is the information of user attribute values, which might not always be at hand.
         \begin{itemize}
             \item \textbf{Maximizing Average Role Interpretability}\\
             The average interpretability of roles in a role model is optimized towards a value of 1. The role interpretability is calculated as described in section \ref{sec:classifierRule}. The worst value is 0, where no descriptive rule for any role in the rolemodel can be found.
@@ -255,7 +224,7 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
             \begin{equation}\label{eq:FBasic}
                 F_{basic} = (w_1 * |R| + w_2 * G^{conf} + w_3 G^{accs})^{-1}
             \end{equation}    
-            where $G^{conf}$ are the number of confidentiality violations and $G^{accs}$ the number of availability violations. A similar fitness function is created, but formalized as Minimization Function:
+            where $G^{conf}$ are the number of confidentiality violations and $G^{accs}$ the number of availability violations. With the weights $w_i$ the influence of the single objectives can be adjusted. A similar fitness function is created, but formalized as Minimization Function:
             \begin{equation}\label{eq:FBasicMin}
                 F_{basic}^{min} = w_1 * |R| + w_2 * G^{conf} + w_3 G^{accs}
             \end{equation}
@@ -269,15 +238,15 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
             \begin{equation}\label{eq:WSCStar}
                 WSC(\gamma,W)^* = w_1 * |R| + w_2 * |UA| + w_3 * |PA| + w_4 * G^{accs} + w_5 * G^{conf}
             \end{equation}
-            When the function in \eqref{eq:WSCStar} was tested with different weights it showed that the number of roles got reduced quickly over the generations, although $w_1$ was set to 0 or lower. By looking at the optimization function description for User-Role- and Role-Permission-Assignments (see section \ref{sec:optimizationComplexity}) it is obvious that the number of roles already gets its impact through the number of User-Role- and Role-Permission-Assignments. When removing the first summand from \eqref{eq:WSCStar} the function is similar to the function in Saenko \& Kotenko\cite{Igor} for the Min-Edge-RMP, which is defined as maximization function:
+            where $\gamma$ is the role model and $W$ a set of weights. When the function in \eqref{eq:WSCStar} was tested with different weights it showed that the number of roles got reduced quickly over the generations, although $w_1$ was set to 0 or lower. By looking at the optimization function description for User-Role- and Role-Permission-Assignments (see section \ref{sec:optimizationComplexity}) it is obvious that the number of roles already gets its impact through the number of User-Role- and Role-Permission-Assignments. When removing the first summand from \eqref{eq:WSCStar} the function is similar to the function in Saenko \& Kotenko\cite{Igor} for the Min-Edge-RMP, which is defined as maximization function:
             \begin{equation}\label{eq:FEdge}
                 F_{edge} = (w_1 * (|UA| + |PA|) + w_2 * G^{conf} + w_3 * G^{accs})^{-1}
             \end{equation}
-            Hence the maximization function in \eqref{eq:FEdge} is used as guideline for a minimization function for the Min-Edge-RMP: 
+            where $w_i$ are the weights for the single objectives. Hence the maximization function in \eqref{eq:FEdge} is used as guideline for a minimization function for the Min-Edge-RMP: 
             \begin{equation}\label{eq:FEdgeMin}
                 F_{edge}^{min} = w_1 * (|UA| + |PA|) + w_2 * G^{conf} + w_3 * G^{accs}
             \end{equation}
-            The Minimization function is used for the Evo-RoleMiner for the same reason why the minimization function is chosen in the Basic-RMP: The conversion into a maximization function does not influence the result and has only a negative influence on the time performance.
+            where $w_i$ are the weights for the single objectives. The Minimization function is used for the Evo-RoleMiner for the same reason why the minimization function is chosen in the Basic-RMP: The conversion into a maximization function does not influence the result and has only a negative influence on the time performance.
             \item \textbf{Fitness Function for the Interference-RMP}\\
             At last the objective for comprehension is combined with the objectives of completeness and complexity. The interpretability measure is added to the fitness functions of the Basic-RMP and the Min-Edge-RMP.
             \begin{equation}\label{eq:FBasicMin_INT}
@@ -287,7 +256,7 @@ In this thesis a single- and a multi-objective EA for Role Mining has been const
             \begin{equation}\label{eq:FEdgeMin_INT}
                 F_{edge\_INT}^{min} = F_{edge}^{min} + w_6 * (1-INT)
             \end{equation}
-            where $INT$ stands for the interpretability measure. Since the function is a minimization function, the Interpretability value is inversed in order to reward a higher interpretability.
+            where $INT$ stands for the interpretability measure and $w_6$ is the weight for the interpretability objective. Since the function is a minimization function, the Interpretability value is inversed in order to reward a higher interpretability.
         \end{itemize}
     
     \section{Initialization of the Population and Termination condition}
