@@ -231,18 +231,20 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
                   +str(logbook.chapters["RPCnt"].stream)+"\t\t"
                   +str(logbook.chapters["Interp"].stream)
                   )
+        if generation % int((genStart+NGEN)/10) == 0:
             if (printPopulations):
                 pop_subdirectory = pop_directory+"\\Generation_"+str(generation)
                 #if not os.path.exists(pop_subdirectory):
                 #    os.makedirs(pop_subdirectory)
                 utils.saveDiversity(generation,population,pop_subdirectory+"_diversity.json")
-                utils.savePopulation(generation,population,pop_subdirectory+"_population.pkl")
+                #utils.savePopulation(generation,population,pop_subdirectory+"_population.pkl")
                 #visual.showBestResult(offspring, genStart, Original, pop_subdirectory+"\\Individual", "Individual", "Individual from Generation "+str(generation), False, False, True, False)
 
         population = offspring
         generation += 1
 
-    utils.printDiversity(pop_directory, freq)
+    utils.printDiversity(pop_directory, int((genStart+NGEN)/10))
+    utils.savePopulation(generation,population,pop_subdirectory+"_population.pkl")
 
     end = datetime.datetime.now()
     timediff = end-start

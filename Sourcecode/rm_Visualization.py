@@ -150,7 +150,7 @@ def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFun
 # -----------------------------------------------------------------------------------
 # Print Logbook AVG of several experiments into graph for single objective EAs
 # -----------------------------------------------------------------------------------
-def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG, freq):
 
     # Plot graphs
     #fig, ax = plt.subplots(figsize=(12, 8))
@@ -160,7 +160,7 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
     if (len(stats)==1):
         fig, ax = plt.subplots(figsize=(12, 8))
         temp = list(numpy.array(data)[:,1])
-        ax = plotLogbookAVGData(stats[0], temp, ax)
+        ax = plotLogbookAVGData(stats[0], temp, ax, freq)
         min = ax.get_ylim()[0]
         if (min > 0):
             min = 0
@@ -178,9 +178,9 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
                     temp = list(numpy.array(data)[:,s+2])
                     if (s==2):
                         temp2 = list(numpy.array(data)[:,-1])
-                        ax = plotLogbookAVGData(stat, temp, ax, data2=temp2)
+                        ax = plotLogbookAVGData(stat, temp, ax, freq, data2=temp2)
                     else:
-                        ax = plotLogbookAVGData(stat, temp, ax)
+                        ax = plotLogbookAVGData(stat, temp, ax, freq)
                     min = ax.get_ylim()[0]
                     if (min > 0):
                         min = 0
@@ -213,8 +213,8 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
 # -----------------------------------------------------------------------------------
 # Plot data into graph for single objective EAs
 # -----------------------------------------------------------------------------------
-def plotLogbookAVGData(data_name,data, ax, data2=None):
-    gen = [i for i in range(0,len(data))]
+def plotLogbookAVGData(data_name,data, ax, freq, data2=None):
+    gen = [i*freq for i in range(0,len(data))]
     ax.set_xlabel("Generation", fontsize=16)
     ax.set_ylabel(data_name, fontsize=16)
     #ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
