@@ -1,0 +1,64 @@
+\newpage
+\chapter{Discussion}
+\label{sec:discussion}
+\hl{SECTION UNDER CONSTRUCTION}\\
+\iffalse
+\hl{adequacy, efficiency, productiveness, effectiveness (choose your criteria, state them clearly and justify them)
+be careful that you are using a fair measure, and that you are actually measuring what you claim to be measuring
+if comparing with previous techniques those techniques must be described in Chapter 2
+be honest in evaluation
+admit weaknesses
+\\\\
+The Results and Discussion portion of the thesis.  These two components should remain separated with the appropriate headings within this chapter, as they both serve a different function.  The results portion only presents the hard data without any accompanying analysis or interpretation.  This section should include, where possible, a visual representation of the data, such as in charts, graphs, or tables.  Each figure should have a brief description associated with it and clearly marked labels.  The results of all statistical analyses should be presented, such that the reader has enough information to determine reliability, validity, and the statistical significance of the relationships among variables.   This section should also be clearly organized by subheadings.
+\\\\
+Which could be the system you made and the reasons for various design decisions, what your interview objects said, observations of people using a computer system, stories of a development process, numeral data from a questionnaire, etc. 
+The discussion of the findings can be included in these chapters, or the discussion can be put  in a separate chapter. 
+The issues from the theory chapter (chapter 2) should be discussed here.}
+\fi
+
+\begin{itemize}
+    \item Limited diversity in the final population; Novelty Search might help
+    \item Interpretability measure only measures if there are reasonable rules or not; Advanced measure might help
+    \item Runtime increases drastically with the dimension of the UP-Matrix
+    \item Objectives Conf, Accs, Number of UR- and RP-Assignments have also a big impact on the Objective of number of roles. The weight for number of roles in WSC can be set low or even minus (which encourages a maximization of role numbers). Or the probability of mutation for removing roles is strongly lowered
+    \item Crossover is just a bigger mutation
+    \item Representation might not be optimal
+    \item Individuals might have the same Fitness and even re-created the original UP-Matrix, but it does not mean that the role model is the same; Additional attributes, like user attributes, could help by e.g. introducing an Interpretability measure to distinguish the role models
+    \item Rules, which might have lead to a role, might not be identified again as the rule, the role was created on
+    \item A smarter mutation, which does not allow "invalid" role models is...
+    \item An additional interpretability measure can lead to...
+    \item Multiobjective EA shows ...
+    \item Multiobjective EA can ...
+    \item The optimization of combining roles with similar roles or similar permissions is not necessarily optimal?
+    \item Noise in the data can ...
+    \item Rolemodel is hard to evaluate as a whole by a human
+    \item Even improving the NSGA2 algorithm does not show ...
+    \item Constraint handling can be easily introduced, but...
+    \item The results in Saenko et al. are based on artificial datasets and also do not evaluate the resulting role models. In the experiments executed in this thesis it can be seen that ...
+    \item Testing the EA on real datasets reveal that...
+    \item The alternative approach is not developed far enough to see any advantage ...
+\end{itemize}
+
+\iffalse
+\hl{State what you've done and what you've found
+Summarize contributions (achievements and impact)
+Outline open issues/directions for future work
+\\\\
+The final chapter of the Master's thesis is the Conclusions chapter. Here is where the writer sums up the entire project in one to two brief paragraphs. This chapter should remind the reader of the initial problem statement or hypothesis and then relate that to the results from the study. The writer should then present any conclusions reached or any new insights that arose from this work.  Finally, the writer should present the research in terms of the overall impact in the field. For example, how will the results of this study change the way a person or organization behaves or makes decisions? One caution when writing this chapter is not to merely reiterate the other portions of the thesis. Instead, the writer should strive to leave a lasting impression upon the reader, conveying with the same passion that drove the research project the importance of the work completed.
+\\\\
+Summary of the problem, the main findings and the discussion. Structured according to the issues in chapter 2.
+Comparison with the literature presented in chapter 2: how do your results fill in, advance or contradict previously reported research?
+What are the implications of your research for people working in the field that you have studies? In which direction should further research go? }
+\fi
+
+Discussion
+\begin{itemize}
+    \item 
+    \item Different objectives than Saenko
+    \item Multi-objective
+    \item Evaluating also solutions by EA
+    \item Integrated interpretability for generated data
+    \item Performance results different than in Saenko
+    \item Executed also on real data, used by research to be comparable
+    \item
+\end{itemize}

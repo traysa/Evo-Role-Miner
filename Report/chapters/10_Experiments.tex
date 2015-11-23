@@ -1,11 +1,13 @@
 \newpage
-\section{Experiments}
+\chapter{Experiments}
+\label{sec:experiments}
 \hl{SECTION UNDER CONSTRUCTION}\\
-This chapter describes the setup of the experiments executed. First the data sets used in the experiments are described. Then the measures and the setup of the experiments are introduced.
+This chapter describes the setup of the experiments executed. First the data sets used in the experiments are described. Then the measures and the setup of the experiments are introduced.\\
+The experiments shall provide information, which is not given in Saenko \& Kotenko \cite{saenko2012design}. In particular how parameters can be set and how the objectives of the role models evolve and impact other objectives. Also the EA is executed on datasets commonly used in role mining research.
 
-\subsection{Data Sets}
-\subsubsection{Real Datasets}
-In many research papers the same datasets are used for performance evaluation of role mining Algorithms. Table \ref{tab:realDatasets} lists some of these data sets and their components. The authors of \cite{Ene} obtained these datasets from Cisco firewalls and the Lotus Domino server of the Hewlett Packard (HP) networks. The healthcare dataset was collected from the US Veteran’s Administration.
+\section{Data Sets}
+\subsection{Real Datasets}
+In many research papers the same datasets are used for performance evaluation of role mining algorithms. Table \ref{tab:realDatasets} lists some of these data sets and their components. The authors of \cite{Ene} obtained these datasets from Cisco firewalls and the Lotus Domino server of the Hewlett Packard (HP) networks. The healthcare dataset was collected from the US Veteran’s Administration.
 \begin{table}
     \centering
     \begin{tabular}{|l|l|l|l|}
@@ -25,7 +27,7 @@ In many research papers the same datasets are used for performance evaluation of
 \end{table}
 In Xu \& Stolter\cite{Xu} the authors created an algorithm to generate user attribute information on the datasets in table \ref{tab:realDatasets}.\hl{More details}
 
-\subsubsection{Synthetic Datasets}
+\subsection{Synthetic Datasets}
 Some papers are providing data generators for synthetic datasets for the performance evaluation of the various role mining algorithms. The data generator in Vaidya et al.\cite{Vaidya:2006:RMR:1180405.1180424} takes as input the number of users, permissions and roles to generate a pair of User-Role-Assignment and Role-Permission-Assignment matrices. Combining these two matrices, the corresponding User-Permission-Assignment matrix is obtained.\\
 \iffalse In the data generator introduced in [Lu et al. 2014]...\\
 "In [Lu et al. 2014], several sets of synthetic data of varying parameters are used. The data generator takes as input the number of users and permissions, density of 1s in the PA, density of 1s in the UA and the noise level to produce the UA and PA matrices."\fi
@@ -67,125 +69,75 @@ Since users and roles have been generated before, the rules can be applied to cr
     \item \textbf{User-permission matrix with noise}\\
     Given two parameters for noise, random bits in the User-permission matrix are flipped. The first parameter is the probability that a user-permission-relation is removed ("1" flipped to "0") and the second parameter is the probability that a user-permission-relation is added ("0" flipped to "1").
 \end{itemize}
+Three datasets have been generated with the data generator in order to execute experiments with fitness functions $F_{basic\_INT}^{min}$ \eqref{eq:FBasicMin_INT} and $F_{edge\_INT}^{min}$ \eqref{eq:FEdgeMin_INT}. The synthetic datasets are listed in table \ref{tab:syntheticDatasets}.
+\begin{table}
+    \centering
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \rowcolor{myGray} 
+        \textbf{Dataset} & \textbf{Users} & \textbf{Permissions} & \textbf{User Permission Assignments} & \textbf{Roles}\\ \hline
+        1       & 10    & 10   & 100    & 4\\ \hline
+        2       & 50    & 50   & 2500   & 15\\ \hline
+        3       & 100   & 100  & 10000  & 25\\ \hline
+    \end{tabular}
+    \caption{Synthetic Datasets}
+    \label{tab:syntheticDatasets}
+\end{table}
+A visualization of synthetic dataset 1 and the healthcare dataset can be seen in Figure \ref{fig:dataset1} and \ref{fig:healthcare}.
+
+\afterpage{
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[scale=0.3]{./Figures/dataset1}
+        \caption{DATASET 1: Role model of synthetic dataset 1 including User-Permission Matrix. From u.l. to l.r.: User-Role Matrix (Rows: Users, Columns: Roles), Role-Permission Matrix (Rows: Roles, Columns: Permissions), Resulting User-Permission Matrix (Rows: Users, Columns: Permissions), User-Permission Matrix with Noise (Rows: Users, Columns: Permissions)}
+        \label{fig:dataset1}
+    \end{figure}
+    \clearpage
+}
+
+\afterpage{
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[scale=0.3]{./Figures/dummy}
+        \caption{HEALTHCARE DATASET: User-Permission Matrix (Rows: Users, Columns: Permissions)}
+        \label{fig:healthcare}
+    \end{figure}
+    \clearpage
+}
+
+\newpage
+\section{Experiments with Evo-RoleMiner}
+\hl{SECTION UNDER CONSTRUCTION}\\
+The experiments have been divided into several phases, where the results of one phase lead to the setup of the experiments in the next phase.\\
+In the first phase single objectives introduced in section \ref{sec:optimizationCompleteness}, \ref{sec:optimizationComplexity} and \ref{sec:optimizationComprehension} are set as fitness function in the Evo-RoleMiner. This phase was executed to validate the implementation of the objective functions, which are combined at a later stage, and to analyse the impact of these objectives to each other. The findings lead to the setup in phase two, where the actual fitness functions for the Basic-RMP, Min-Edge-RMP and Interference-RMP (see section \ref{sec:fitnessFunctions}) are used in the Evo-RoleMiner.\\
+All experiments have been executed ten times and started with a random start-population. The experiments have been executed on the healthcare dataset (see Figure \ref{fig:healthcare}) and on a synthetic dataset generated by the data generator (see Figure \ref{fig:dataset1}).
+
+\import{chapters/}{10_Phase1.tex}
+\import{chapters/}{10_Phase2.tex}
+\import{chapters/}{10_Phase3.tex}
+\import{chapters/}{10_Phase4.tex}
+\import{chapters/}{10_Phase5.tex}
+\import{chapters/}{10_Phase6.tex}
+
+\section{Experiments with Evo-RoleMiner$M$}
+\hl{SECTION UNDER CONSTRUCTION}\\
+\subsection{Setup}
+\subsection{Measures}
+
+\section{Experiments with Co-Evolution}
+\hl{SECTION UNDER CONSTRUCTION}\\
+\subsection{Setup}
+\subsection{Measures}
 
 \iffalse
-\subsection{Visualisation of the RBAC Model}
-\hl{SECTION UNDER CONSTRUCTION}\\
-
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.4]{./Figures/logbook_AVG}
-        \caption{Example of result diagram: Average Fitness of 10 experiments}
-        \label{fig:logbook_AVG}
-    \end{figure}
-    
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.4]{./Figures/testresult1}
-        \caption{Example of result diagram: Min, Max and Average Fitness of 1 experiment}
-        \label{fig:testresult1}
-    \end{figure}
-    
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.35]{./Figures/testresult2}
-        \caption{Example of result diagrams: Objective measures of 1 experiment}
-        \label{fig:testresult2}
-    \end{figure}
-    
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.4]{./Figures/testresult3}
-        \caption{Example of result diagram: Fitness of population of 1 experiment}
-        \label{fig:testresult3}
-    \end{figure}
-    
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=0.3]{./Figures/testresult4}
-        \caption{Example of result diagram: 1 Role model of the top 5 role models of 1 experiment}
-        \label{fig:testresult4}
-    \end{figure}
-\fi
-
-\subsection{Experiments with Single-Objective EAs}
-\hl{SECTION UNDER CONSTRUCTION}\\
-Several experiments have been executed with different parameters and fitness functions for the objectives. All experiments have been executed \hl{5} times and started with a random start-population. The experiments have been executed on the healthcare dataset (see Figure \ref{fig:healthcare}) and on a synthetic dataset generated by the data generator (see Figure \ref{fig:dataset1}). The results lead to the basic setup in table \ref{tab:setup1} for the next phase of experiments.\\
-The results in the first phase of experiments revealed that...
-
-\begin{table}
-    \centering
-    \begin{tabular}{|l|l|}
-        \hline
-        \rowcolor{myGray} 
-        \textbf{Parameter}              & \textbf{Value}    \\ \hline
-        Generations                     & 1000              \\ \hline
-        Population                      & 1000              \\ \hline
-        CXPB                            & 0.25              \\ \hline
-        MUTPB                           & 0.25              \\ \hline
-        MUTPB-Type1: Add role           & 0.25              \\ \hline
-        MUTPB-Type2: Add User           & 0.25              \\ \hline
-        MUTPB-Type3: Add Permission     & 0.25              \\ \hline
-        MUTPB-Type4: Remove Role        & 0.25              \\ \hline
-        MUTPB-Type5: Remove User        & 0.25              \\ \hline
-        MUTPB-Type6: Remove Permission  & 0.25              \\ \hline
-        Tournament size                 & 2                 \\ \hline
-        Local optimization              & True              \\ \hline
-    \end{tabular}
-    \caption{Experiment setup 1}
-    \label{tab:setup1}
-\end{table}
-It should be noted the mutation probability for removing roles has been set low, since ...\\
-The results of the setup can be seen in table \ref{tab:results1}.
-\begin{table}
-    \centering
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|}
-        \hline
-        \rowcolor{myGray} 
-        \textbf{Fitness Function} & \textbf{\# $G_{conf}$} & \textbf{\# $G_{accs}$} & \textbf{\# Roles} & \textbf{\# UR} & \textbf{\# RP} & \textbf{INT} & \textbf{Time} & \textbf{Solution found}\\ \hline
-        $F_{basic}$             &   0   &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-        $F_{edge}$              &   0   &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-        $WSC^*$                 &   0   &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-        $WSC_INT$               &   0   &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-    \end{tabular}
-    \caption{Results of Experiment setup 1 for generated Dataset 1}
-    \label{tab:results1}
-\end{table}
-\begin{table}
-    \centering
-    \begin{tabular}{|l|l|l|l|l|l|l|l|}
-        \hline
-        \rowcolor{myGray} 
-        \textbf{Fitness Function} & \textbf{\# $G_{conf}$} & \textbf{\# $G_{accs}$} & \textbf{\# Roles} & \textbf{\# UR} & \textbf{\# RP} & \textbf{Time} & \textbf{Solution found}\\ \hline
-        $F_{basic}$             &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-        $F_{edge}$              &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-        $WSC^*$                 &   0   &   0   &   0   &   0   &   0   &   0   & No\\ \hline
-    \end{tabular}
-    \caption{Results of Experiment setup 1 for healthcare dataset}
-    \label{tab:results1}
-\end{table}
-The results show that...\\
-Therefore the setup has been changed to...\\
-Compared to other work...\\
-\subsection{Experiments with Multi-Objective EAs}
-\hl{SECTION UNDER CONSTRUCTION}\\
-\subsubsection{Setup}
-\subsubsection{Measures}
-
-\subsection{Experiments with Co-Evolution}
-\hl{SECTION UNDER CONSTRUCTION}\\
-\subsubsection{Setup}
-\subsubsection{Measures}
-
-\iffalse
-\subsection{Experiments with Human Interaction}
-\subsubsection{Setup}
+\section{Experiments with Human Interaction}
+\subsection{Setup}
 \begin{itemize}
     \item Number of turns
     \item Random Start-population
     \item Fixed Start-population
 \end{itemize}
-\subsubsection{Measures}
+\subsection{Measures}
 \begin{itemize}
     \item Fitness (Min, Max, Avg)
     \item Time complexity

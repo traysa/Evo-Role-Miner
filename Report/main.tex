@@ -1,5 +1,4 @@
-%\documentclass{article}
-\documentclass[version=last, pagesize=auto, paper=a4]{scrartcl}
+\documentclass[version=last, pagesize=auto, paper=a4]{report}%{scrartcl}
 \usepackage[utf8]{inputenc}
 \usepackage{import}
 
@@ -9,14 +8,16 @@
 %Graphics
 \usepackage{graphicx}
 \graphicspath{ {Figures/} }
-\DeclareGraphicsExtensions{.png,.jpg,.pdf}  
+\DeclareGraphicsExtensions{.png,.jpg,.pdf} 
+\usepackage{afterpage}
+\usepackage[font={small,it}]{caption}
 
 %Packages for Watermark
 \usepackage[printwatermark]{xwatermark}
 \usepackage{xcolor}
 %\usepackage{graphicx}
 \usepackage{lipsum}
-\newwatermark[allpages,color=grey!5,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
+\newwatermark[allpages,color=gray!5,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
 
 % Packages for tables
 \usepackage{longtable}
@@ -28,7 +29,7 @@
 
 % Packages for bibliography
 \usepackage[square, numbers, comma, sort&compress]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
-\usepackage[nottoc,numbib]{tocbibind} %including bibtex into table of contents
+\usepackage[nottoc]{tocbibind} %including bibtex into table of contents
 
 % Packages for highlighting
 \usepackage{color,soul}
@@ -51,6 +52,12 @@
 \usepackage{amsmath}
 \numberwithin{equation}{section}
 
+% Packages for appendix
+\usepackage[toc,page]{appendix}
+
+% Packages for landscape pages
+\usepackage{lscape}
+
 % Unknown packages
 %\usepackage{listings}
 %\usepackage{color}
@@ -59,9 +66,9 @@
 %\usepackage{mathabx}
 %\usepackage{enumitem}
 
-\usepackage[acronym]{glossaries}
-\makeglossaries
-\include{glossary}
+%\usepackage[acronym]{glossaries}
+%\makeglossaries
+%\include{glossary}
 
 \begin{document}
 
@@ -83,28 +90,30 @@
 
 \import{chapters/}{08_RelatedWork.tex}
 
-%\import{chapters/}{08_ProblemAnalysis.tex}
-
 \import{chapters/}{09_Approach.tex}
 
 \import{chapters/}{10_Experiments.tex}
 
-\import{chapters/}{11_Results.tex}
+\import{chapters/}{11_Discussion.tex}
 
-\import{chapters/}{12_Discussion.tex}
+\import{chapters/}{12_FutureWork.tex}
 
 \import{chapters/}{13_Conclusion.tex}
 
-%\import{chapters/}{14_References.tex}
+\import{chapters/}{14_References.tex}
 
 \clearpage
-\bibliographystyle{plain}
-\bibliography{bibliography}
+\listoffigures
 
-\import{chapters/}{15_Appendix.tex}
+\clearpage
+\listoftables
 
-%\clearpage
-%\printglossary[type=\acronymtype]
-%\printglossary
+\newpage
+\begin{appendices}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+    \chapter{Appendix}
+        \import{chapters/}{15_Appendix.tex}
+        \import{chapters/}{16_AppendixB.tex}
+\end{appendices}
 
 \end{document}
