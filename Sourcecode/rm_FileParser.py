@@ -43,6 +43,70 @@ def read(filename):
     return UPmatrix
 
 # -----------------------------------------------------------------------------------
+# Parse datasets from research (e.g. domino.rbac)
+# -----------------------------------------------------------------------------------
+def read2(filename):
+    logger.info("Read2")
+    logger.info("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count users
+    userCount = max(list(map(int, re.findall('u_U(.+?)[\n\r\s]+', data))))#+1
+    logger.info("userCount: "+str(userCount))
+
+    # Count permissions
+    permCount = max(list(map(int, re.findall('p_P(.+?)[\n\r\s]+', data))))#+1
+    logger.info("permCount: "+str(permCount))
+
+    # Create UP Matrix
+    UPmatrix = [[0 for i in range(permCount)] for j in range(userCount)]
+    for line in lines:
+        if line.startswith("u_"):
+            parts = line.split(" ")
+            user = parts[0]
+            userId = int(user[3:])-1
+            for i in range(len(parts)-1):
+                perm = parts[i+1]
+                permId = int(perm[3:])-1
+                #print(str(userId)+" , "+str(permId))
+                UPmatrix[userId][permId] = 1
+    logger.info("DONE.\n")
+    return UPmatrix
+
+# -----------------------------------------------------------------------------------
+# Parse datasets from research (e.g. firewall-1.rbac)
+# -----------------------------------------------------------------------------------
+def read4(filename):
+    logger.info("Read4")
+    logger.info("Parsing file "+str(filename)+"... ")
+    data = open(filename, 'r').read()
+    lines = data.splitlines()
+
+    # Count users
+    userCount = max(list(map(int, re.findall('u_U(.+?)[\n\r\s]+', data))))#+1
+    logger.info("userCount: "+str(userCount))
+
+    # Count permissions
+    permCount = max(list(map(int, re.findall('p_P(.+?)[\n\r\s]+', data))))+1
+    logger.info("permCount: "+str(permCount))
+
+    # Create UP Matrix
+    UPmatrix = [[0 for i in range(permCount)] for j in range(userCount)]
+    for line in lines:
+        if line.startswith("u_"):
+            parts = line.split(" ")
+            user = parts[0]
+            userId = int(user[3:])-1
+            for i in range(len(parts)-1):
+                perm = parts[i+1]
+                permId = int(perm[3:])
+                #print(str(userId)+" , "+str(permId))
+                UPmatrix[userId][permId] = 1
+    logger.info("DONE.\n")
+    return UPmatrix
+
+# -----------------------------------------------------------------------------------
 # Parse datasets from datagenerator
 # -----------------------------------------------------------------------------------
 def read3(filename):

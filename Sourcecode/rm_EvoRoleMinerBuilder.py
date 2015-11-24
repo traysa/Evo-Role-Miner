@@ -148,7 +148,11 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,
                                      removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
-                                     numberTopRoleModels,fortin=(evolutionType=="Multi_Fortin2013"))
+                                     numberTopRoleModels, optimization, fortin=(evolutionType=="Multi_Fortin2013"),
+                                     untilSolutionFound=untilSolutionFound,
+                                     userAttributeValues=userAttributeValues,
+                                     constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory)
+
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, obj_weights, CXPB,
@@ -245,6 +249,12 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                 entry = logbook[i]
                 for o,obj in enumerate(evalFunc):
                     entry['fitness_'+obj] = logbook.chapters["fitnessObj"+str(o+1)][i]
+                entry['Conf'] = logbook.chapters["Conf"][i]
+                entry['Accs'] = logbook.chapters["Accs"][i]
+                entry['RoleCnt'] = logbook.chapters["RoleCnt"][i]
+                entry['URCnt'] = logbook.chapters["URCnt"][i]
+                entry['RPCnt'] = logbook.chapters["RPCnt"][i]
+                entry['Interp'] = logbook.chapters["Interp"][i]
                 logbookEntryList.append(entry)
         else:
             for i in range(0,len(logbook)):
@@ -270,7 +280,14 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                 headers = "gen;evals;"
                 for obj in evalFunc:
                     headers += obj+"_Min;"+obj+"_Max;"+obj+"_Avg;"+obj+"_Std;"
-                outfile.write(headers+"\n")
+                headers += "Conf_Min;Conf_Max;Conf_Avg;Conf_Std"\
+                              ";Accs_Min;Accs_Max;Accs_Avg;Accs_Std"\
+                              ";RoleCnt_Min;RoleCnt_Max;RoleCnt_Avg;RoleCnt_Std"\
+                              ";URCnt_Min;URCnt_Max;URCnt_Avg;URCnt_Std"\
+                              ";RPCnt_Min;RPCnt_Max;RPCnt_Avg;RPCnt_Std"\
+                              ";Interp_Min;Interp_Max;Interp_Avg;Interp_Std"\
+                              "\n"
+                outfile.write(headers)
                 for i in range(0,len(logbook)):
                     gen = logbook.select("gen")[i]
                     evals = logbook.select("evals")[i]
@@ -281,7 +298,45 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                         avg = logbook.chapters["fitnessObj"+str(o)].select("avg")[i]
                         std = logbook.chapters["fitnessObj"+str(o)].select("std")[i]
                         entry+= ";"+str(min)+";"+str(max)+";"+str(avg)+";"+str(std)
-                    outfile.write(entry+"\n")
+                    Conf_Min = logbook.chapters["Conf"].select("min")[i]
+                    Conf_Max = logbook.chapters["Conf"].select("max")[i]
+                    Conf_Avg = logbook.chapters["Conf"].select("avg")[i]
+                    Conf_Std = logbook.chapters["Conf"].select("std")[i]
+                    Accs_Min = logbook.chapters["Accs"].select("min")[i]
+                    Accs_Max = logbook.chapters["Accs"].select("max")[i]
+                    Accs_Avg = logbook.chapters["Accs"].select("avg")[i]
+                    Accs_Std = logbook.chapters["Accs"].select("std")[i]
+                    RoleCnt_Min = logbook.chapters["RoleCnt"].select("min")[i]
+                    RoleCnt_Max = logbook.chapters["RoleCnt"].select("max")[i]
+                    RoleCnt_Avg = logbook.chapters["RoleCnt"].select("avg")[i]
+                    RoleCnt_Std = logbook.chapters["RoleCnt"].select("std")[i]
+                    URCnt_Min = logbook.chapters["URCnt"].select("min")[i]
+                    URCnt_Max = logbook.chapters["URCnt"].select("max")[i]
+                    URCnt_Avg = logbook.chapters["URCnt"].select("avg")[i]
+                    URCnt_Std = logbook.chapters["URCnt"].select("std")[i]
+                    RPCnt_Min = logbook.chapters["RPCnt"].select("min")[i]
+                    RPCnt_Max = logbook.chapters["RPCnt"].select("max")[i]
+                    RPCnt_Avg = logbook.chapters["RPCnt"].select("avg")[i]
+                    RPCnt_Std = logbook.chapters["RPCnt"].select("std")[i]
+                    Interp_Min = logbook.chapters["Interp"].select("min")[i]
+                    Interp_Max = logbook.chapters["Interp"].select("max")[i]
+                    Interp_Avg = logbook.chapters["Interp"].select("avg")[i]
+                    Interp_Std = logbook.chapters["Interp"].select("std")[i]
+                    entry+= ";"+str(Conf_Min)+";"+str(Conf_Max)+";"+str(Conf_Avg)+";"+str(Conf_Std)\
+                                  +";"+str(Accs_Min)+";"+str(Accs_Max)+";"+str(Accs_Avg)+";"+str(Accs_Std)\
+                                  +";"+str(RoleCnt_Min)+";"+str(RoleCnt_Max)+";"+str(RoleCnt_Avg)+";"+str(RoleCnt_Std)\
+                                  +";"+str(URCnt_Min)+";"+str(URCnt_Max)+";"+str(URCnt_Avg)+";"+str(URCnt_Std)\
+                                  +";"+str(RPCnt_Min)+";"+str(RPCnt_Max)+";"+str(RPCnt_Avg)+";"+str(RPCnt_Std)\
+                                  +";"+str(Interp_Min)+";"+str(Interp_Max)+";"+str(Interp_Avg)+";"+str(Interp_Std)\
+                                  +"\n"
+                    outfile.write(entry)
+                resultInfo = "Conf("+str(Conf_Min)+","+str(Conf_Avg)+","+str(Conf_Max)\
+                             +"),Accs("+str(Accs_Min)+","+str(Accs_Avg)+","+str(Accs_Max)\
+                             +"),RoleCnt("+str(RoleCnt_Min)+","+str(RoleCnt_Avg)+","+str(RoleCnt_Max)\
+                             +"),URCnt("+str(URCnt_Min)+","+str(URCnt_Avg)+","+str(URCnt_Max)\
+                             +"),RPCnt("+str(RPCnt_Min)+","+str(RPCnt_Avg)+","+str(RPCnt_Max)\
+                             +"),Interp("+"{0:.2f}".format(Interp_Min)+","+"{0:.2f}".format(Interp_Avg)+","+"{0:.2f}".format(Interp_Max)+")"
+
                 outfile.close()
         else:
             with open(logfile, "a") as outfile:
@@ -374,8 +429,10 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
                               roleModelsAsPNG, showRoleModelsPNG)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
-        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, evalFunc, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
-                                            showLogPlotPNG)
+        stats2 = ["Conf","Accs","RoleCnt","URCnt","RPCnt","Interp"]
+        visual.plotLogbookForMultiObjective(results, generation, freq, log_filename+"_plot", fileExt[1:], info, evalFunc, fitnessAsPDF,
+                                                  fitnessAsSVG, fitnessAsPNG, showFitnessPNG,population=population)
+        visual.plotLogbook(logbook, log_filename+"_rmmeasures", stats2, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
         visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc, fitnessAsPDF,
                                                   fitnessAsSVG, fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,

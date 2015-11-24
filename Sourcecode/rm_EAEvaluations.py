@@ -166,7 +166,6 @@ def evalFunc_RPCnt(individual, Original, constraints=[]):
         fitness = numberOfRP
     return fitness,
 
-
 # -----------------------------------------------------------------------------------
 # Single Objective Evaluation: Interpretability
 # Interpretability is the average Role Fitness (calculation based on Generalized Intra-Inter Silhouette Index)
@@ -475,6 +474,34 @@ def evalFunc_FEdgeMin_INT(individual, Original, weights, userAttributeValues, co
 
         fitness = fitness[0] + int_weight * (1-interp)
     return fitness,
+
+# -----------------------------------------------------------------------------------
+# Multi Objective Evaluation: Number of Roles + Violations
+# -----------------------------------------------------------------------------------
+def evalFunc_Multi(individual, Original, evalFunc, userAttributeValues=[], constraints=[]):
+    fitness = ()
+    for obj in evalFunc:
+        if (obj=="Confidentiality"):
+            fitness+= (evalFunc_Confidentiality(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="Availability"):
+            fitness+= (evalFunc_Availability(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="RoleCnt"):
+            fitness+= (evalFunc_RoleCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="Violations"):
+            fitness+= (evalFunc_Violations(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="AvgRoleConf_A"):
+            fitness+= (evalFunc_AvgRoleConfViolations_Availability(individual,  Original=Original, constraints=constraints)[0],)
+        elif (obj=="URCnt"):
+            fitness+= (evalFunc_URCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="RPCnt"):
+            fitness+= (evalFunc_RPCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="AvgRoleConf"):
+            fitness+= (evalFunc_AvgRoleConfViolations(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="Interpretability"):
+            fitness+= (evalFunc_Interpretability(individual, Original=Original, userAttributeValues=userAttributeValues, constraints=constraints)[0],)
+        else:
+            raise ValueError("Evaluation function for '"+obj+"' not known")
+    return fitness
 
 # -----------------------------------------------------------------------------------
 # Feasability of an individual for penalty

@@ -12,6 +12,7 @@ from collections import defaultdict
 import rm_EADecoder as decoder
 import os
 import logging
+from mpl_toolkits.mplot3d import Axes3D
 logger = logging.getLogger('root')
 
 # -----------------------------------------------------------------------------------
@@ -97,10 +98,10 @@ def plotLogbook(logbook, logbook_filename, stats, title, info, saveAsPDF, saveAs
 # -----------------------------------------------------------------------------------
 # Print Logbook into graph for multi objective EAs
 # -----------------------------------------------------------------------------------
-def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+def plotLogbookForMultiObjective2(logbook, logbook_filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
     gen = logbook.select("gen")
     # Plot graphs
-    fig, plots = plt.subplots(2,1,figsize=(12, 8))
+    fig, plots = plt.subplots(len(evalFunc),1,figsize=(12, 8))
     i = 0
     for ax in plots:
 
@@ -124,7 +125,7 @@ def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFun
 
         i+= 1
 
-    fig.text(0.1,0.01,info, fontsize=10)
+    #fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle("Fitness for: "+title, fontsize=20)
 
     if (saveAsPDF):
@@ -150,7 +151,7 @@ def plotLogbookForMultiObjective(logbook, logbook_filename, title, info, evalFun
 # -----------------------------------------------------------------------------------
 # Print Logbook AVG of several experiments into graph for single objective EAs
 # -----------------------------------------------------------------------------------
-def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG, freq):
+def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG, freq, multi=False, evalFunc=[]):
 
     # Plot graphs
     #fig, ax = plt.subplots(figsize=(12, 8))
@@ -158,16 +159,32 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
     #ax = fig.add_subplot(111)
 
     if (len(stats)==1):
-        fig, ax = plt.subplots(figsize=(12, 8))
-        temp = list(numpy.array(data)[:,1])
-        ax = plotLogbookAVGData(stats[0], temp, ax, freq)
-        min = ax.get_ylim()[0]
-        if (min > 0):
-            min = 0
-        max = ax.get_ylim()[1]
-        ax.set_ylim(min,max)
-        ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
-        pre_title = "Fitness for: "
+        if (multi):
+            fig, plots = plt.subplots(len(evalFunc),1,figsize=(12, 8))
+            i = 0
+            for ax in plots:
+                fitnessData = list(numpy.array(data)[:,1+i])
+                ax = plotLogbookAVGData(stats[0], fitnessData, ax, freq)
+                i += 1
+                min = ax.get_ylim()[0]
+                if (min > 0):
+                    min = 0
+                max = ax.get_ylim()[1]
+                ax.set_ylim(min,max)
+            #plots.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+            pre_title = "Fitness for: "
+        else:
+            fig, ax = plt.subplots(figsize=(12, 8))
+            fitnessData = list(numpy.array(data)[:,1])
+            ax = plotLogbookAVGData(stats[0], fitnessData, ax, freq)
+            min = ax.get_ylim()[0]
+            if (min > 0):
+                min = 0
+            max = ax.get_ylim()[1]
+            ax.set_ylim(min,max)
+            ax.set_position((.1, .18, .8, .72)) # [pos from left, pos from bottom, width, height]
+            pre_title = "Fitness for: "
+            fig.text(0.1,0.01,info, fontsize=10)
     else:
         fig, plots = plt.subplots(3, 2,figsize=(18,16))
         s = 0
@@ -175,12 +192,15 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
             for ax in ay:
                 if (s < len(stats)):
                     stat = stats[s]
-                    temp = list(numpy.array(data)[:,s+2])
+                    objectives = 1
+                    if (multi):
+                        objectives = len(evalFunc)
+                    statData = list(numpy.array(data)[:,s+1+objectives])
                     if (s==2):
                         temp2 = list(numpy.array(data)[:,-1])
-                        ax = plotLogbookAVGData(stat, temp, ax, freq, data2=temp2)
+                        ax = plotLogbookAVGData(stat, statData, ax, freq, data2=temp2)
                     else:
-                        ax = plotLogbookAVGData(stat, temp, ax, freq)
+                        ax = plotLogbookAVGData(stat, statData, ax, freq)
                     min = ax.get_ylim()[0]
                     if (min > 0):
                         min = 0
@@ -188,7 +208,7 @@ def plotLogbookAVG(data, logbook_filename, stats, title, info, saveAsPDF, saveAs
                     ax.set_ylim(min,max)
                     s += 1
         pre_title = "Measures for: "
-    fig.text(0.1,0.01,info, fontsize=10)
+        fig.text(0.1,0.01,info, fontsize=10)
     plt.suptitle(pre_title+title, fontsize=20)
     logger.info("DONE.\n")
 
@@ -226,6 +246,85 @@ def plotLogbookAVGData(data_name,data, ax, freq, data2=None):
         labs = [l.get_label() for l in lns]
         ax.legend(lns, labs, loc="center right")
     return ax
+
+# -----------------------------------------------------------------------------------
+# Print Logbook AVG of several experiments into graph for single objective EAs
+# NOT FINISHED
+# -----------------------------------------------------------------------------------
+def plotAllParetoFronts(data, logbook_filename, exp_Cnt, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG, freq, multi=False, evalFunc=[]):
+
+    ax1 = plt.subplot2grid((3,3), (0,0), colspan=2, rowspan=2)
+    ax2 = plt.subplot2grid((3,3), (0,2), colspan=2, rowspan=2)
+    ax3 = plt.subplot2grid((3,3), (2, 0))
+    ax4 = plt.subplot2grid((3,3), (2, 1))
+    ax5 = plt.subplot2grid((3,3), (2, 2))
+    ax6 = plt.subplot2grid((3,3), (2, 3))
+    ax7 = plt.subplot2grid((3,3), (3, 0))
+    ax8 = plt.subplot2grid((3,3), (3, 1))
+    ax9 = plt.subplot2grid((3,3), (3, 2))
+    ax10 = plt.subplot2grid((3,3), (3, 3))
+    plots = [ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10]
+    i = 0
+    for ax in plots:
+        # Plot a scatter graph of all results
+        size = len(results)
+        colors = plt.cm.rainbow(numpy.linspace(start=0, stop=1, num=size))
+        generation = freq
+        i = 0
+        while ((i < size) and (generation <= generations)):
+            c = colors[i]
+            generationResults = numpy.array(results[generation], dtype=object)
+            pop_size = len(generationResults)
+            if (pop_size > 0):
+                objective1 = generationResults[:,0]
+                objective2 = generationResults[:,1]
+                #ax.scatter(objective1, objective2, color=c)
+                #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
+                # Find lowest values for cost and highest for savings
+                p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
+                ax.plot(p_front[0], p_front[1],color=c)
+                i += 1
+            generation += freq
+        ax.set_xlim(0)
+        ax.set_ylim(0)
+        ax.set_xlabel('Objective: '+evalFunc[0], fontsize=16)
+        ax.set_ylabel('Objective: '+evalFunc[1], fontsize=16)
+        ax.tick_params(labelsize=14)
+        ax.set_position((.1, .18, .76, .72)) # [pos from left, pos from bottom, width, height]
+
+        Z = [[-1,-1],[-1,-1]]
+        #Z = [[0,0],[0,0]]
+        levels = range(0,generation - freq+1,freq)
+        data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
+        cbar_axes=fig.add_axes([0.88,.18,.02,.72])  # [pos from left, pos from bottom, width, height]
+        cbar = plt.colorbar(data, cax=cbar_axes)
+        cbar.set_label('Generations', fontsize=16)
+        cbar.ax.tick_params(labelsize=14)
+
+        fig.text(0.1,0.01, info, fontsize=10)
+        plt.suptitle("Fitness for: "+title, fontsize=20)
+        logger.info("DONE.\n")
+
+        if (saveAsPDF):
+            logger.info("Save plot as PDF...")
+            pp = PdfPages(logbook_filename+".pdf")
+            pp.savefig(fig)
+            pp.close()
+
+        if (saveAsSVG):
+            logger.info("Save plot as SVG...")
+            plt.savefig(logbook_filename+".svg")
+
+        if (saveAsPNG):
+            logger.info("Save plot as PNG...")
+            plt.savefig(logbook_filename+".png")
+            if (showPNG):
+                logger.info("Show plot...")
+                os.startfile(logbook_filename+".png")
+
+        plt.close('all')
+    else:
+        logger.warn("Number of objectives not supported")
 
 # -----------------------------------------------------------------------------------------
 # Visualize evaluation values of population in a plot over generations (Single Objective)
@@ -299,7 +398,7 @@ def showFitnessInPlot(results, generations, freq, filename, title, info, evalFun
 # -----------------------------------------------------------------------------------------
 # Visualize evaluation values of population in a plot (Multi Objective)
 # -----------------------------------------------------------------------------------------
-def showFitnessInPlotForMultiObjective(results, generations, freq, filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+def showFitnessInPlotForMultiObjective(results, generations, freq, filename, title, info, evalFunc, saveAsPDF=True, saveAsSVG=False, saveAsPNG=True, showPNG=False):
     logger.info("\nCreate plot...")
     if (len(evalFunc)==2):
         fig = plt.figure(figsize=(12, 8))
@@ -363,6 +462,118 @@ def showFitnessInPlotForMultiObjective(results, generations, freq, filename, tit
         plt.close('all')
     else:
         logger.warn("Number of objectives not supported")
+
+# -----------------------------------------------------------------------------------------
+# Visualize evaluation values of population in a plot (Multi Objective)
+# -----------------------------------------------------------------------------------------
+def plotLogbookForMultiObjective(results, generations, freq, filename, title, info, evalFunc, saveAsPDF=True, saveAsSVG=False, saveAsPNG=True, showPNG=False, population=[]):
+    logger.info("\nCreate plot...")
+    if (len(evalFunc)==2):
+        fig = plt.figure(figsize=(12, 8))
+        ax = fig.add_subplot(111)
+        # Plot a scatter graph of all results
+        size = len(results)
+        colors = plt.cm.rainbow(numpy.linspace(start=0, stop=1, num=size))
+        generation = freq
+        i = 0
+        while ((i < size) and (generation <= generations)):
+            c = colors[i]
+            generationResults = numpy.array(results[generation], dtype=object)
+            pop_size = len(generationResults)
+            if (pop_size > 0):
+                objective1 = generationResults[:,0]
+                objective2 = generationResults[:,1]
+                #ax.scatter(objective1, objective2, color=c)
+                #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
+                # Find lowest values for cost and highest for savings
+                p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
+                ax.plot(p_front[0], p_front[1],color=c)
+                i += 1
+            generation += freq
+        ax.set_xlim(0)
+        ax.set_ylim(0)
+        ax.set_xlabel('Objective: '+evalFunc[0], fontsize=16)
+        ax.set_ylabel('Objective: '+evalFunc[1], fontsize=16)
+        ax.tick_params(labelsize=14)
+        ax.set_position((.1, .18, .76, .72)) # [pos from left, pos from bottom, width, height]
+
+        Z = [[-1,-1],[-1,-1]]
+        #Z = [[0,0],[0,0]]
+        levels = range(0,generation - freq+1,freq)
+        data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
+        cbar_axes=fig.add_axes([0.88,.18,.02,.72])  # [pos from left, pos from bottom, width, height]
+        cbar = plt.colorbar(data, cax=cbar_axes)
+        cbar.set_label('Generations', fontsize=16)
+        cbar.ax.tick_params(labelsize=14)
+
+        fig.text(0.1,0.01, info, fontsize=10)
+        plt.suptitle("Fitness for: "+title, fontsize=20)
+        logger.info("DONE.\n")
+
+        if (saveAsPDF):
+            logger.info("Save plot as PDF...")
+            pp = PdfPages(filename+".pdf")
+            pp.savefig(fig)
+            pp.close()
+
+        if (saveAsSVG):
+            logger.info("Save plot as SVG...")
+            plt.savefig(filename+".svg")
+
+        if (saveAsPNG):
+            logger.info("Save plot as PNG...")
+            plt.savefig(filename+".png")
+            if (showPNG):
+                logger.info("Show plot...")
+                os.startfile(filename+".png")
+
+        plt.close('all')
+
+    else:
+        logger.warn("Plot not supported for 3 objectives")
+        '''fig = plt.figure(figsize=(12, 8))
+        ax = fig.gca(projection='3d')
+        # Plot a scatter graph of all results
+        size = len(results)
+        colors = plt.cm.rainbow(numpy.linspace(start=0, stop=1, num=size))
+        generation = freq
+        i = 0
+        while ((i < size) and (generation <= generations)):
+            c = colors[i]
+            generationResults = numpy.array(results[generation], dtype=object)
+            pop_size = len(generationResults)
+            if (pop_size > 0):
+                objective1 = generationResults[:,0]
+                objective2 = generationResults[:,1]
+                #ax.scatter(objective1, objective2, color=c)
+                #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
+                # Find lowest values for cost and highest for savings
+                p_front = pareto_frontier3d(population)
+                data = [list(a) for a in zip(*p_front)]
+                ax.plot(numpy.array(data[0]),numpy.array(data[1]),numpy.array(data[2]), color=c)
+                i += 1
+            generation += freq
+        ax.set_xlim(0)
+        ax.set_ylim(0)
+        ax.set_zlim(0)
+        ax.set_xlabel('Objective: '+evalFunc[0], fontsize=16)
+        ax.set_ylabel('Objective: '+evalFunc[1], fontsize=16)
+        ax.set_zlabel('Objective: '+evalFunc[2], fontsize=16)
+        ax.tick_params(labelsize=14)
+        ax.set_position((.1, .18, .76, .72)) # [pos from left, pos from bottom, width, height]
+
+        Z = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]]
+        #Z = [[0,0],[0,0]]
+        levels = range(0,generation - freq+1,freq)
+        data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
+        cbar_axes=fig.add_axes([0.88,.18,.02,.72])  # [pos from left, pos from bottom, width, height]
+        cbar = plt.colorbar(data, cax=cbar_axes)
+        cbar.set_label('Generations', fontsize=16)
+        cbar.ax.tick_params(labelsize=14)
+
+        fig.text(0.1,0.01, info, fontsize=10)
+        plt.suptitle("Fitness for: "+title, fontsize=20)
+        logger.info("DONE.\n")'''
 
 # -----------------------------------------------------------------------------------------
 #
@@ -482,8 +693,8 @@ def showBestResult(top_pop, generation, Original, filename, title, info, saveAsP
 # -----------------------------------------------------------------------------------------
 # Visualize UPMatrix
 # -----------------------------------------------------------------------------------------
-def visualizeUPMatrix(UPmatrix):
-    fig,ax = plt.subplots()
+def visualizeUPMatrix(UPmatrix,filename,saveAsPDF=True,saveAsPNG=True,showPNG=False):
+    fig,ax = plt.subplots(figsize=(100,10))
 
     ax.pcolor(numpy.array(UPmatrix),cmap=plt.cm.Blues,edgecolors='#FFFFFF',linewidths=0.5)
     ax.set_xticks(numpy.arange(UPmatrix.shape[1])+0.5)
@@ -499,11 +710,24 @@ def visualizeUPMatrix(UPmatrix):
     ax.set_yticklabels(range(0,UPmatrix.shape[0]),minor=False,fontsize=8)
     ax.tick_params(width=0)
 
-    plt.text(0.5,1.08,'User-Permission Matrix',horizontalalignment='center',transform=ax.transAxes)
+    plt.text(0.5,1.08,'User-Permission Matrix',horizontalalignment='center',transform=ax.transAxes,fontsize=72)
 
-    plt.ylabel('Users')
-    plt.xlabel('Permissions')
-    plt.show()
+    plt.ylabel('Users',fontsize=72)
+    plt.xlabel('Permissions',fontsize=72)
+
+    plt.tight_layout()
+
+    if (saveAsPDF):
+        pp = PdfPages(filename+".pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsPNG):
+        plt.savefig(filename+".png")
+        if (showPNG):
+            #plt.show()
+            os.startfile(filename+".png")
+    plt.close('all')
 
 # -----------------------------------------------------------------------------------------
 # Visualize the URMatrix, PRMatrix and UPMatrix
@@ -641,6 +865,46 @@ def pareto_frontier(Xs, Ys, maxX = True, maxY = True):
     p_frontX = [pair[0] for pair in p_front]
     p_frontY = [pair[1] for pair in p_front]
     return p_frontX, p_frontY
+
+def pareto_frontier3d(population):
+    inputPoints = []
+    for ind in population:
+        inputPoints.append(ind.fitness.values)
+    paretoPoints, dominatedPoints = simple_cull(inputPoints, dominates)
+    return paretoPoints
+
+def dominates(row, candidateRow):
+    return sum([row[x] >= candidateRow[x] for x in range(len(row))]) == len(row)
+
+def simple_cull(inputPoints, dominates):
+    paretoPoints = set()
+    candidateRowNr = 0
+    dominatedPoints = set()
+    while True:
+        candidateRow = inputPoints[candidateRowNr]
+        inputPoints.remove(candidateRow)
+        rowNr = 0
+        nonDominated = True
+        while len(inputPoints) != 0 and rowNr < len(inputPoints):
+            row = inputPoints[rowNr]
+            if dominates(candidateRow, row):
+                # If it is worse on all features remove the row from the array
+                inputPoints.remove(row)
+                dominatedPoints.add(tuple(row))
+            elif dominates(row, candidateRow):
+                nonDominated = False
+                dominatedPoints.add(tuple(candidateRow))
+                rowNr += 1
+            else:
+                rowNr += 1
+
+        if nonDominated:
+            # add the non-dominated point to the Pareto frontier
+            paretoPoints.add(tuple(candidateRow))
+
+        if len(inputPoints) == 0:
+            break
+    return paretoPoints, dominatedPoints
 
 # -----------------------------------------------------------------------------------------
 # Create boxplot of role count

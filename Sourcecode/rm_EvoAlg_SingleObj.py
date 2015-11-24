@@ -12,6 +12,8 @@ import rm_EAEvaluations as evals
 import rm_Visualization as visual
 import rm_Utils as utils
 import rm_Statistics as statistics
+import MatrixOperators as matrixOps
+import rm_EADecoder as decoder
 from collections import defaultdict
 import logging
 logger = logging.getLogger('root')
@@ -208,8 +210,10 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
             # Stop condition
-            if (untilSolutionFound and fit[0] == 0):
-                stop = True
+            if (untilSolutionFound):
+                array = decoder.resolveRoleModelChromosomeIntoBoolArray(ind[0], Original.shape[0], Original.shape[1])
+                conf, accs = matrixOps.compareMatrices(array,Original)
+                stop = (conf+accs)==0
 
         # Add Fitness values to results
         if generation % freq == 0:

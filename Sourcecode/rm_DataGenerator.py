@@ -557,16 +557,16 @@ def printDataIntoFiles(directory, users, roles, UPMatrix, URMatrix, RPMatrix, ru
 # -----------------------------------------------------------------------------------
 # Configuration parameters for Data Generator
 # -----------------------------------------------------------------------------------
-attributes = [['Sales','Motor','HumanResources'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
-userCnt = 10 #Total number of users
-userTypeCnt = 5 #Number of different usertypes (usertype is described by the users attributes)
-permissionCnt = 10 #Total number of permissions
-roleCnt = 4 #Total number of roles
-configPermissionsForRoles = [(0.2,8,10),(0.8,1,4)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
+attributes = [['Sales','Motor','HumanResources','Development','FacilityManagement','Marketing'],['Denmark','Germany','US'],['Internal','External']] #User attributes and attributevalues
+userCnt = 100 #Total number of users
+userTypeCnt = 25 #Number of different usertypes (usertype is described by the users attributes)
+permissionCnt = 100 #Total number of permissions
+roleCnt = 25 #Total number of roles
+configPermissionsForRoles = [(0.2,11,15),(0.8,2,10)] #Density of roles: (percentage of all roles, minPermissionCnt, maxPermissionCnt)
 #RPdensity = 0.8
 #maxPermissionForRole = 46
-maxPermissionUsage = 3 #How often a permission can occur in different roles
-maxRuleConditionCnt = 2 #
+maxPermissionUsage = 5 #How often a permission can occur in different roles
+maxRuleConditionCnt = 3 #
 noise = [0.02,0.04] #Artificial noise (bit-flip in UP-Matrix):[users with to few permissions, users with too many permissions]
 
 #roles = generateRoles3(roleCnt,permissionCnt,maxPermissionForRole, maxPermissionUsage, RPdensity)

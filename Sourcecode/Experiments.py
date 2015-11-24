@@ -30,9 +30,9 @@ def getDataSet(DATA):
     constraints = []
     if (DATA=="healthcare"):
         Original = numpy.matrix(parser.read("..\\TestData\\healthcare.rbac"))
-        userAttributeValues = parser.readUserAttributes2("..\\TestData\\healthcare_5_cust.attr",Original.shape[0])
+        #userAttributeValues = parser.readUserAttributes2("..\\TestData\\healthcare_5_cust.attr",Original.shape[0])
     elif (DATA=="domino"):
-        Original = numpy.matrix(parser.read("..\\TestData\\domino.rbac"))
+        Original = numpy.matrix(parser.read2("..\\TestData\\domino.rbac"))
     elif (DATA=="emea"):
         Original = numpy.matrix(parser.read("..\\TestData\\emea.rbac"))
     elif (DATA=="apj"):
@@ -112,6 +112,8 @@ def executeExperimentFromFile():
 
         eval_weights = []
         obj_weights = []
+        tournsize = 0
+        MUTPB_All = 0.0
 
         experimentNumber = 0
         for experiment in experiments:
@@ -228,7 +230,7 @@ def executeExperimentFromFile():
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq)
+            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType=="Multi"),evalFunc=evalFunc)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Asks user for configuration for the experiment
@@ -504,7 +506,7 @@ def executeDefaultExperiment():
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq)
+    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType=="Multi"),evalFunc=evalFunc)
 
 # create logger with 'spam_application'
 logger = logging.getLogger('root')
