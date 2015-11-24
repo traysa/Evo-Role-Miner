@@ -1,6 +1,7 @@
-\subsection{Phase Three - Parameters}
+\section{Experiment 4 and 5 - Adjusting Parameters}
 \label{sec:phase3}
-In the third phase the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} and $F_{edge}^{min}$ \eqref{eq:FEdgeMin} are tested again on the small synthetic dataset 1 and the healthcare dataset, but with an adjusted setup as shown in table \ref{tab:setup3}. The setup is relaxing the objective for minimizing the role model complexity.\\
+In this set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} and $F_{edge}^{min}$ \eqref{eq:FEdgeMin} are tested again on the small synthetic dataset 1 and the healthcare dataset, but with an adjusted setup as shown in table \ref{tab:setup3}. The setup is relaxing the objective for minimizing the role model complexity (role count, assignment counts).
+
 \begin{table}[H]
     \centering
     \begin{tabular}{|l|l|}
@@ -18,14 +19,15 @@ In the third phase the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} 
         MUTPB-Type5: Remove User        & 0.25              \\ \hline
         MUTPB-Type6: Remove Permission  & 0.25              \\ \hline
         Tournament size                 & 2                 \\ \hline
-        Local optimization              & \hl{True}         \\ \hline
+        Local optimization              & True        		\\ \hline
         Weights for Fitness Function    & 0.1, 1.0, 1.0     \\ \hline
     \end{tabular}
-    \caption{EXPERIMENT 3 setup}
+    \caption{EXPERIMENT 4 and 5 setup}
     \label{tab:setup3}
 \end{table}
 
-The results can be seen in experiment 4 in table \ref{tab:results_exp2_dataset1} and experiment 5 in table \ref{tab:results_exp2_healthcare}. The results show that solutions with better fitness can be found by adjusting the parameters. The best fitness solution of the experiments with the healthcare dataset can be seen in Figure \ref{fig:exp5edge_RM}. The solution belongs to the experiments with fitness functions $F_{edge}^{min}$ and has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. Example fitness-optimal solution for the synthetic dataset 1 can be seen in the Appendix in Figure \ref{fig:exp4aBasic_RM} and \ref{fig:exp4bEdge_RM}.\\
+The results can be seen in experiment 4 in table \ref{tab:results_exp2_dataset1} and experiment 5 in table \ref{tab:results_exp2_healthcare}. The results show that solutions with better fitness can be found by adjusting the parameters. The best fitness solution of the experiments with the healthcare dataset can be seen in Figure \ref{fig:exp5edge_RM}. The solution belongs to the experiments with fitness functions $F_{edge}^{min}$ and has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. Example fitness-optimal solution for the synthetic dataset 1 can be seen in the Appendix \ref{sec:experiment4a} and \ref{sec:experiment4b}.
+
 There are many parameters, which can be adjusted and other settings might lead to even better results. But these adjustments have been done based on some knowledge, which might not be given.
 
 \begin{figure}[H]
@@ -34,3 +36,14 @@ There are many parameters, which can be adjusted and other settings might lead t
     \caption{EXPERIMENT 5b: Example of fitness-optimal solution role model resulting of EvoRoleMiner with Fitness function $F_{edge}^{min}$ on healthcare dataset with setup in table \ref{tab:setup3}. From u.l. to l.r.: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more usre-role- and role-permission assignments causing the user-permission assignment.}
     \label{fig:exp5edge_RM}
 \end{figure}
+
+Another critical point is the diversity of the individuals in the populations. When looking on the role count diversity it can be noted, that the individuals of a population quickly get the same role count size. The boxplot in Figure \ref{fig:exp3a_diversity} visualizes the role count diversity of the individuals in a population in different generations in one of the experiments. The boxplots in the other experiment look similar.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{./Figures/exp3a_diversity}
+	\caption{EXPERIMENT 3a: Example boxplot of role count diversity of individuals of a population in different generations.}
+	\label{fig:exp3a_diversity}
+\end{figure}
+
+It is therefore not surprising that it is difficult for the Evo-RoleMiner to find a solution with a minimum amount of violations.

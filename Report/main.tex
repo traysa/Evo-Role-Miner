@@ -4,6 +4,9 @@
 
 % Packages for Line spacing
 \linespread{1.3} % 1.5 spacing
+\usepackage[english]{babel}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{1em}
   
 %Graphics
 \usepackage{graphicx}
@@ -111,8 +114,9 @@
 \newpage
 \begin{appendices}
     \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
-    \chapter{Appendix}
+    \chapter{Implementation}
         \import{chapters/}{15_Appendix.tex}
+    \chapter{Experiments}
         \import{chapters/}{16_AppendixB.tex}
 \end{appendices}
 
