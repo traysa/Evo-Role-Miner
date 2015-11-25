@@ -10,7 +10,7 @@
   
 %Graphics
 \usepackage{graphicx}
-\graphicspath{ {Figures/} }
+\graphicspath{ {./Figures/} }
 \DeclareGraphicsExtensions{.png,.jpg,.pdf} 
 \usepackage{afterpage}
 \usepackage[font={small,it}]{caption}
@@ -29,6 +29,13 @@
 \usepackage{listliketab}
 \usepackage{color, colortbl}
 \definecolor{myGray}{gray}{0.9}
+
+\usepackage{rotating}
+\usepackage{tabularx}
+\usepackage{mathptmx}
+\usepackage{textcomp}
+\usepackage{array}
+%\usepackage{adjustbox}
 
 % Packages for bibliography
 \usepackage[square, numbers, comma, sort&compress]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' 
@@ -87,14 +94,18 @@
 
 \import{chapters/}{05_Introduction.tex}
 
+\graphicspath{ {./Figures/06_Domain/} }
 \import{chapters/}{06_Domain.tex}
 
+\graphicspath{ {./Figures/07_EABackground/} }
 \import{chapters/}{07_EABackground.tex}
 
 \import{chapters/}{08_RelatedWork.tex}
 
+\graphicspath{ {./Figures/09_Approach/} }
 \import{chapters/}{09_Approach.tex}
 
+\graphicspath{ {./Figures/10_Experiments/} }
 \import{chapters/}{10_Experiments.tex}
 
 \import{chapters/}{11_Discussion.tex}
@@ -105,19 +116,15 @@
 
 \import{chapters/}{14_References.tex}
 
-\clearpage
-\listoffigures
-
-\clearpage
-\listoftables
-
 \newpage
 \begin{appendices}
     \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
     \chapter{Implementation}
-        \import{chapters/}{15_Appendix.tex}
-    \chapter{Experiments}
+        \import{chapters/}{15_AppendixA.tex}
+    \chapter{Datasets}
         \import{chapters/}{16_AppendixB.tex}
+    \chapter{Experiment Results}
+	    \import{chapters/}{17_AppendixC.tex}
 \end{appendices}
 
 \end{document}

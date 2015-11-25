@@ -163,12 +163,15 @@ In this section a basic introduction to the domain is given. It is important tha
     \begin{itemize}
         \item \textbf{The Basic Role-Mining Problem}\cite{Vaidya:2007}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and does not deviate from $UPA$."}
+        The Basic RMP is the most commonly researched RMP. The minimal set of roles is probably different from the most useful set of roles, but it is argued that a minimal set of roles is appropriate when semantic information (i.e. human expert knowledge) is not given and that it is already helping security administrators by knowing the minimum required to accurately describe the current access policy configurations.
         
         \item \textbf{The $\delta$-approx. Role-Mining Problem}\cite{Vaidya:2007}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and deviates from $UPA$ with less than $\delta$ assignments."}
+        Compared to the Basic RMP, the $\delta$-approx. RMP bounds the degree of availability violations (underentitlements). The Basic RMP is a subproblem of the $\delta$-approx. RMP where $\delta$ is 0. It is argued that the strict Basic RMP might not be good for the dynamic environment of users and permissions, which can change over time.
         
         \item \textbf{The Min-Noise Role-Mining Problem}\cite{Vaidya:2007}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, and the number of roles $k$, find an RBAC configuration $RC$ with $k$ roles, minimizing the deviation between $UPA$ and $RC$."}
+        Compared to the $\delta$-approx. RMP, the Min-Noise RMP bounds the number of roles, and minimizes the $\delta$-approximation.
         
         \item \textbf{The Min-Edge Role-Mining Problem}\cite{4497438}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that is consistent with $UPA$ and minimizes the number user-role assignments and role-permission assignments."}
@@ -180,6 +183,9 @@ In this section a basic introduction to the domain is given. It is important tha
         2. $RC*$ reflects top-down information ($TDI$).\\
         3. Exceptions (errors) might exist."}
     \end{itemize}
+    
+    In Vaidya et al.\cite{Vaidya:2007} it is shown that the Basic RMP, the $\delta$-approx. RMP and the Min-Noise RMP are NP-complete problems. The problems are mapped to the database tiling and the discrete basis problem, which are in the area of data mining and data analysis.
+    
     \subsection{Related Problem: Boolean Matrix Decomposition Problem}
     \hl{The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem.} In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
     \begin{itemize}
@@ -190,5 +196,5 @@ In this section a basic introduction to the domain is given. It is important tha
     \end{itemize}
     For RMP a user-permission assignment matrix ($C$) needs to be decomposed into a user-role assignments matrix ($A$) and a role-permission assignments matrix ($B$). Variable $k$ then represents the number of roles, variable $m$ and $n$ the number of users and permissions accordingly. Therefore finding the minimal $k$ in the BMD problem corresponds to finding the minimal number of roles in the basic RMP. The notion of BMD for the RMP is also used in this thesis and has been already introduced in previous sections (see Figure \ref{fig:roleminingExample} and \ref{fig:rolemodelComparison}).
     
-\newline
+    
 In this thesis the role mining problem is tackled with evolutionary algorithms. An introduction to evolutionary algorithms is given in the next chapter.

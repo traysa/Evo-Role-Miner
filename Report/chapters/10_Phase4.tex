@@ -26,27 +26,48 @@ To counteract on the diversity problem and the strong bias of the complexity mea
 	\label{tab:setup4}
 \end{table}
 
-The results are illustrated in Figure \ref{fig:exp6_fitness} and \ref{fig:exp6_measures} 
+The results for the synthetic dataset 1 are illustrated in Figure \ref{fig:exp6_fitness} and \ref{fig:exp6_measures}. For the healthcare dataset the results can be seen in Figure \ref{fig:exp7_fitness} and \ref{fig:exp7_measures}.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.35, trim=0cm 2cm 0cm 2cm, clip=true]{./Figures/exp6_fitness}
-	\caption{EXPERIMENT 6a: Pareto fronts of each generation in the experiment with EvoRoleMiner$M$ on the synthetic dataset 1}
+	\includegraphics[scale=0.35, trim=0cm 2cm 0cm 1.5cm, clip=true]{exp6_fitness}
+	\caption{EXPERIMENT 6: Fitness of individuals over several generations in one of the experiments with EvoRoleMiner$M$ on the synthetic dataset 1.}
 	\label{fig:exp6_fitness}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.33, trim=4cm 2cm 4cm 0cm, clip=true]{./Figures/exp6_measures}
-	\caption{EXPERIMENT 6a: Single objective measures in the experiment with EvoRoleMiner$M$ on the synthetic dataset 1}
-	\label{fig:exp6_measures}
+	\includegraphics[scale=0.35, trim=0cm 2cm 0cm 1.5cm, clip=true]{exp7_fitness}
+	\caption{EXPERIMENT 7: Pareto fronts of each generation in the experiment with EvoRoleMiner$M$ on the healthcare dataset}
+	\label{fig:exp7_fitness}
 \end{figure}
-
-A boxplot on the diversity of the role count of individuals of a population is shown in Figure \ref{fig:exp6_boxplot}.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.3]{./Figures/exp6_boxplot}
-	\caption{EXPERIMENT 6a: Example boxplot of role count diversity of individuals of a population in different generations with EvoRoleMiner$M$ on the synthetic dataset 1.}
+	\includegraphics[scale=0.33, trim=4cm 2cm 4cm 0cm, clip=true]{exp6_measures}
+	\caption{EXPERIMENT 6: Average optimum of the single objective measures of the ten experiments with EvoRoleMiner$M$ on the synthetic dataset 1}
+	\label{fig:exp6_measures}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.33, trim=4cm 2cm 4cm 0cm, clip=true]{exp7_measures}
+	\caption{EXPERIMENT 7: Average optimum of the single objective measures of the ten experiments with EvoRoleMiner$M$ on the healthcare dataset. The Interpretability measure is not activated and therefore constantly zero.}
+	\label{fig:exp7_measures}
+\end{figure}
+
+Example boxplots on the diversity of the role count of individuals of a population is shown in Figure \ref{fig:exp6_boxplot} for the dataset 1 and Figure \ref{fig:exp7_boxplot} for the healthcare dataset.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{exp6_boxplot}
+	\caption{EXPERIMENT 6: Example boxplot of role count diversity of individuals of a population in different generations with EvoRoleMiner$M$ on the synthetic dataset 1.}
 	\label{fig:exp6_boxplot}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.3]{exp7_boxplot}
+	\caption{EXPERIMENT 7: Example boxplot of role count diversity of individuals of a population in different generations with EvoRoleMiner$M$ on the healthcare dataset.}
+	\label{fig:exp7_boxplot}
 \end{figure}

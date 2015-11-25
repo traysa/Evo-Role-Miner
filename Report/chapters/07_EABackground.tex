@@ -4,7 +4,7 @@
 Evolutionary algorithms (EAs) are stochastic search algorithms inspired by the concept of the natural evolution. The general idea is to have a population of individuals, which is evolving over generations to create fitter individuals by natural selection (survival of the fittest). There are different variants of EAs: Genetic algorithms (GA), evolution strategies (ES), evolutionary programming (EP) and genetic programming (GP). All variants follow the same common concept described in the following with differences in technical details such as the representation of individuals\cite{Eiben}. Figure \ref{fig:eaflowchart} shows a flow chart of an evolutionary algorithm process, which will be described in the following.\\
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.27]{./Figures/EAFlowchart}
+	\includegraphics[scale=0.27]{EAFlowchart}
 	\caption{The general scheme of an evolutionary algorithm as a flow-chart \cite{Eiben}}
 	\label{fig:eaflowchart}
 \end{figure}
@@ -47,7 +47,7 @@ By preserving the possibility that candidate solutions with a lower fitness can 
     An example of a MOP could be buying an airplane ticket for a flight from city X to destination Y, where the buyer takes several factors into account. For simplification lets say the factors are price and travel time, where the rule is: The shorter the travel time, the higher the price. The buyer wants the cheapest airplane ticket and the shortest travel time, so he probably has to make a compromise between these two factors. There is a set of solutions for the two objective problem: From cheap long-travel to expensive short-travel solution.
     \begin{figure}
         \centering
-        \includegraphics[scale=0.3]{./Figures/ParetoExample2}
+        \includegraphics[scale=0.3]{ParetoExample2}
         \caption{MOP Example: Buying an airplane ticket for a flight from X to Y with the objectives price and travel-time. A dot represents an offer from an airline. The red dots represents the optimal offers regarding the objectives, while the yellow dots are suboptimal offers.}
         \label{fig:paretoExample}
     \end{figure}
@@ -65,7 +65,7 @@ By preserving the possibility that candidate solutions with a lower fitness can 
     The new parent population $P_{P}^{t+1}$ of size $N$ in generation $t$ is formed by the individuals in $P_R$ with the lowest non-domination level assigned, starting with the individuals from $F_1$ then from $F_2$ and so on. The individuals of a non-domination level $F_i$ are only added to $P_{P}^{t+1}$, if the resulting population size is not exceeding $N$. If the addition of the individuals in $F_i$ is violating this condition, only the individuals in $F_i$ with the best crowding distance are added to $P_{P}^{t+1}$. Figure \ref{fig:nsga2procedure} visualizes the construction of the new parent population $P_{P}^{t+1}$.\\
     \begin{figure}
         \centering
-        \includegraphics[scale=0.3]{./Figures/NSGA2Procedure}
+        \includegraphics[scale=0.3]{NSGA2Procedure}
         \caption{NSGA-II procedure\cite{Deb:2002}}
         \label{fig:nsga2procedure}
     \end{figure}
@@ -108,7 +108,7 @@ By preserving the possibility that candidate solutions with a lower fitness can 
     The crowding distance of an individual with respect to one objective $m$ is calculated by the distance of the left and right neighbour of the individual according to their normalized fitness values. Individuals in the boundary of a non-dominated level (individuals with smallest and largest fitness values according to n objective) get an infinite distance value assigned. The crowding distance of an individual with respect to all objectives, is the sum of the distance values for each objective of an individual. Figure \ref{fig:crowdingDistance} demonstrates the calculation of an individual crowding distance value according to two objectives.\\
     \begin{figure}
         \centering
-        \includegraphics[scale=0.3]{./Figures/CrowdingDistance}
+        \includegraphics[scale=0.3]{CrowdingDistance}
         \caption{Crowding-distance calculation of an individual $i$ corresponding to two objectives. Points of the same color represent the individuals of a non-domination level.}
         \label{fig:crowdingDistance}
     \end{figure}

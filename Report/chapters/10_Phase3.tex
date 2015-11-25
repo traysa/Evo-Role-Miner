@@ -26,13 +26,13 @@ In this set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBa
     \label{tab:setup3}
 \end{table}
 
-The results can be seen in experiment 4 in table \ref{tab:results_exp2_dataset1} and experiment 5 in table \ref{tab:results_exp2_healthcare}. The results show that solutions with better fitness can be found by adjusting the parameters. The best fitness solution of the experiments with the healthcare dataset can be seen in Figure \ref{fig:exp5edge_RM}. The solution belongs to the experiments with fitness functions $F_{edge}^{min}$ and has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. Example fitness-optimal solution for the synthetic dataset 1 can be seen in the Appendix \ref{sec:experiment4a} and \ref{sec:experiment4b}.
+The results can be seen in experiment 4 in table \ref{tab:results_exp2_dataset1} and experiment 5 in table \ref{tab:results_exp2_healthcare}. The results show that solutions with better fitness can be found by adjusting the parameters. One of the individuals with the best fitness solution of the experiments with the healthcare dataset can be seen in Figure \ref{fig:exp5edge_RM}. The solution belongs to the experiments with fitness functions $F_{edge}^{min}$ and has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. The fitness measure of the individual is 0.032. Examples of individuals with the best achieved fitness for the synthetic dataset 1 can be seen in the Appendix \ref{sec:experiment4a} and \ref{sec:experiment4b}.
 
-There are many parameters, which can be adjusted and other settings might lead to even better results. But these adjustments have been done based on some knowledge, which might not be given.
+There are many parameters, which can be adjusted and other settings might lead to even better results. These adjustments can be done based on some pre-knowledge, which might not be given.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.37, trim=4cm 2cm 4cm 2cm, clip=true]{./Figures/exp5edge_RM}
+    \includegraphics[scale=0.37, trim=4cm 2cm 4cm 2cm, clip=true]{exp5edge_RM}
     \caption{EXPERIMENT 5b: Example of fitness-optimal solution role model resulting of EvoRoleMiner with Fitness function $F_{edge}^{min}$ on healthcare dataset with setup in table \ref{tab:setup3}. From u.l. to l.r.: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more usre-role- and role-permission assignments causing the user-permission assignment.}
     \label{fig:exp5edge_RM}
 \end{figure}
@@ -41,9 +41,9 @@ Another critical point is the diversity of the individuals in the populations. W
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.3]{./Figures/exp3a_diversity}
-	\caption{EXPERIMENT 3a: Example boxplot of role count diversity of individuals of a population in different generations.}
+	\includegraphics[scale=0.3]{exp3a_diversity}
+	\caption{EXPERIMENT 3a: Example boxplot of role count diversity of individuals of a population in different generations.Experiment was executed on the healthcare dataset.}
 	\label{fig:exp3a_diversity}
 \end{figure}
 
-It is therefore not surprising that it is difficult for the Evo-RoleMiner to find a solution with a minimum amount of violations.
+It is therefore not surprising that it is difficult for the Evo-RoleMiner to find an individual with a minimum amount of violations.
