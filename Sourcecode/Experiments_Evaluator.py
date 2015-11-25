@@ -1,8 +1,9 @@
 __author__ = 'Theresa'
-import os, json
+import os, json, pickle
 import numpy
 import rm_Visualization as visual
 import logging
+from deap import creator, base, tools, algorithms
 logger = logging.getLogger('root')
 
 # -----------------------------------------------------------------------------------
@@ -48,7 +49,7 @@ def summarizeLogbooks(logbookfolder,freq):
 # -----------------------------------------------------------------------------------
 # Summarize logbook for multi objective EA
 # -----------------------------------------------------------------------------------
-def summarizeLogbooks_Multi(logbookfolder,freq, evalFunc):
+def summarizeLogbooks_Multi(logbookfolder, freq, evalFunc):
     json_files = [pos_json for pos_json in os.listdir(logbookfolder) if pos_json.endswith('.json')]
     cnt_jsonFiles = len(json_files)
     logger.debug("json_files: "+str(cnt_jsonFiles))
@@ -95,11 +96,35 @@ def summarizeLogbooks_Multi(logbookfolder,freq, evalFunc):
     #    print(i)
     return results_summedUp, json_files
 
-def execute(dirname,setupInfo,fileExt,freq,multi=False,evalFunc=[]):
+# -----------------------------------------------------------------------------------
+# Read population pickle file
+# -----------------------------------------------------------------------------------
+def populationReader_Multi(populationFile):
+    creator.create("FitnessMinMax", base.Fitness, weights=(-1.0,-1.0))  # MINIMIZATION
+    creator.create("Individual", list, fitness=creator.FitnessMinMax)
+    cp = pickle.load(open(populationFile, "rb"))
+    population = cp["population"]
+    return population
+
+# -----------------------------------------------------------------------------------
+# Read all last populations of all experiments
+# -----------------------------------------------------------------------------------
+def readAllLastPopulations(popfolder, generation):
+    populationFolders = [foldername for foldername in os.listdir(popfolder) if foldername.endswith('Populations')]
+    data = []
+    for folder in populationFolders:
+        data += populationReader_Multi(popfolder+"\\"+folder+"\\Generation_"+str(generation)+"_population.pkl")
+    return data
+
+def execute(dirname,setupInfo,fileExt,freq,multi=False,evalFunc=[],popfolder='',generation=0):
     if (multi):
         data, json_files = summarizeLogbooks_Multi(dirname,freq,evalFunc)
         title = fileExt[1:]+"\n(AVG of "+str(len(json_files))+" experiments)"
-        #visual.plotAllParetoFronts(data, dirname+"\\logbook_AVG", expCnt, title, setupInfo, True, False, True, False,freq)
+        ind_data = readAllLastPopulations(popfolder,generation)
+        results = []
+        for ind in ind_data:
+            results.append(ind.fitness.values)
+        visual.plotSummarizedParetoFront(results, dirname+"\\logbook_AVG", title, setupInfo, evalFunc, True, False, True, False)
     else:
         data, json_files = summarizeLogbooks(dirname,freq)
         title = fileExt[1:]+"\n(AVG of "+str(len(json_files))+" experiments)"

@@ -7,6 +7,7 @@ import rm_FileParser as parser
 import rm_Visualization as visual
 import rm_EAEvaluations as evals
 import nsga2_classic as nsga2
+import Experiments_Evaluator as exp_eval
 from collections import defaultdict
 
 # -----------------------------------------------------------------------------------
@@ -127,13 +128,24 @@ populationFile = "..\\Output\\20151124-1629_EXP_Multi\\Multi_Conf_Accs\\Populati
 output_filename = "..\\Output\\lastpopulation"
 OriginalFile = "..\\TestData\\GeneratedData_Set1\\URMatrix.csv"
 OriginalFile = "..\\TestData\\healthcare.rbac"
-population = populationReader_Multi(populationFile)
+#population = populationReader_Multi(populationFile)
 
-front = nsga2.sortNondominated(population, len(population), first_front_only=True)
+#front = nsga2.sortNondominated(population, len(population), first_front_only=True)
 
-printStatistics(front[0],OriginalFile,10)
+#printStatistics(front[0],OriginalFile,10)
 #getIndWithLowestRoleCnt(population,OriginalFile,10)
 #getIndWithLowestURRPCnt(population,OriginalFile,10)
-drawPareto(population,output_filename)
+#drawPareto(population,output_filename)
+
+dirname = ""
+setupInfo = ""
+fileExt = ""
+freq = 0
+multi=True
+evalFunc=["Confidentiality","Availability"]
+popfolder=''
+generation=1000
+
+exp_eval.execute(dirname,setupInfo,fileExt,freq,multi=multi,evalFunc=evalFunc,popfolder=popfolder,generation=generation)
 
 

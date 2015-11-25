@@ -221,7 +221,7 @@ def executeExperimentFromFile():
                     sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                      NGEN, numberOfTrialItems, freq)
                 else:
-                    logbooksSubsubdirectory,setupInfo,fileExt = rm_builder.startExperiment(directory, Name, experimentNumber,
+                    logbooksSubsubdirectory,setupInfo,fileExt, popfolder = rm_builder.startExperiment(directory, Name, experimentNumber,
                                                         experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
                                                         MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                                         removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
@@ -230,7 +230,7 @@ def executeExperimentFromFile():
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType=="Multi"),evalFunc=evalFunc)
+            exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType.startswith("Multi")),evalFunc=evalFunc,popfolder=popfolder,generation=NGEN)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Asks user for configuration for the experiment
@@ -497,7 +497,7 @@ def executeDefaultExperiment():
             sane.execute(Original, POP_SIZE, removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN,
                          numberOfTrialItems, freq)
         else:
-            logbooksSubsubdirectory,setupInfo,fileExt = rm_builder.startExperiment(directory, Name, 1, experimentCnt,
+            logbooksSubsubdirectory,setupInfo,fileExt, popfolder = rm_builder.startExperiment(directory, Name, 1, experimentCnt,
                                                         Original, DATA, POP_SIZE, tournsize, CXPB, MUTPB_All,
                                                         addRolePB, removeRolePB, removeUserPB, removePermissionPB,
                                                         addUserPB, addPermissionPB, NGEN, freq, evolutionType, evalFunc,
@@ -506,7 +506,7 @@ def executeDefaultExperiment():
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
                                                         constraints=constraints)
-    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType=="Multi"),evalFunc=evalFunc)
+    exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType.startswith("Multi")),evalFunc=evalFunc,popfolder=popfolder,generation=NGEN)
 
 # create logger with 'spam_application'
 logger = logging.getLogger('root')

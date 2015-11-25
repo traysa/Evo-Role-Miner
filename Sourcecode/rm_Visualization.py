@@ -251,40 +251,19 @@ def plotLogbookAVGData(data_name,data, ax, freq, data2=None):
 # Print Logbook AVG of several experiments into graph for single objective EAs
 # NOT FINISHED
 # -----------------------------------------------------------------------------------
-def plotAllParetoFronts(data, logbook_filename, exp_Cnt, title, info, saveAsPDF, saveAsSVG, saveAsPNG, showPNG, freq, multi=False, evalFunc=[]):
-
-    ax1 = plt.subplot2grid((3,3), (0,0), colspan=2, rowspan=2)
-    ax2 = plt.subplot2grid((3,3), (0,2), colspan=2, rowspan=2)
-    ax3 = plt.subplot2grid((3,3), (2, 0))
-    ax4 = plt.subplot2grid((3,3), (2, 1))
-    ax5 = plt.subplot2grid((3,3), (2, 2))
-    ax6 = plt.subplot2grid((3,3), (2, 3))
-    ax7 = plt.subplot2grid((3,3), (3, 0))
-    ax8 = plt.subplot2grid((3,3), (3, 1))
-    ax9 = plt.subplot2grid((3,3), (3, 2))
-    ax10 = plt.subplot2grid((3,3), (3, 3))
-    plots = [ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10]
-    i = 0
-    for ax in plots:
+def plotSummarizedParetoFront(data, filename, title, info, evalFunc, saveAsPDF, saveAsSVG, saveAsPNG, showPNG):
+    logger.info("\nCreate plot...")
+    if (len(evalFunc)==2):
+        fig = plt.figure(figsize=(12, 8))
+        ax = fig.add_subplot(111)
         # Plot a scatter graph of all results
-        size = len(results)
-        colors = plt.cm.rainbow(numpy.linspace(start=0, stop=1, num=size))
-        generation = freq
-        i = 0
-        while ((i < size) and (generation <= generations)):
-            c = colors[i]
-            generationResults = numpy.array(results[generation], dtype=object)
-            pop_size = len(generationResults)
-            if (pop_size > 0):
-                objective1 = generationResults[:,0]
-                objective2 = generationResults[:,1]
-                #ax.scatter(objective1, objective2, color=c)
-                #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
-                # Find lowest values for cost and highest for savings
-                p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
-                ax.plot(p_front[0], p_front[1],color=c)
-                i += 1
-            generation += freq
+        data = numpy.array([list(elem) for elem in data])
+        objective1 = data[:,0]
+        objective2 = data[:,1]
+        # Find lowest values for cost and highest for savings
+        p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
+        ax.plot(p_front[0], p_front[1])
+
         ax.set_xlim(0)
         ax.set_ylim(0)
         ax.set_xlabel('Objective: '+evalFunc[0], fontsize=16)
@@ -292,39 +271,31 @@ def plotAllParetoFronts(data, logbook_filename, exp_Cnt, title, info, saveAsPDF,
         ax.tick_params(labelsize=14)
         ax.set_position((.1, .18, .76, .72)) # [pos from left, pos from bottom, width, height]
 
-        Z = [[-1,-1],[-1,-1]]
-        #Z = [[0,0],[0,0]]
-        levels = range(0,generation - freq+1,freq)
-        data = ax.contourf(Z, levels, cmap=plt.cm.rainbow)
-        cbar_axes=fig.add_axes([0.88,.18,.02,.72])  # [pos from left, pos from bottom, width, height]
-        cbar = plt.colorbar(data, cax=cbar_axes)
-        cbar.set_label('Generations', fontsize=16)
-        cbar.ax.tick_params(labelsize=14)
-
         fig.text(0.1,0.01, info, fontsize=10)
         plt.suptitle("Fitness for: "+title, fontsize=20)
         logger.info("DONE.\n")
 
         if (saveAsPDF):
             logger.info("Save plot as PDF...")
-            pp = PdfPages(logbook_filename+".pdf")
+            pp = PdfPages(filename+".pdf")
             pp.savefig(fig)
             pp.close()
 
         if (saveAsSVG):
             logger.info("Save plot as SVG...")
-            plt.savefig(logbook_filename+".svg")
+            plt.savefig(filename+".svg")
 
         if (saveAsPNG):
             logger.info("Save plot as PNG...")
-            plt.savefig(logbook_filename+".png")
+            plt.savefig(filename+".png")
             if (showPNG):
                 logger.info("Show plot...")
-                os.startfile(logbook_filename+".png")
+                os.startfile(filename+".png")
 
         plt.close('all')
+
     else:
-        logger.warn("Number of objectives not supported")
+        logger.warn("Plot not supported for 3 objectives")
 
 # -----------------------------------------------------------------------------------------
 # Visualize evaluation values of population in a plot over generations (Single Objective)
@@ -418,8 +389,8 @@ def showFitnessInPlotForMultiObjective(results, generations, freq, filename, tit
                 ax.scatter(objective1, objective2, color=c)
                 #ax.scatter([generation] * pop_size, objective, color=c, cmap=colors)
                 # Find lowest values for cost and highest for savings
-                p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
-                ax.plot(p_front[0], p_front[1],color=c)
+                #p_front = pareto_frontier(objective1, objective2, maxX = False, maxY = False)
+                #ax.plot(p_front[0], p_front[1],color=c)
                 i += 1
             generation += freq
         ax.set_xlim(0)
@@ -628,8 +599,8 @@ def showBestResult(top_pop, generation, Original, filename, title, info, saveAsP
         #if (bestFit > fit):
         #    bestFit = fit
         #    bestInd = ind
-    #if (bestInd != []):
-        UMatrix, PMatrix, UPMatrix = decoder.resolveRoleModelChromosomeIntoIntArrays(ind[0], Original.shape[0], Original.shape[1])
+        #if (bestInd != []):
+        UMatrix, PMatrix, UPMatrix = decoder.resolveRoleModelChromosomeIntoBoolArrays(ind[0], Original.shape[0], Original.shape[1])
 
         results.append(UMatrix)
         results.append(PMatrix)
@@ -686,8 +657,53 @@ def showBestResult(top_pop, generation, Original, filename, title, info, saveAsP
                 logger.info("Show plot...")
                 #plt.show()
                 os.startfile(filename+"_"+str(i)+".png")
+        plt.close('all')
+
+        UPMatrix2 = numpy.array(decoder.resolveRoleModelChromosomeIntoIntArray(ind[0], Original.shape[0], Original.shape[1]))
+        visualizeUPMatrixDuplicates(UPMatrix2,filename,title,info,i,saveAsPDF=saveAsPDF, saveAsSVG=saveAsSVG,saveAsPNG=saveAsPNG,showPNG=showPNG)
 
         i += 1
+
+# -----------------------------------------------------------------------------------------
+# Visualize UPMatrix with duplicate assignments
+# -----------------------------------------------------------------------------------------
+def visualizeUPMatrixDuplicates(UPmatrix,filename,title,info,index,saveAsPDF=True, saveAsSVG=False ,saveAsPNG=True,showPNG=False):
+    fig,ax = plt.subplots(figsize=(16,12))
+    x_length = UPmatrix.shape[1]
+    y_length = UPmatrix.shape[0]
+    cmap = plt.cm.Blues
+    cmap.set_under('white') # Color for values less than vmin
+    eps = numpy.spacing(0.0) # Very small float such that 0.0 != 0 + eps
+    ax.pcolor(UPmatrix, cmap=cmap, vmin=eps, edgecolors='#FFFFFF', linewidths=0.5)
+    ax.set_xticks(numpy.arange(x_length) + 0.5)
+    ax.set_yticks(numpy.arange(y_length) + 0.5)
+    #ax.xaxis.tick_top()
+    #ax.yaxis.tick_left()
+    ax.set_xlim(0, x_length)
+    ax.set_ylim(0, y_length)
+    ax.invert_yaxis()
+    ax.set_xticklabels(range(1, x_length+1), minor=False, fontsize=8)
+    ax.set_yticklabels(range(1, y_length+1), minor=False, fontsize=8)
+    ax.tick_params(width=0)
+    ax.set_ylabel('Users',fontsize=14)
+    ax.set_xlabel('Permissions',fontsize=14)
+    fig.text(0.1,0.01,info, fontsize=10)
+    #fig.set_tight_layout(True)
+    plt.suptitle("Resulting UPA of RoleModel for: "+title, fontsize=20)
+
+    if (saveAsPDF):
+        pp = PdfPages(filename+"_"+str(index)+"_duplicates.pdf")
+        pp.savefig(fig)
+        pp.close()
+
+    if (saveAsSVG):
+        plt.savefig(filename+"_"+str(index)+"_duplicates.svg")
+
+    if (saveAsPNG):
+        plt.savefig(filename+"_"+str(index)+"_duplicates.png")
+        if (showPNG):
+            #plt.show()
+            os.startfile(filename+"_"+str(index)+"_duplicates.png")
     plt.close('all')
 
 # -----------------------------------------------------------------------------------------

@@ -482,4 +482,4 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                           +str(timeSum)+";"+str(useCheckpoint)+";"+prevFile+";"+subdirectory[10:]+"\n")
             outfile.close()
         logger.info("DONE.\n")
-    return logbooksSubsubdirectory,setupInfo,fileExt
+    return logbooksSubsubdirectory,setupInfo,fileExt, pop_directory
