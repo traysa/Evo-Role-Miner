@@ -8,10 +8,13 @@ import rm_EAOptimizer as optimizer
 # Initialization of Population (Chromosomes)
 # RoleModel
 # -----------------------------------------------------------------------------------
-def generateChromosome(maxRoles, userSize, permissionSize, optimization=True):
+def generateChromosome(maxRoles, userSize, permissionSize, optimization=True, fixedRoleCnt=0):
     chromosome = []
     # Create random number of genes (roles) for one chromosome
-    maxRoleCnt = random.randint(1, maxRoles)
+    if fixedRoleCnt > 0:
+        maxRoleCnt = fixedRoleCnt
+    else:
+        maxRoleCnt = random.randint(1, maxRoles)
     #print("ROLESIZE: "+str(maxRoleCnt))
     permissionUsage = [0 for i in range(0,permissionSize)]
     #print("permissionUsage: "+str(permissionUsage))

@@ -114,6 +114,7 @@ def executeExperimentFromFile():
         obj_weights = []
         tournsize = 0
         MUTPB_All = 0.0
+        fixedRoleCnt = 0
 
         experimentNumber = 0
         for experiment in experiments:
@@ -163,6 +164,9 @@ def executeExperimentFromFile():
             if ("freq" in experiment.keys()):
                 freq = int(experiment["freq"])
                 logger.info("freq: "+str(freq))
+            if ("fixedRoleCnt" in experiment.keys()):
+                fixedRoleCnt = int(experiment["fixedRoleCnt"])
+                logger.info("fixedRoleCnt: "+str(fixedRoleCnt))
             if ("evolutionType" in experiment.keys()):
                 evolutionType = experiment["evolutionType"]
                 logger.info("evolutionType: "+evolutionType)
@@ -186,14 +190,14 @@ def executeExperimentFromFile():
                     or(evalFunc == "WSC" and numberOfWeights!=4)
                     or(evalFunc == "WSC_Star" and numberOfWeights!=5)
                     or(evalFunc == "WSC_Star_RoleDis" and numberOfWeights!=6)):
-                    raise ValueError("Number of weights is incorrect for evaluation function")
+                    raise ValueError("Number of eval_weights is incorrect for evaluation function")
 
             if ("obj_weights" in experiment.keys()):
                 obj_weights = [float(w) for w in experiment["obj_weights"].split(',')]
                 logger.info("obj_weights: "+str(obj_weights))
             if (evolutionType == "Multi_Weighted" or evolutionType == "Multi_Fortin2013_Weighted"):
                 if (not obj_weights or len(obj_weights)!=2):
-                    raise ValueError("Number of weights is incorrect for evolution Type")
+                    raise ValueError("Number of obj_weights is incorrect for evolution Type")
 
             if ("numberOfTrialItems" in experiment.keys()):
                 if (evolutionType == "SANE"):
@@ -229,7 +233,7 @@ def executeExperimentFromFile():
                                                         obj_weights=obj_weights,
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
-                                                        constraints=constraints)
+                                                        constraints=constraints, fixedRoleCnt=fixedRoleCnt)
             exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType.startswith("Multi")),evalFunc=evalFunc,popfolder=popfolder,generation=NGEN)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -390,7 +394,7 @@ def executeCustomExperiment():
         for experimentCnt in range(1,repeat+1):
             rm_builder.startExperiment(directory,Name,1,experimentCnt,Original,DATA,POP_SIZE,tournsize,CXPB,MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                            removePermissionPB, addUserPB, addPermissionPB, NGEN,freq,evolutionType,evalFunc,untilSolutionFound, optimization,
-                           obj_weights=obj_weights,eval_weights=eval_weights)
+                           obj_weights=obj_weights,eval_weights=eval_weights,fixedRoleCnt=fixedRoleCnt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Loads configuration for experiment from configfile
@@ -418,6 +422,7 @@ def executeDefaultExperiment():
     untilSolutionFound = False
     optimization = True
     repeat = 1
+    fixedRoleCnt = 0
 
     config = configparser.ConfigParser()
     config.read('Experiments_config.ini')
@@ -427,7 +432,7 @@ def executeDefaultExperiment():
         config['General'] = {'experiment_Name': experimentName, 'POP_SIZE': POP_SIZE,'tournsize': tournsize, 'CXPB': CXPB, 'MUTPB_All': MUTPB_All,'addRolePB': addRolePB,
                              'removeRolePB': removeRolePB,'removeUserPB': removeUserPB,
                              'removePermissionPB': removePermissionPB, 'addUserPB': addUserPB,
-                             'addPermissionPB': addPermissionPB, 'NGEN': NGEN, 'freq': freq}
+                             'addPermissionPB': addPermissionPB, 'NGEN': NGEN, 'freq': freq, 'fixedRoleCnt': fixedRoleCnt}
         config['Algorithm'] = {'evolutionType': evolutionType, 'evalFunc': evalFunc, 'eval_weights': eval_weights, 'obj_weights': obj_weights,
                                'until_Solution_Found': untilSolutionFound, 'optimization': optimization}
         config['Experiment'] = {'repeat': repeat}
@@ -448,6 +453,7 @@ def executeDefaultExperiment():
         addPermissionPB = config['General'].getfloat('addPermissionPB')
         NGEN = config['General'].getint('NGEN')
         freq = config['General'].getint('freq')
+        fixedRoleCnt = config['General'].getint('fixedRoleCnt')
         evolutionType = config['Algorithm']['evolutionType']
         evalFunc = [o for o in config['Algorithm']['evalFunc'].split(',')]
         if (evolutionType == 'Multi_Weighted' or evolutionType == 'Multi_Fortin2013_Weighted'):
@@ -505,7 +511,7 @@ def executeDefaultExperiment():
                                                         obj_weights=obj_weights,
                                                         eval_weights=eval_weights,
                                                         userAttributeValues=userAttributeValues,
-                                                        constraints=constraints)
+                                                        constraints=constraints, fixedRoleCnt=fixedRoleCnt)
     exp_eval.execute(logbooksSubsubdirectory,setupInfo,fileExt,freq,multi=(evolutionType.startswith("Multi")),evalFunc=evalFunc,popfolder=popfolder,generation=NGEN)
 
 # create logger with 'spam_application'

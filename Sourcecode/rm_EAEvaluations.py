@@ -167,6 +167,39 @@ def evalFunc_RPCnt(individual, Original, constraints=[]):
     return fitness,
 
 # -----------------------------------------------------------------------------------
+# Single Objective Evaluation: Number of Roles
+# No Normalization
+# -----------------------------------------------------------------------------------
+def evalFunc_AssignmentCnt(individual, Original, constraints=[]):
+    userSize = Original.shape[0]
+    permissionSize = Original.shape[1]
+    if (constraints and not feasible(individual, userSize, permissionSize, constraints)):
+        worstCase_numberOfRoles = min(userSize,permissionSize)
+        fitness = worstCase_numberOfRoles*2
+    else:
+        numberOfUR = statistics.URCnt(individual[0])
+        numberOfRP = statistics.RPCnt(individual[0])
+        fitness = numberOfUR+numberOfRP
+    return fitness,
+
+# -----------------------------------------------------------------------------------
+# Single Objective Evaluation: Number of Roles
+# No Normalization
+# -----------------------------------------------------------------------------------
+def evalFunc_Conf_AssignmentCnt(individual, Original, constraints=[]):
+    userSize = Original.shape[0]
+    permissionSize = Original.shape[1]
+    if (constraints and not feasible(individual, userSize, permissionSize, constraints)):
+        worstCase_numberOfRoles = min(userSize,permissionSize)
+        fitness = worstCase_numberOfRoles*2
+    else:
+        numberOfUR = statistics.URCnt(individual[0])
+        numberOfRP = statistics.RPCnt(individual[0])
+        conf = statistics.Conf(individual[0], Original)
+        fitness = conf+numberOfUR+numberOfRP
+    return fitness,
+
+# -----------------------------------------------------------------------------------
 # Single Objective Evaluation: Interpretability
 # Interpretability is the average Role Fitness (calculation based on Generalized Intra-Inter Silhouette Index)
 # No Normalization
@@ -495,6 +528,10 @@ def evalFunc_Multi(individual, Original, evalFunc, userAttributeValues=[], const
             fitness+= (evalFunc_URCnt(individual, Original=Original, constraints=constraints)[0],)
         elif (obj=="RPCnt"):
             fitness+= (evalFunc_RPCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="AssignmentCnt"):
+            fitness+= (evalFunc_AssignmentCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="Conf_AssignmentCnt"):
+            fitness+= (evalFunc_Conf_AssignmentCnt(individual, Original=Original, constraints=constraints)[0],)
         elif (obj=="AvgRoleConf"):
             fitness+= (evalFunc_AvgRoleConfViolations(individual, Original=Original, constraints=constraints)[0],)
         elif (obj=="Interpretability"):

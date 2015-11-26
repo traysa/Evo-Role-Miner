@@ -24,7 +24,7 @@ logger = logging.getLogger('root')
 def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
               removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
               untilSolutionFound=False, eval_weights=[], pickleFile="", checkpoint=False, prevFiles="",
-              userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
+              userAttributeValues=[], constraints=[], printPopulations=False, pop_directory="", fixedRoleCnt=0):
 
     logger.info("Prepare evolutionary algorithm...")
     time = []
@@ -70,7 +70,7 @@ def evolution(Original, evalFunc, populationSize, tournsize, CXPB, MUTPB_All, ad
     # Toolbox
     toolbox = base.Toolbox()
     # Register Chromosome Generator
-    toolbox.register("chromosome", init.generateChromosome, maxRoles=userSize, userSize=userSize, permissionSize=permissionSize)
+    toolbox.register("chromosome", init.generateChromosome, maxRoles=userSize, userSize=userSize, permissionSize=permissionSize, optimization=optimization, fixedRoleCnt=fixedRoleCnt)
     # Register Individual and Population Initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)

@@ -23,7 +23,7 @@ logger = logging.getLogger('root')
 def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeRolePB, removeUserPB,
                     removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
                     fortin=False, untilSolutionFound=False, pickleFile="", checkpoint=False, prevFiles="",
-                    userAttributeValues=[], constraints=[], printPopulations=False, pop_directory=""):
+                    userAttributeValues=[], constraints=[], printPopulations=False, pop_directory="",fixedRoleCnt=0):
 
     # Validations
     if (len(evalFunc)<2):
@@ -80,7 +80,7 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
     # Toolbox
     toolbox = base.Toolbox()
     # Chromosome generator
-    toolbox.register("chromosome", init.generateChromosome, userSize, userSize, permissionSize)
+    toolbox.register("chromosome", init.generateChromosome, userSize, userSize, permissionSize, optimization=optimization, fixedRoleCnt=fixedRoleCnt)
     # Structure initializers
     toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.chromosome, 1)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
@@ -137,11 +137,15 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
         logger.info("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
 
+    solutionFound = None
+
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
+        if (max(fit)==0):
+            solutionFound = 0
 
     # Save population in JSON file
     if (printPopulations):
@@ -198,6 +202,8 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
+            if (not solutionFound and max(fit)==0):
+                solutionFound = generation
             #if (fit[0] == 0):
             #    stop = True
 
@@ -248,7 +254,7 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
     # Set Checkpoint
     fileExt = "_M"
     for obj in evalFunc:
-        fileExt+= "_" +obj
+        fileExt+= "_" +obj[:5]
     fileExt+= "_"+str(len(population)) + "_" + str(generation)
     '''if (checkpoint):
         fileExt = "_cont_" + str(len(population)) + "_" + str(generation) + "_" + str(CXPB) + "_" + str(MUTPB_All)
@@ -276,4 +282,4 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
 
     top = toolbox.select(population, k=numberTopRoleModels)
 
-    return population, results, generation, time, prevFiles, top, logbook, fileExt
+    return population, results, generation, time, prevFiles, top, logbook, fileExt, solutionFound

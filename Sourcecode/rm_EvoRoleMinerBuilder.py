@@ -93,7 +93,7 @@ else:
 def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, DATA, POP_SIZE, tournsize, CXPB,
                     MUTPB_All, addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB, addPermissionPB,
                     NGEN, freq, evolutionType, evalFunc, untilSolutionFound, optimization, obj_weights=[],eval_weights=[],
-                    userAttributeValues=[], constraints=[]):
+                    userAttributeValues=[], constraints=[], fixedRoleCnt=0):
     global useCheckpoint
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -137,28 +137,32 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
     # EVOLUTION
     # ------------------------------------------------------------------------------------------------------------------
     logbook = tools.Logbook()
+    solutionFound = None
     if (evolutionType=="Single"):
         population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
             ea_single.evolution(Original, evalFunc[0], POP_SIZE, tournsize, CXPB, MUTPB_All, addRolePB, removeRolePB, removeUserPB,
                                 removePermissionPB, addUserPB, addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
                                 untilSolutionFound=untilSolutionFound, eval_weights=eval_weights,
                                 userAttributeValues=userAttributeValues,
-                                constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory)
+                                constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory,fixedRoleCnt=fixedRoleCnt)
     elif (evolutionType=="Multi" or evolutionType=="Multi_Fortin2013"):
-        population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
+        population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt, solutionFound = \
             ea_multi.evolution_multi(Original, evalFunc, POP_SIZE, CXPB, addRolePB, removeRolePB,
                                      removeUserPB, removePermissionPB, addUserPB, addPermissionPB, NGEN, freq,
                                      numberTopRoleModels, optimization, fortin=(evolutionType=="Multi_Fortin2013"),
                                      untilSolutionFound=untilSolutionFound,
                                      userAttributeValues=userAttributeValues,
-                                     constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory)
+                                     constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory,fixedRoleCnt=fixedRoleCnt)
 
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
-        population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt = \
+        population, results, generation, timeArray, prevFiles, top_pop, logbook, fileExt, solutionFound = \
             ea_multi_w.evolution_multi_weighted(Original, evalFunc, POP_SIZE, obj_weights, CXPB,
                                                 addRolePB, removeRolePB, removeUserPB, removePermissionPB, addUserPB,
-                                                addPermissionPB, NGEN, freq, numberTopRoleModels,
-                                                fortin=(evolutionType=="Multi_Fortin2013_Weighted"))
+                                                addPermissionPB, NGEN, freq, numberTopRoleModels, optimization,
+                                                fortin=(evolutionType=="Multi_Fortin2013_Weighted"),
+                                                untilSolutionFound=untilSolutionFound,
+                                                userAttributeValues=userAttributeValues,
+                                                constraints=constraints, printPopulations=True, pop_directory=pop_subdirectory,fixedRoleCnt=fixedRoleCnt)
     else:
         raise ValueError('Evolution type not known')
 
@@ -438,8 +442,10 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
                               roleModelsAsPNG, showRoleModelsPNG)
     elif (evolutionType=="Multi_Weighted" or evolutionType=="Multi_Fortin2013_Weighted"):
-        visual.plotLogbookForMultiObjective(logbook, log_filename+"_plot", fileExt[1:], info, evalFunc, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG,
-                                            showLogPlotPNG)
+        stats2 = ["Conf","Accs","RoleCnt","URCnt","RPCnt","Interp"]
+        visual.plotLogbookForMultiObjective(results, generation, freq, log_filename+"_plot", fileExt[1:], info, evalFunc, fitnessAsPDF,
+                                                  fitnessAsSVG, fitnessAsPNG, showFitnessPNG,population=population)
+        visual.plotLogbook(logbook, log_filename+"_rmmeasures", stats2, fileExt[1:], info, logPlotAsPDF, logPlotAsSVG, logPlotAsPNG, showLogPlotPNG)
         visual.showFitnessInPlotForMultiObjective(results, generation, freq, fitness_filename, fileExt[1:], info, evalFunc, fitnessAsPDF,
                                                   fitnessAsSVG, fitnessAsPNG, showFitnessPNG)
         visual.showBestResult(top_pop,generation,Original, roleModel_filename, fileExt[1:], info, roleModelsAsPDF, roleModelsAsSVG,
@@ -462,7 +468,7 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
                        'POP_SIZE':str(len(population)), 'NGEN':str(generation),'obj_weights':str(obj_weights),'eval_weights':str(eval_weights),'tournsize':str(tournsize),'CXPB':str(CXPB),'MUTPB':str(MUTPB_All),
                        'Frequency':str(freq),'Runtime':str(time), 'Runtime_Sum':str(timeSum),
                        'Continued':str(useCheckpoint),'PreviousCheckpoint':prevFile,
-                       'ResultFiles':str(subdirectory[10:])}, outfile, indent=4)
+                       'ResultFiles':str(subdirectory[10:]), 'solutionFound':str(solutionFound)}, outfile, indent=4)
             outfile.close()
         logger.info("DONE.\n")
 
@@ -473,13 +479,13 @@ def startExperiment(directory, Name, experimentNumber, experimentCnt, Original, 
             with open(resultCSVfile, "a") as outfile:
                 outfile.write("sep=;\n")
                 outfile.write("ExperimentNumber;ExperimentCount;Experiment;userCount;permissionCount;EvoType;EvalFunc;POP_SIZE;NGEN;obj_weights;eval_weights;tournsize;CXPB;MUTPB;"
-                              "Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files\n")
+                              "Frequency;Runtime;Runtime_Sum;Continued;prevFile;Result_files;solutionFound\n")
                 outfile.close()
         with open(resultCSVfile, "a") as outfile:
             outfile.write(str(experimentNumber)+";"+str(experimentCnt)+";"+Name+";"+str(userCount)+";"+str(permissionCount)+";"
                           +evolutionType+";"+str(evalFunc)+";"+str(len(population))+";"+str(generation)+";"+str(obj_weights)+";"
                           +str(eval_weights)+";"+str(tournsize)+";"+str(CXPB)+";"+str(MUTPB_All)+";"+str(freq)+";"+str(time)+";"
-                          +str(timeSum)+";"+str(useCheckpoint)+";"+prevFile+";"+subdirectory[10:]+"\n")
+                          +str(timeSum)+";"+str(useCheckpoint)+";"+prevFile+";"+subdirectory[10:]+";"+str(solutionFound)+"\n")
             outfile.close()
         logger.info("DONE.\n")
     return logbooksSubsubdirectory,setupInfo,fileExt, pop_directory

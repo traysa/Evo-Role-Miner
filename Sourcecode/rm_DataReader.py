@@ -20,6 +20,17 @@ def populationReader(populationFile):
     population = cp["population"]
     return population
 
+
+# -----------------------------------------------------------------------------------
+# Find generation where optimum is reached first
+# -----------------------------------------------------------------------------------
+def readAllLastPopulations(popfolder, generation):
+    populationFolders = [foldername for foldername in os.listdir(popfolder) if foldername.endswith('Populations')]
+    data = []
+    for folder in populationFolders:
+        data += populationReader_Multi(popfolder+"\\"+folder+"\\Generation_"+str(generation)+"_population.pkl")
+    return data
+
 # -----------------------------------------------------------------------------------
 # Read population pickle file
 # -----------------------------------------------------------------------------------
@@ -145,7 +156,4 @@ multi=True
 evalFunc=["Confidentiality","Availability"]
 popfolder=''
 generation=1000
-
-exp_eval.execute(dirname,setupInfo,fileExt,freq,multi=multi,evalFunc=evalFunc,popfolder=popfolder,generation=generation)
-
-
+#exp_eval.execute(dirname,setupInfo,fileExt,freq,multi=multi,evalFunc=evalFunc,popfolder=popfolder,generation=generation)
