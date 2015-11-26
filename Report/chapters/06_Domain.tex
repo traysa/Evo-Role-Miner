@@ -66,18 +66,18 @@ In this section a basic introduction to the domain is given. It is important tha
     A basic role model consists of users, permissions, roles, user-role assignments and role-permission assignments. A role model is most desirable if it has a state, which best leverages the RBAC model by satisfying the business, security and regulatory drivers: Lowering the costs for the administration of access control and equip employees with necessary permissions such that they can efficiently full-fill their tasks while keeping security requirements and being compliant.
     
     How this goal is measured in the role model has been described by several quality criteria\cite{Kunz}\cite{Frank}. The criteria concern the role model state, individual roles or both. In this thesis the different criteria is summarized into the categories: Completeness, complexity and comprehension.
+    
         \subsection{Completeness}
         \label{sec:completeness}
         Completeness is the degree to which the role model fulfills the existing user-permission assignments. When the user-role and the permission-role assignments of the role model are resolved, it should cover all current user-permission assignments. In figure \ref{fig:roleminingExample} an example is shown where user-permission assignments are split into user-role and the permission-role assignments. Resolving an role model would be the other way around - from user-role and permission-role assignments to user-permission assignment.
-        \iffalse
-        \hl{(FEEDBACK:different scenarios: 1. starting from scratch, 2. already have assignments)}
-        \fi
+        
         \begin{figure}[H]
             \centering
             \includegraphics[scale=0.07]{RoleminingExample}
             \caption{University toy example taken from Frank\cite{roleMiningExample}, which demonstrates the transformation from user-permission assignment($UPA$) to user-role assignments($UA$) and permission-role assignments($PA$)}
             \label{fig:roleminingExample}
         \end{figure}
+        
         It is assumed that the current user-permission assignments are in a state, where users get the necessary access to efficiently perform their tasks and no security or compliance regulations are violated. This of course is an ideal situation, but in reality the current state often has quite some noise, especially when no IAM solution has been in place before. Users tend to have more permissions than they actually need, since it is unlikely that someone will claim that he has too many permissions. The measure of completeness of the role model state is therefore in accordance to the initial access control configuration.
         
         A certain amount of overentitlements (users get too many permissions) or underentitlements (users get too few permissions) in the access control policies can be acceptable, if the least privilege principle is too costly to implement in practice. In figure \ref{fig:rolemodelComparison} an example of over- and underentitlements can be seen.
@@ -92,6 +92,7 @@ In this section a basic introduction to the domain is given. It is important tha
         The combinations of permissions within roles or the combination of user-role assignments might violate security regulations such as SoD. This measure is therefore not only taking individual roles but also the role model state into account.
         
         Constraints could also be ensured in a mechanism posterior to the role model, where individual permissions are detracted from users again, if it violates a constraint. Allowing constraint violations in the role model increases not only the processing and reliance on the posterior mechanism but also the auditing effort.
+        
         \subsection{Complexity}
         \label{sec:complexity}
         The complexity of a role model is measured in its number of roles and the number of user-role and permission-role assignments. It is often connected to the maintenance costs of a role model. For example in figure \ref{fig:rolemodelComparison} three roles, eight user-role assignments and nine role-permission assignments can be counted.
@@ -101,6 +102,7 @@ In this section a basic introduction to the domain is given. It is important tha
         Also the more user-role and permission-role assignments are needed, the more maintenance effort is expected. Large roles with many permissions may reduce the number of user-role assignments, but may lead to more confidentiality/accessibility violations (conflicting Completeness). The same applies for if each role is used by many users. Small roles with few permissions on the other hand can lead to more administration effort as mentioned above, since many roles are necessary for achieving completeness. The same applies if each role is only used by very few users.
         
         A role model can consists of very general large roles (e.g. a role for an organizational unit) and specialized small roles (e.g. a project-specific role). Determining a fix boundary of how many permissions or users can be assigned to a role requires knowledge of the role model or is given by company or security regulations.
+        
         \subsection{Comprehension}
         \label{sec:comprehension}
         A trending topic is to respect the "meaningfulness" of roles in a role model\cite{Xu}\cite{Frank}. It is important that the administrators, who are maintaining the role model, can logically understand the role model for maintaining the roles and assignments confidently. Otherwise it might happen that they avoid to work with the role model since they feel not confident to stay in line with security and compliance regulations. Or it will cause them extra effort and costs to work with the role model. The roles should be therefore comprehensive, which can be achieved by giving them a meaning close to business roles, e.g. a role "Employee", which contains all permissions every employee will get and is assigned to every employee-user.
@@ -121,6 +123,7 @@ In this section a basic introduction to the domain is given. It is important tha
     Role engineering \cite{Coyne:2011} describes the process to create a role model for RBAC. This task is proved to be very difficult in large enterprises.
     
     There are three different approaches to conquer the goal of finding the right role model: Top-Down, Bottom-Up and the Hybrid approach\cite{Coyne:2011}\cite{Frank}.
+    
     \begin{itemize}
         \item \textbf{Top-Down Approach}\\
         One approach is to do a top-down analysis, where the roles are built out of business information. Business processes, business roles and security policies are analysed to build a suitable role model. The resulting roles contain high-level permissions, which need to be mapped to technical permissions that are used by IT systems. The roles are easy to understand as they are derived from business concepts. The analysis of the business information by experts to a high-level role model and the mapping into low-level accesses by IT Specialists are very time-consuming and costly. Furthermore the resulting role model could lead to a different access control configuration than the current one. It is likely that users get less permissions than they used to have, which might prevent them from doing their tasks efficiently.
@@ -131,16 +134,20 @@ In this section a basic introduction to the domain is given. It is important tha
         \item \textbf{Hybrid approach}\\        
         Since the advantages and disadvantages of the top-down and the bottom-up approach are mirrored, hybrid approaches have been suggested \cite{Frank}\cite{6274146}. In these approaches the business information is leveraged to guide the computational generation of a role model out of user-permission assignments.
     \end{itemize}
+    
     A role model is evolving over time and needs constant maintenance\cite{Montrieux:2011}. Administrators and Re-attestation processes are changing the user-permission assignments by adding and removing users and permissions to and from roles. New users are joining and others get removed, same is valid for applications and their permissions. Separate access control configurations might need to be migrated to one access control configuration. The task of role engineering is therefore not a one time task, but an on-going process. An over-the-time suboptimal role model can increase the administration costs and has to be optimized again to benefit from the advantages of RBAC.
     
     \section{Role Mining}
     Role Mining is a bottom-up role engineering approach. The basic input of role mining are users, permissions and the current assignments to each other. The input can be expressed as tuple $<U,P,UPA>$, where
+    
     \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
         \item \textbf{$U$} is a set of users
         \item \textbf{$P$} is a set of permissions
         \item \textbf{$UPA \subseteq U \times P$} are user-permission assignments
     \end{itemize}
+    
     On top additional information can be taken as input like constraints, top-down information (business information) and already existing roles. The output of role mining is the role model. A basic role model state can be described as tuple $<U,P,R,UA,PA>$, where
+    
     \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
         \item \textbf{$U$} is a set of users
         \item \textbf{$P$} is a set of permissions
@@ -148,6 +155,7 @@ In this section a basic introduction to the domain is given. It is important tha
         \item \textbf{$UA \subseteq U \times R$} are user-role assignments
         \item \textbf{$PA \subseteq R \times P$} are permission-role assignments
     \end{itemize}
+    
     Optionally a role hierarchy is also part of the role model. In some papers, such as \cite{Molloy} and \cite{DuChang}, direct user-role assignments ($DUPA \subseteq U \times P$) are added to the role model tuple in order to provide more flexibility to handle anomalous permissions which do not fit into the role structure. Alternatively a new role for each of the individual direct assignments of DUPA can be defined, although such roles are not desirable in a role model. By adding DUPA to the tuple it can be distinguished between DUPA and undiserable roles. Figure \ref{fig:rolemining} shows the inputs and outputs of the role mining process.  A specific example in matrix representation is shown in figure \ref{fig:roleminingExample}.
     
     \begin{figure}[H]
@@ -160,21 +168,23 @@ In this section a basic introduction to the domain is given. It is important tha
     \subsection{Role Mining Problem Definitions}
     \label{sec:roleMiningProblems}
     There are several role-mining problem (RMP) definitions existing. The problem definitions, which will be referred to in this thesis, are introduced in the following.
+    
     \begin{itemize}
         \item \textbf{The Basic Role-Mining Problem}\cite{Vaidya:2007}\\
-        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and does not deviate from $UPA$."}
+        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and does not deviate from $UPA$."}\\
         The Basic RMP is the most commonly researched RMP. The minimal set of roles is probably different from the most useful set of roles, but it is argued that a minimal set of roles is appropriate when semantic information (i.e. human expert knowledge) is not given and that it is already helping security administrators by knowing the minimum required to accurately describe the current access policy configurations.
         
         \item \textbf{The $\delta$-approx. Role-Mining Problem}\cite{Vaidya:2007}\\
-        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and deviates from $UPA$ with less than $\delta$ assignments."}
+        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that minimizes the number of roles $k$ and deviates from $UPA$ with less than $\delta$ assignments."}\\
         Compared to the Basic RMP, the $\delta$-approx. RMP bounds the degree of availability violations (underentitlements). The Basic RMP is a subproblem of the $\delta$-approx. RMP where $\delta$ is 0. It is argued that the strict Basic RMP might not be good for the dynamic environment of users and permissions, which can change over time.
         
         \item \textbf{The Min-Noise Role-Mining Problem}\cite{Vaidya:2007}\\
-        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, and the number of roles $k$, find an RBAC configuration $RC$ with $k$ roles, minimizing the deviation between $UPA$ and $RC$."}
+        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, and the number of roles $k$, find an RBAC configuration $RC$ with $k$ roles, minimizing the deviation between $UPA$ and $RC$."}\\
         Compared to the $\delta$-approx. RMP, the Min-Noise RMP bounds the number of roles, and minimizes the $\delta$-approximation.
         
-        \item \textbf{The Min-Edge Role-Mining Problem}\cite{4497438}\\
-        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that is consistent with $UPA$ and minimizes the number user-role assignments and role-permission assignments."}
+        \item \textbf{The Min-Edge Role-Mining Problem}\cite{Vaidya:2009}\\
+        \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that is consistent with $UPA$ and minimizes the number user-role assignments and role-permission assignments."}\\
+        Compared to the Basic RMP, the Min-Edge RMP is not minimizing the number of roles, but the number of $UA$ and $PA$ assignments. It is argued that minimizing the assignments also minimizes the administrative load. Furthermore the Min-Edge RMP discovers redundant roles that are heavily used\cite{4497438}.
         
         \item \textbf{The Interference Role-Mining Problem}\cite{Frank:2013}\\
         \textit{"Let a set of users $U$, a set of permissions $P$, a user-permission relation $UPA$, and, optionally, part of the top-down information $TDI$ be given. Under Assumption 1-3 (defined below), infer the unknown RBAC configuration $RC*=(R*, UA*, PA*)$.\\
@@ -182,19 +192,22 @@ In this section a basic introduction to the domain is given. It is important tha
         1. $RC*$ generated $UPA$\\
         2. $RC*$ reflects top-down information ($TDI$).\\
         3. Exceptions (errors) might exist."}
+	    Compared to the other RMPs, the Interference RMP is not only compressing user-permission assignments. Algorithms, which follow the Interference RMP, set the focus on predictions of roles. The inference problem respects the hybrid role mining scenario, where additional business information is available.  
     \end{itemize}
     
     In Vaidya et al.\cite{Vaidya:2007} it is shown that the Basic RMP, the $\delta$-approx. RMP and the Min-Noise RMP are NP-complete problems. The problems are mapped to the database tiling and the discrete basis problem, which are in the area of data mining and data analysis.
     
     \subsection{Related Problem: Boolean Matrix Decomposition Problem}
     \hl{The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem.} In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
-    \begin{itemize}
-    \item \textbf{Boolean Matrix Multiplication Definition:}\\
-    $C = A \times B$ is the boolean matrix multiplication between boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$. The product $C$ is a boolean matrix with $m \times n$ dimension and is calculated with $c_{ij} = \bigvee_{l=1}^{k}(a_{ij} \wedge b_{ij})$
-     \item \textbf{Boolean Matrix Decomposition Problem Definition:}\\
-    The BMD problem is an optimization problem where given a boolean matrix $C \in \{0,1\}^{m \times n}$, the boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$ have to be found, such that $C = A \times B$ and $k$ is minimal\cite{vaidya2012boolean}. $A \times B$ is called a decomposition of $C$.
-    \end{itemize}
-    For RMP a user-permission assignment matrix ($C$) needs to be decomposed into a user-role assignments matrix ($A$) and a role-permission assignments matrix ($B$). Variable $k$ then represents the number of roles, variable $m$ and $n$ the number of users and permissions accordingly. Therefore finding the minimal $k$ in the BMD problem corresponds to finding the minimal number of roles in the basic RMP. The notion of BMD for the RMP is also used in this thesis and has been already introduced in previous sections (see Figure \ref{fig:roleminingExample} and \ref{fig:rolemodelComparison}).
     
+    \begin{itemize}
+	    \item \textbf{Boolean Matrix Multiplication Definition:}\\
+	    $C = A \times B$ is the boolean matrix multiplication between boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$. The product $C$ is a boolean matrix with $m \times n$ dimension and is calculated with $c_{ij} = \bigvee_{l=1}^{k}(a_{ij} \wedge b_{ij})$
+	     \item \textbf{Boolean Matrix Decomposition Problem Definition:}\\
+	    The BMD problem is an optimization problem where given a boolean matrix $C \in \{0,1\}^{m \times n}$, the boolean matrices $A \in \{0,1\}^{m \times k}$ and $B \in \{0,1\}^{k \times n}$ have to be found, such that $C = A \times B$ and $k$ is minimal\cite{vaidya2012boolean}. $A \times B$ is called a decomposition of $C$.
+    \end{itemize}
+    
+    For RMP a user-permission assignment matrix ($C$) needs to be decomposed into a user-role assignments matrix ($A$) and a role-permission assignments matrix ($B$). Variable $k$ then represents the number of roles, variable $m$ and $n$ the number of users and permissions accordingly. Therefore finding the minimal $k$ in the BMD problem corresponds to finding the minimal number of roles in the basic RMP. The notion of BMD for the RMP is also used in this thesis and has been already introduced in previous sections (see Figure \ref{fig:roleminingExample} and \ref{fig:rolemodelComparison}).
+   
     
 In this thesis the role mining problem is tackled with evolutionary algorithms. An introduction to evolutionary algorithms is given in the next chapter.

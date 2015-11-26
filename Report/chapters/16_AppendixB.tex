@@ -1,6 +1,56 @@
 \newpage
 \section{Sythentic Datasets}
 \label{sec:A_syn_datasets}
+	\subsection{Dataset1}
+		\begin{table}[H]
+			\centering
+			\caption{Users with attributes}
+			\label{tab:dataset1_users}
+			\begin{tabular}{|l|l|l|l|}
+				\hline
+				\rowcolor[HTML]{EFEFEF} 
+				User & Attribute1     & Attribute2 & Attribute3 \\ \hline
+				1    & HumanResources & Denmark    & Internal   \\ \hline
+				2    & Motor          & Denmark    & External   \\ \hline
+				3    & Motor          & Denmark    & External   \\ \hline
+				4    & Motor          & Denmark    & External   \\ \hline
+				5    & Motor          & Germany    & Internal   \\ \hline
+				6    & Motor          & Germany    & Internal   \\ \hline
+				7    & Sales          & Denmark    & Internal   \\ \hline
+				8    & Sales          & Denmark    & Internal   \\ \hline
+				9    & Sales          & Denmark    & Internal   \\ \hline
+				10   & Sales          & US         & External   \\ \hline
+			\end{tabular}
+		\end{table}
+		\begin{table}[H]
+			\centering
+			\caption{Roles and their containing permissions}
+			\label{tab:dataset1_roles}
+			\begin{tabular}{|l|l|l|}
+				\hline
+				\rowcolor[HTML]{EFEFEF} 
+				Role & Permissions \\ \hline
+				1    & 8,1,2,3,6   \\ \hline
+				2    & 9,5,6       \\ \hline
+				3    & 0,4         \\ \hline
+				4    & 3,7         \\ \hline
+			\end{tabular}
+		\end{table}
+		
+		\begin{table}[H]
+			\centering
+			\caption{Rules for roles}
+			\label{tab:dataset1_rules}
+			\begin{tabular}{|l|l|l|l|}
+				\hline
+				\rowcolor[HTML]{EFEFEF} 
+				Role & Attribute1 & Attribute2 & Attribute3 \\ \hline
+				1    & Motor      &            &            \\ \hline
+				2    &            & US         &            \\ \hline
+				3    &            & Denmark    & External   \\ \hline
+				4    &            & Denmark    & Internal   \\ \hline
+			\end{tabular}
+		\end{table}
 
 \section{Real Datasets}
 \label{sec:A_real_datasets}
