@@ -1,6 +1,8 @@
 \newpage
 \section{Experiment 4 - Multiobjective EA}
 \label{sec:exp4}
+In this experiment set the three versions of the Evo-RoleMiner$M$ are tested.
+
 To counteract on the diversity problem and the strong bias of the complexity measure (role count, assignments counts) in the previous experiments, the Evo-RoleMiner$M$ is tested on the Dataset1 (Experiment 4a and 4b) and the Healthcare dataset (Experiment 4c and 4d). For the objectives "Minimizing Confidentiality Violations" and "Minimizing Availability Violations" are chosen, since as shown in Experiment 1 the objectives are conflicting (see section \ref{sec:exp1}). The setup can be seen in Table \ref{tab:exp4_setup}.
 
 \begin{table}[H]
@@ -10,7 +12,7 @@ To counteract on the diversity problem and the strong bias of the complexity mea
 			\hline
 			\rowcolor{myGray} 
 			\textbf{Parameter}              & \textbf{Value}    \\ \hline
-			Generations                     & 150 / 1000       	\\ \hline
+			Generations                     & 100 / 1000       	\\ \hline
 			Population                      & 1000        		\\ \hline
 			CXPB                            & 0.25              \\ \hline
 			MUTPB-Type1: Add role           & 0.25              \\ \hline
@@ -24,38 +26,40 @@ To counteract on the diversity problem and the strong bias of the complexity mea
 			Objective 2					    & Availability     	\\ \hline
 		\end{tabular}
 	\end{adjustbox}
-	\caption{EXPERIMENT 4 setup. For experiments 4a-b a generation limit of 150 is chosen, while for experiments 4c-d the generation limit is 1000.}
+	\caption{EXPERIMENT 4 setup. For experiments 4a-b a generation limit of 100 is chosen, while for experiments 4c-d the generation limit is 1000.}
 	\label{tab:exp4_setup}
 \end{table}
 
 The results are listed in experiment 4a and 4c in Table \ref{tab:exp4_results}. Figure \ref{fig:exp4a_fitness} shows the development of the population in one of the experiments with Dataset1 (for the Healthcare dataset see Appendix \ref{sec:A_Exp4c_Diagrams}). It can be seen that the individuals in each generation have a wide spread and converging near a pareto front. Since the Dataset1 yields a solution where both objectives can be met, the pareto front consist of one point at (0,0) if the solution is found. The objectives of confidentiality and availability violations are only conflicting until the solution is found.
 
-\begin{table}
+\begin{table}[H]
 	\centering
-	\caption{Evo-RoleMiner$M$: Results of ten experiments for Dataset1 and Healthcare dataset. The values for each objectives' Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|RP|$) are the average minimum in the last Generation of the experiments. The values for Interpretability (INT) are the average maximum in the last Generation of the experiments. The generation ($\gamma$), where an individual occurs the first time, which has reached the optimum of all objectives, is the average out of the ten experiments. The time is the average runtime in seconds.}
+	\caption{Evo-RoleMiner$M$: Results of ten experiments for Dataset1 and Healthcare dataset. The values for each objectives' Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|RP|$) are the average minimum in the last Generation of the experiments. The values for Interpretability (INT) are the average maximum in the last Generation of the experiments. The generation ($\gamma$), where an individual occurs the first time, which has no violations, is the average out of the ten experiments. The time is the average runtime in seconds.}
 	\label{tab:exp4_results}
 	\subcaption*{DATASET1}
 	\begin{adjustbox}{width=\textwidth}
-		\begin{tabular}{|l|l|l|l|c|c|c|c|c|c|c|}
+		\begin{tabular}{|l|l|l|l|c|c|c|c|c|c|c|c|}
 			\hline
 			\rowcolor{myGray} 
-			\textbf{Experiment} & \textbf{Algorithm} & \textbf{Objectives} & $\gamma$ & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|RP|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
-			4a & NSGA-II & Conf+Accs &  35.3 &   0   &   0 & 3.7   &   11.2   &   13.2   &   0.998    & 16.14\\ \hline
-			4b & NSGA-II$R$ & Conf+Accs &   33.4&   0   &   0 & 4.1   &   12   &   15.2   &   0.996    & 14.42\\ \hline			
+			\textbf{Exp.} & \textbf{Algorithm} & \textbf{Objectives} & \textbf{Fitness} & $\gamma$ & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|RP|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
+			4a & NSGA-II & Conf,Accs &  [0,0] &  53 & 0   &   0 & 4   &   11.1   &   13   &   1    & 156\\ \hline
+			4b & NSGA-II$R$ & Conf,Accs &   [0,0] &   23.4 &0   &   0 & 4   &   11.2   &   13.4   &   1    & 256\\ \hline
+			4e & NSGA-II$R$ with weights & Viol.,$|UA+PA|$ &   [0,24.7] &   26.2 &   0 & 0 &4   &   13   &   12   &   1    & 139\\ \hline			
 		\end{tabular}
 	\end{adjustbox}
 	\subcaption*{HEALTHCARE}
 	\begin{adjustbox}{width=\textwidth}
-		\begin{tabular}{|l|l|l|l|c|c|c|c|c|c|c|}
+		\begin{tabular}{|l|l|l|l|c|c|c|c|c|c|c|c|}
 			\hline
 			\rowcolor{myGray} 
-			\textbf{Experiment} & \textbf{Algorithm} & \textbf{Objectives} & $\gamma$ & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|RP|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
-			4c & NSGA-II & Conf+Accs &  35.3 &   0   &   0 & 3.7   &   11.2   &   13.2   &   0.998    & 16.14\\ \hline
-			4d & NSGA-II$R$ & Conf+Accs   &   33.4&   0   &   0 & 4.1   &   12   &   15.2   &   0.996    & 14.42\\ \hline			
+			\textbf{Exp.} & \textbf{Algorithm} & \textbf{Objectives} & \textbf{Fitness} & $\gamma$ & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|RP|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
+			4c & NSGA-II & Conf,Accs &   [0,0] &   $>$1000 &0   &   0 & 17   &   218.6   &   265.8   &   -    & 4076\\ \hline
+			4d & \hl{NSGA-II$R$} & Conf,Accs   & [0,0] &   $>$1000 &   0   &   0 & 0   &   0   &   0   &   -    & 0\\ \hline
+			4f & \hl{NSGA-II$R$ with weights} & Viol.,$|UA+PA|$ & [0,0] &   $>$1000 &   0   &   0 & 0   &   0   &   0   &   -    & 0\\ \hline		
 		\end{tabular}
 	\end{adjustbox}
 \end{table}
-
+\newpage
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{\textwidth}
@@ -99,9 +103,35 @@ Role models can have the same fitness values for both objectives, although their
 		\caption{}
 		\label{fig:exp4a_RM2}
 	\end{subfigure}
-	\caption{EXPERIMENT 4a: Example role models resulting from an experiment on the Evo-RoleMiner$M$ on Dataset1. From u.l. to l.r.: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more user-role- and role-permission assignments causing the user-permission assignment.}
+	\caption{EXPERIMENT 4a: Example role models resulting from an experiment on the Evo-RoleMiner$M$ on Dataset1. For each role model from u.l. to l.r.: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more user-role- and role-permission assignments causing the user-permission assignment.}
 	\label{fig:exp4a_RM_compare}
 \end{figure}
 
-The results are listed in Table \ref{tab:exp4_results}.
+The results of experiment 4b and d are listed in Table \ref{tab:exp4_results}. In case of experiment 4b it can be seen that the Evo-RoleMiner$M$ based on NSGA-II$R$ gives an improvement, since in average a perfect solution is found after 23.4 generations, while in case of the Evo-RoleMiner$M$ based on the traditional NSGA-II, the average generation when a solution is found is 53 (see experiment 4a in \ref{tab:exp4_results}). Also a T-Test confirmed a statistical significant difference of the generations, when a solution with all objectives fulfilled is found (P-Value=6.379E-10).
+
+The objectives chosen for experiment 4a-d are only confidentiality and availability violations. Although the local optimization is preventing roles with the same user- or permission-assignments, the Evo-RoleMiner$M$ cannot distinguish between the complexity of role models, which can reconstruct the original access policy configuration $UPA$. The Basic RMP optimizes the complexity regards the role count, while the Min-Edge RMP optimizes towards a minimum user- and permission assignment count.
+
+In experiment 4e-f a third version of the Evo-RoleMiner$M$ is tested, where one objective is the minimization of the combined violations count $|G_{conf}^{Min} + G_{accs}^{Min}|$ and the second objective is the minimization of user- and permission assignment count $|UA + PA|$. Since it is known from previous experiments, that the complexity measure has a strong influence the third version of the Evo-RoleMiner$M$ is chosen, which allows to relax the second objective by setting a weight for the second objective (see section \ref{sec:weightedNSGA2}). The weight of the second objective is set to 0.8.
+
+The results can be seen in experiment 4e-f in Table \ref{tab:exp4_results}. In Figure \ref{fig:exp4e_fitness} the development of one of the ten experiments is illustrated. The results show 
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth, trim=0cm 2cm 0cm 1.5cm, clip=true]{exp4e_fitness}
+		\caption{}
+		\label{fig:exp4e_fitness_A}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth, trim=0cm 2cm 0cm 1.5cm, clip=true]{exp4e_fitness_pareto}
+		\caption{}
+		\label{fig:exp4e_fitness_B}
+	\end{subfigure}
+	\caption{EXPERIMENT 4e: Example of result of the experiments with Evo-RoleMiner$M$ version 3 on Dataset1. (a) Fitness of individuals over several generations (b) Pareto fronts of each generation.}
+	\label{fig:exp4e_fitness}
+\end{figure}
+
+
 

@@ -10,7 +10,7 @@
   
 %Graphics
 \usepackage{graphicx}
-\graphicspath{ {./Figures/} }
+\graphicspath{ {./Figures/} {./Figures/06_Domain/} {./Figures/07_EABackground/} {./Figures/09_Approach/} {./Figures/10_Experiments/} }
 \DeclareGraphicsExtensions{.png,.jpg,.pdf} 
 \usepackage{afterpage}
 \usepackage[font={small,it}]{caption}
@@ -99,18 +99,18 @@
 
 \import{chapters/}{05_Introduction.tex}
 
-\graphicspath{ {./Figures/06_Domain/} }
+%\graphicspath{ {./Figures/06_Domain/} }
 \import{chapters/}{06_Domain.tex}
 
-\graphicspath{ {./Figures/07_EABackground/} }
+%\graphicspath{ {./Figures/07_EABackground/} }
 \import{chapters/}{07_EABackground.tex}
 
 \import{chapters/}{08_RelatedWork.tex}
 
-\graphicspath{ {./Figures/09_Approach/} }
+%\graphicspath{ {./Figures/09_Approach/} }
 \import{chapters/}{09_Approach.tex}
 
-\graphicspath{ {./Figures/10_Experiments/} }
+%\graphicspath{ {./Figures/10_Experiments/} }
 \import{chapters/}{10_Experiments.tex}
 
 \import{chapters/}{11_Discussion.tex}
@@ -124,12 +124,9 @@
 \newpage
 \begin{appendices}
     \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
-    \chapter{Implementation}
-        \import{chapters/}{15_AppendixA.tex}
-    \chapter{Datasets}
-        \import{chapters/}{16_AppendixB.tex}
-    \chapter{Experiment Results}
-	    \import{chapters/}{17_AppendixC.tex}
+    \import{chapters/}{15_AppendixA.tex}
+    \import{chapters/}{16_AppendixB.tex}
+    \import{chapters/}{17_AppendixC.tex}
 \end{appendices}
 
 \end{document}

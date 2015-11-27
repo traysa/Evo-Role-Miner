@@ -5,44 +5,24 @@ The role mining problems (see section \ref{sec:roleMiningProblems}) have been ap
 
 Since there has not been a lot of research done up till now regarding Role Mining with evolutionary computation (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the domain-specific problem as evolutionary computation problem. The evolutionary algorithms, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described in the following sections. \hl{For handling constraints for an RBAC$_2$ role model, a penalty function and intelligent variation operators are introduced. In order to come to an human digestible representation of individuals for human feedback in an IEC approach, an alternative approach with a different representation and a Co-Evolution technique is presented.}
 
-In this thesis a single- and a multi-objective EA for Role Mining has been constructed, where the objectives can be exchanged in regard to the considered Role Mining Problem. In the following the algorithms will be called Evo-RoleMiner and Evo-RoleMiner$M$ accordingly.
-The Evo-RoleMiner is based on the evolutionary algorithm process described in chapter \ref{sec:EA}. A pseudo-code is outlined in Algorithm \ref{alg:EA} in the Appendix. The Evo-RoleMiner$M$ is based on the NSGA-II algorithm described in section \ref{sec:nsga2}. The second version of the Evo-RoleMiner$M$ is based on the improved NSGA-II$R$ algorithm from Fortin et al.\cite{Fortin:2013} (see also section \ref{sec:crowdingDistance}).
+	\section{Evo-RoleMiner and Evo-RoleMiner$M$}
+	In this thesis a single- and a multi-objective EA for Role Mining has been constructed, where the objectives can be exchanged in regard to the considered Role Mining Problem. In the following the algorithms will be called Evo-RoleMiner and Evo-RoleMiner$M$ accordingly.
+	
+	The Evo-RoleMiner is based on the evolutionary algorithm process described in chapter \ref{sec:EA}. A pseudo-code is outlined in Algorithm \ref{alg:EA} in the Appendix.
+	
+	The Evo-RoleMiner$M$ is based on the NSGA-II algorithm described in section \ref{sec:nsga2}. The second version of the Evo-RoleMiner$M$ is based on the improved NSGA-II$R$ algorithm from Fortin et al.\cite{Fortin:2013} (see also section \ref{sec:crowdingDistance}). In a third version of the Evo-RoleMiner$M$ the second of two objectives can be relaxed by setting a weight (see also section \ref{sec:weightedNSGA2}). The third version builds on version two of the Evo-RoleMiner$M$ and is based on NSGA-II$R$ with weights.
     
     \section{Representation of a Role Model as Individual}
-    The representation of individuals in an EA is crucial for the success of the EA and influences the variation operators. Finding a good representation of role models as individuals for a Role Mining EA is a challenging task, since the number of roles for a role model is not predefined. In the following one bit-string and two representations are introduced and evaluated. The complex representations were proposed by Saenko \& Kotenko\cite{saenko2012design}.
+    The representation of individuals in an EA is crucial for the success of the EA and influences the variation operators. Finding a good representation of role models as individuals for a Role Mining EA is a challenging task, since the number of roles for a role model is not necessarily predefined and part of the search. After considering a bit-string representation and the multi-chromosomal representation proposed by Saenko \& Kotenko\cite{Igor} (see Appendix \ref{sec:A_representations}), the improved representation proposed by Saenko \& Kotenko\cite{saenko2012design} has been chosen as representation of individuals. One of the drawbacks of the other representations are unnecessary information (unused roles). Another disadvantage of the representations are complex crossover operations.
     
-        \subsection{Representation as Bit-string}
-        The representation of individuals as bit-string is one of the simplest and is often mistakenly used in genetic algorithms\cite{Eiben}. A suggestion for a bit-string representation for a role model is derived from a combined user-role- (UA) and role-permission-matrix (PA). Figure \ref{fig:representation1} shows an example of a combined UA- and PA-Matrix and an according bit-string representation.
+    The improved representation eliminates these drawbacks by having one chromosome for an individual, where no unnecessary information occur. The chromosome consists of a list of roles, which contain a user-list and a permission-list (see figure \ref{fig:representation3}). For the Evo-RoleMiner and Evo-RoleMiner$M$ the user- and permission lists are implemented as sets.
         
-        \begin{figure}[H]
-            \centering
-            \includegraphics[scale=0.4]{BitstringRepresentation}
-            \caption{\textit{Example of a UA- and PA-Matrix with its bit-string representation}}
-            \label{fig:representation1}
-        \end{figure}
-        
-        The motivation of this initial idea is that the mutation operator can be easily executed by just flipping a bit within the bit-string. The mutation is therefore adding or removing a user or permission from a role. For the decoding two leading 8-bit integers can represent the number of users and permission. However, the problem with this representation is that the number of roles needs to be pre-defined, such that the bit-string can be decoded again. Alternatively another leading 8-bit integer can represent the number of roles in the role model. But varying the number of roles demands adding or removing bits in the bit-string for each user-role- and role-permission relation. Furthermore the information that a user or a permission is not part of a role seems to unnecessarily lengthens the bit-string, which can consume a lot of space for high-dimensional UA- and PA-Matrices.
-        
-        \subsection{Representations as Complex Objects}
-        In Saenko \& Kotenko\cite{saenko2012design} two different representations are introduced, which are briefly described in section \ref{sec:relatedWork3}. With the first representation the authors suggest a multi-chromosomal representation where the number of roles becomes part of the search. An example can be seen in figure \ref{fig:representation2}. A drawback of this representation are unnecessary genes (roles) like the unnecessary information in the bit-string representation. Another disadvantage of the representation are complex crossover operations\cite{saenko2012design}.
-        
-        \begin{figure}[H]
-            \centering
-            \includegraphics[scale=0.5]{ComplexRepresentation1}
-            \caption{Example of a multi-chromosomal representation. Chromosome X represents the UA-Informationa and Chromosome Y the PA-Information. Chromosome Z determines if a role is active or passive. The columns in all chromosomes are consistent to roles. In this example roles 1, 3 and 5 are active.}
-            \label{fig:representation2}
-        \end{figure}
-        
-        The second improved representation eliminates these drawbacks by having one chromosome for an individual, where no unnecessary genes (roles) occur. The chromosome consists of a list of roles, which contain a user-list and a permission-list (see figure \ref{fig:representation3}).
-        
-        \begin{figure}[H]
-            \centering
-            \includegraphics[scale=0.4]{ComplexRepresentation2}
-            \caption{Example of a role model representation suggested in Saenko \& Kotenko\cite{saenko2012design}. A row represents a role (gene). In the column $L^X$ are user lists and in the column $L^Y$ are permission lists.}
-            \label{fig:representation3}
-        \end{figure}
-        
-        Due to the advantages of the improved representation of Saenko \& Kotenko\cite{saenko2012design}, their suggested representation has been implemented for the Evo-RoleMiner and Evo-RoleMiner$M$. The user- and permission lists are implemented as sets.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.4]{ComplexRepresentation2}
+        \caption{Example of a role model representation suggested in Saenko \& Kotenko\cite{saenko2012design}. A row represents a role (gene). In the column $L^X$ are user lists and in the column $L^Y$ are permission lists.}
+        \label{fig:representation3}
+    \end{figure}
     
     \section{Variation Operators on Role Model Representation}
     Dependent on the choice of the representation of individuals in the previous section, according mutation and crossover methods are created. The choice of variation operators and how often they are executed influences how much of the search space is discovered during the evolution. Since the improved representation of Saenko \& Kotenko\cite{saenko2012design} has been selected for this thesis, the following variation operators are suited for this representation.
@@ -331,7 +311,8 @@ The Evo-RoleMiner is based on the evolutionary algorithm process described in ch
 		where $INT$ stands for the interpretability measure and $w_6$ is the weight for the interpretability objective. Since the function is a minimization function, the Interpretability value is inversed in order to reward a higher interpretability.
     
     \section{Initialization of the Population and Termination condition}
-    The initial population is randomly generated by creating chromosomes (role models) of either random or fixed gene size (role size), which contain a random set of users and permissions. The initialization of role models with a fixed role size is only used for the Min-Noise-RMP (see section \ref{sec:roleMiningProblems}). It is ensured that each role has at least one user and permission assigned. It should be noted that incomplete role models can be generated, where users might not get any role or permissions are not contained in any role.
+    The initial population is randomly generated by creating chromosomes (role models) of either random or fixed gene size (role size), which contain a random set of users and permissions. The initialization of role models with a fixed role size is only used for the Min-Noise-RMP (see section \ref{sec:roleMiningProblems}).
+    It is ensured that each role has at least one user and permission assigned. It should be noted that incomplete role models can be generated, where users might not get any role or permissions are not contained in any role.
     The termination of the EA is via a previously set generation limit.
     
     \section{Constraint Handling for RBAC$_2$ role models}
