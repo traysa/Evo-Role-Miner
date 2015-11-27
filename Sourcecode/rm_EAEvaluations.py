@@ -49,7 +49,7 @@ def evalFunc_Violations(individual, Original, constraints=[]):
         worstCase_fitness = 3
         fitness = worstCase_fitness
     else:
-        worstCase_accs = Original.sum() # All permissions are assigned directly to user
+        '''worstCase_accs = Original.sum() # All permissions are assigned directly to user
         bestCase_accs = 0 # No direct assignements required
         range_accs = worstCase_accs-bestCase_accs+1
         accs_normalized = (accs-bestCase_accs+1)/range_accs
@@ -59,7 +59,8 @@ def evalFunc_Violations(individual, Original, constraints=[]):
         range_conf = worstCase_conf-bestCase_conf+1
         conf_normalized = (conf-bestCase_conf+1)/range_conf
 
-        fitness = (conf_normalized+accs_normalized)
+        fitness = (conf_normalized+accs_normalized)'''
+        fitness = (conf+accs)
 
     return fitness,
 
@@ -204,15 +205,33 @@ def evalFunc_Conf_AssignmentCnt(individual, Original, constraints=[]):
 # Interpretability is the average Role Fitness (calculation based on Generalized Intra-Inter Silhouette Index)
 # No Normalization
 # -----------------------------------------------------------------------------------
+def evalFunc_Int_AssignmentCnt(individual, Original, userAttributeValues, constraints=[]):
+    userSize = Original.shape[0]
+    permissionSize = Original.shape[1]
+    if (constraints and not feasible(individual, userSize, permissionSize, constraints)):
+        worstCase_interp = 1
+        fitness = worstCase_interp
+    else:
+        AssignmentCnt = statistics.URCnt(individual[0])+statistics.RPCnt(individual[0])
+        AssignmentCnt_normalized = utils.normalization(AssignmentCnt,userSize+permissionSize,userSize * permissionSize)
+        interp = statistics.Interp(individual[0],userAttributeValues)
+        fitness = AssignmentCnt_normalized-interp+1
+    return fitness,
+
+# -----------------------------------------------------------------------------------
+# Single Objective Evaluation: Interpretability
+# Interpretability is the average Role Fitness (calculation based on Generalized Intra-Inter Silhouette Index)
+# No Normalization
+# -----------------------------------------------------------------------------------
 def evalFunc_Interpretability(individual, Original, userAttributeValues, constraints=[]):
     userSize = Original.shape[0]
     permissionSize = Original.shape[1]
     interp = statistics.Interp(individual[0],userAttributeValues)
     if (constraints and not feasible(individual, userSize, permissionSize, constraints)):
-        worstCase_interp = 0
+        worstCase_interp = 1
         fitness = worstCase_interp
     else:
-        fitness = interp
+        fitness = abs(interp*(-1))
     return fitness,
 
 
@@ -532,6 +551,8 @@ def evalFunc_Multi(individual, Original, evalFunc, userAttributeValues=[], const
             fitness+= (evalFunc_AssignmentCnt(individual, Original=Original, constraints=constraints)[0],)
         elif (obj=="Conf_AssignmentCnt"):
             fitness+= (evalFunc_Conf_AssignmentCnt(individual, Original=Original, constraints=constraints)[0],)
+        elif (obj=="Int_AssignmentCnt"):
+            fitness+= (evalFunc_Int_AssignmentCnt(individual, Original=Original, userAttributeValues=userAttributeValues, constraints=constraints)[0],)
         elif (obj=="AvgRoleConf"):
             fitness+= (evalFunc_AvgRoleConfViolations(individual, Original=Original, constraints=constraints)[0],)
         elif (obj=="Interpretability"):

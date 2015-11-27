@@ -136,7 +136,7 @@ def evolution_multi_weighted(Original, evalFunc, populationSize, obj_weights, CX
 
     # Creating the population
     if (not population):
-        print("Generate new population of "+str(populationSize)+" individuals")
+        logger.info("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
 
     solutionFound = None
@@ -285,4 +285,4 @@ def evolution_multi_weighted(Original, evalFunc, populationSize, obj_weights, CX
 
     top = toolbox.select(population, k=numberTopRoleModels)
 
-    return population, results, generation, time, prevFiles, top, logbook, fileExt
+    return population, results, generation, time, prevFiles, top, logbook, fileExt, solutionFound

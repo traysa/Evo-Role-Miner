@@ -71,6 +71,16 @@ def getDataSet(DATA):
         fitness = eval.evalFunc_FEdgeMin_INT([individual], Original, [0,1,1,0.5,0.5,0.8], userAttributeValues, constraints=[])
         logger.info("VALIDATION OF DATASET")
         logger.info("Fitness of solution of dataset: "+str(fitness))
+    elif (DATA=="GeneratedData_Set2"):
+        Original = numpy.matrix(parser.read("..\\TestData\\GeneratedData_Set2\\testdata.rbac"))
+        userAttributeValues, userAttributes = parser.readUserAttributes("..\\TestData\\GeneratedData_Set2\\users.csv")
+        #constraints = parser.readConstraints("..\\TestData\\GeneratedData_Set2\\constraints.csv")
+        URMatrix = parser.readURMatrix("..\\TestData\\GeneratedData_Set2\\URMatrix.csv")
+        RPMatrix = parser.readRPMatrix("..\\TestData\\GeneratedData_Set2\\RPMatrix.csv")
+        individual = utils.buildIndividual(URMatrix,RPMatrix)
+        fitness = eval.evalFunc_Interpretability([individual], Original, userAttributeValues, constraints=[])
+        logger.info("VALIDATION OF DATASET (INT)")
+        logger.info("Fitness of solution of dataset: "+str(fitness))
     return Original, userAttributeValues, userAttributes, constraints
 
 #-----------------------------------------------------------------------------------------------------------------------

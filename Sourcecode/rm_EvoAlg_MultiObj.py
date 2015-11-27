@@ -137,15 +137,19 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
         logger.info("Generate new population of "+str(populationSize)+" individuals")
         population = toolbox.population(n=populationSize)
 
-    solutionFound = None
+    solutionFound = [None,None,None]
 
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
         ind.fitness.values = fit
+        if (fit[0]==0):
+            solutionFound[0] = 0
+        if (fit[1]==0):
+            solutionFound[1] = 0
         if (max(fit)==0):
-            solutionFound = 0
+            solutionFound[2] = 0
 
     # Save population in JSON file
     if (printPopulations):
@@ -202,8 +206,12 @@ def evolution_multi(Original, evalFunc, populationSize, CXPB, addRolePB, removeR
         fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
-            if (not solutionFound and max(fit)==0):
-                solutionFound = generation
+            if (not solutionFound[0] and fit[0]==0):
+                solutionFound[0] = generation
+            if (not solutionFound[1] and fit[1]==0):
+                solutionFound[1] = generation
+            if (not solutionFound[2] and max(fit)==0):
+                solutionFound[2] = generation
             #if (fit[0] == 0):
             #    stop = True
 
