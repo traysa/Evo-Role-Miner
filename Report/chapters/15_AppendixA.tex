@@ -25,9 +25,22 @@
 
 \chapter{Implementation}
 \section{Implementation Information}
-	For the implementation of the Evo-RoleMiner and the Evo-Roleminer$M$ the programming language Python has been chosen. For rapid prototyping of the Evo-RoleMiner and the Evo-Roleminer$M$ the Framework "Distributed Evolutionary Algorithms in Python (DEAP)"\cite{DeRainville:2012} has been used.
+	For the implementation of the Evo-RoleMiner and the Evo-Roleminer$M$ the programming language Python has been chosen. For rapid prototyping of the Evo-RoleMiner and the Evo-Roleminer$M$ the Framework "Distributed Evolutionary Algorithms in Python (DEAP)"\cite{DeRainville:2012} has been used. The development and testing have been executed on a computer with the following specifications.
 	
-	The development and testing have been executed on a laptop with the following configurations: \hl{...}
+	\begin{table}[H]
+		\centering
+		\caption{Computer specifications}
+		\label{tab:specifications}
+		\begin{tabular}{|l|l|}
+			\hline
+			\rowcolor[HTML]{EFEFEF} 
+			Specification &                            \\ \hline
+			CPU           & 1.90GHz-2.49GHz            \\ \hline
+			RAM           & 12 GB                      \\ \hline
+			Processor     & Intel(R) Core(TM) i5-4300U \\ \hline
+			System type   & x64-bit                    \\ \hline
+		\end{tabular}
+	\end{table}
 	
 \section{Evo-RoleMiner Algorithm}
 	In Algorithm \ref{alg:EA} the pseudo-code of the Evo-RoleMiner is given. The algorithm starts with the initial generation and evaluation of the parent population $P_p$. Then, for each generation, individuals from $P_p$ are selected and cloned as offspring population $P_o$. A loop over neighboring individuals in $P_o$ is mating individuals $\mathbf{x}_i$ and $\mathbf{x}_{i+1}$ by crossover probability $CXPB$. The resulting children $\mathbf{y}_i$ and $\mathbf{y}_{i+1}$ replace their respective parents in $P_o$. In a second loop over all individuals in $P_o$ the individuals get mutated by mutation probability $MUTPB$. The resulting mutation is replacing the original individual. The resulting individuals in $P_o$ can be generated from crossover only, mutation only, crossover and mutation, and reproduction according to the given probabilities $CXPB$ and $MUTPB$. The offspring population $P_o$ is then getting the parent population $P_p$ for the next generation, after each individual got evaluated.
@@ -62,6 +75,59 @@
 	   	\end{algorithmic}
 	\end{algorithm}
 
+\section{Rule Induction}
+\label{sec:A_ruleInduction}
+	\begin{algorithm}
+		\small
+		\caption{Rule induction algorithm for classifier-rules for roles\protect\\
+			$D$ = List of role members, which are not matched by current rule\protect\\
+			$RM$ = List of users, which are member of the role\protect\\
+			$notRM$ = List of users, which are not members of the role\protect\\
+			$rule$ = Current rule\protect\\
+			$max$ = Maximum allowed rule size (number of OR-connected rules)\protect\\
+			$Sensitivity$ = Probability that rule matches a user in a user set}
+		\label{alg:ruleInduction}
+		\begin{algorithmic}[1]
+			\Procedure{ruleInduction}{$D$,$RM$,$notRM$,$rule$,$max$}
+			\State $allAttrSets$ = Create all combinations of attributes
+			\State sort($allAttrSets$)
+			\State $ruleSet$ = []
+			\While{ $len(D) > 0$}
+			\State $member = D.pop()$
+			\While{ $len(allAttrSets) > 0$}
+			\State $attrSet = allAttrSets.pop()$
+			\State $newRule$ = \textsc{createRule}($attrSet$,$member$)
+			\State $rule$.add($newRule$)
+			\State $Sensitivity_{notRM}$ = \textsc{calculateSensitivity}($rule$,$notRM$)
+			\If{ $Sensitivity_{notRM} <= (1/3)$}
+			\State $Sensitivity_{RM}$ = \textsc{calculateSensitivity}($rule$,$RM$)
+			\State Remove users in $D$, which are matching $rule$
+			\If{ $Sensitivity_{RM} >= (2/3)$}
+			\State $ruleSet$.append($rule$,$PB_{RM}$,$PB_{notRM}$)
+			\If{ $Sensitivity_{RM} == 1$ AND $PB_{notRM} == 0$}
+			\State $allAttrSets$ = \textsc{reduceAllAttrSet}($allAttrSets$, $rule$)
+			\EndIf
+			\Else
+			\If { $size(rule) <= max$}
+			\State ... recursion ...
+			\iffalse
+			\State $extendedRules$ = ruleInduction($D$,$RM$,$notRM$,$rule$,$max$)
+			\For {$extendedRule$ in $extendedRules$}
+			\State $ruleSet$.append($extendedRule$)
+			\If{ $PB_{RM} == 1$ AND $PB_{notRM} == 0$}
+			\State $allAttrSets$=\textsc{reduceAllAttrSet}($allAttrSets$, $rule$)
+			\EndIf
+			\EndFor
+			\fi
+			\EndIf
+			\EndIf
+			\EndIf
+			\EndWhile 
+			\EndWhile
+			\State \Return $ruleSet$
+			\EndProcedure
+		\end{algorithmic}
+	\end{algorithm}
 \section{Data Generator}
 \label{sec:A_dataGenerator}
 	Some papers are providing data generators for synthetic datasets for the performance evaluation of the various role mining algorithms. The data generator in Vaidya et al.\cite{Vaidya:2006:RMR:1180405.1180424} takes as input the number of users, permissions and roles to generate a pair of User-Role-Assignment and Role-Permission-Assignment matrices. Combining these two matrices, the corresponding User-Permission-Assignment matrix is obtained.\\

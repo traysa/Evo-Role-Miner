@@ -1,4 +1,4 @@
-\section{Experiment 2 - Basic Setup}
+\section{Experiment 2 - Fitness Functions}
 \label{sec:exp2}
 In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} and $F_{edge}^{min}$ \eqref{eq:FEdgeMin} are tested on the Dataset1 (Experiment 2a and 2b) and the Healthcare dataset (Experiment 2c and 2d) . The setup for the experiments can be seen in table \ref{tab:exp2_setup}. The weights for $F_{basic}^{min}$ and $F_{edge}^{min}$ are set all to one.
 
@@ -28,53 +28,85 @@ In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{
     \label{tab:exp2_setup}
 \end{table}
 
-The results of the experiments can be seen in experiment 2a-d in table \ref{tab:exp2_results}. The fitness graphs can be seen in the Appendix \ref{sec:A_exp2}. In all experiments the fitness is improving over time. The fitness functions look like a hyperbola, where the improvement is strong in the first generations and less strong in the last generations.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.5\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2a_Fitness}
+		\caption{$F_{basic}^{min}$, Dataset1, 100 generations}
+		\label{fig:exp2a_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.5\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2b_Fitness}
+		\caption{$F_{edge}^{min}$, Dataset1, 100 generations}
+		\label{fig:exp2b_Fitness}
+	\end{subfigure}
+	
+	\begin{subfigure}{0.5\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2c_Fitness}
+		\caption{$F_{basic}^{min}$, Healthcare, 1000 generations}
+		\label{fig:exp2c_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.5\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2d_Fitness}
+		\caption{$F_{edge}^{min}$, Healthcare, 1000 generations}
+		\label{fig:exp2d_Fitness}
+	\end{subfigure}
+	\caption{EXPERIMENT2: Fitness graphs of ten experiments with the Evo-RoleMiner with setup in Table \ref{tab:exp2_setup} for Dataset1 and Healthcare dataset. The values for Fitness (y-axes) are the average minimum of all experiments over generations (x-axes)}
+	\label{fig:Results_Exp2_FitnessGraphs}
+\end{figure}
 
-\begin{table}
-   	\centering
-   	\caption{Evo-RoleMiner: Results of ten experiments for Dataset1 and Healthcare dataset. The values for Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|PA|$) are the average minimum in the last Generation of all experiments. The values for Interpretability (INT) are the average maximum in the last Generation of all experiments. The time is the average runtime in seconds of all experiments.}
-   	\label{tab:exp2_results}
-    \subcaption*{DATASET1}
-    \begin{adjustbox}{width=\textwidth}
-	     \begin{tabular}{|l|l|c|c|c|c|c|c|c|c|}
-	         \hline
-	         \rowcolor{myGray} 
-	         \textbf{Experiment} & \textbf{Fitness Function} & \textbf{Fitness} & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|PA|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
-	         2a & $F_{basic}^{min}$ &   0.38   &   2.8   &   0   &   2   &   8.9   &   7.9   &  1   &   336\\ \hline
-	         2b & $F_{edge}^{min}$ &    0.15    &   2.8   &   0   &   3.1   &   9.6   &   11.1   &   1   &   343\\ \hline            
-	         3a & $F_{basic}^{min}$ &   0.08   &   0   &   0   &   3.9   &   10   &   13.3   &   1   & 372\\ \hline
-	         3b & $F_{edge}^{min}$ &   0.05   &   0.2   &   0   &   3.9   &   11.4   &   10.8   &   0.998   & 371\\ \hline            
-	         5a & $F_{basic\_INT}^{min}$ &   0.1  &   1.1   &   0   &   3.4   &   9.9   &   11.4   &   1   &   584\\ \hline
-	         5b & $F_{edge\_INT}^{min}$ &   0.06   &   0.6   &   0   &   3.7   &   10.8   &   11   &   1   &   585\\ \hline
-	     \end{tabular}
-	\end{adjustbox}
-    \bigskip
-    \subcaption*{HEALTHCARE DATASET}
-    \begin{adjustbox}{width=\textwidth}
-    	\begin{tabular}{|l|l|c|c|c|c|c|c|c|c|}
-        	\hline
-        	\rowcolor{myGray} 
-        	\textbf{Experiment} & \textbf{Fitness Function} & \textbf{Fitness} & \textbf{$|G_{conf}|$} & \textbf{$|G_{accs}|$} & \textbf{$|R|$} & \textbf{$|UA|$} & \textbf{$|PA|$} & \textbf{INT} & \textbf{Time (in sec)}\\ \hline
-        	2c & $F_{basic}^{min}$ &   0.13   &   3.6   &   48.4   &   2   &   54.8   &   60.8   &   -   & 664\\ \hline
-        	2d & $F_{edge}^{min}$ &   0.12   &   4.5   &   52.5   &   3.3   &   62.3   &   56.6   &   -   & 775\\ \hline
-        	3c & $F_{basic}^{min}$ &   0.09   &   1.3   &   43.6   &   8.5   &   153.5   &   154.4   &   -   & 1329\\ \hline
-        	3d & $F_{edge}^{min}$  &   0.05   &   2.1   &   18.1   &   14.8   &   155   &   168.6   &   -   & 1554\\ \hline
-        \end{tabular}
-	\end{adjustbox}
-\end{table}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=2cm 2cm 2cm 1.5cm, clip=true]{Results_Exp2_Dataset1_Fitness}
+		\caption{Dataset1}
+		\label{fig:Results_Exp2_Dataset1_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.55\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=4cm 2cm 4cm 1.5cm, clip=true]{Results_Exp2_Dataset1_Statistics}
+		\caption{Dataset1}
+		\label{fig:Results_Exp2_Dataset1_Statistics}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=2cm 2cm 2cm 1.5cm, clip=true]{Results_Exp2_Healthcare_Fitness}
+		\caption{Healthcare}
+		\label{fig:Results_Exp2_Healthcare_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.55\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=4cm 2cm 4cm 1.5cm, clip=true]{Results_Exp2_Healthcare_Statistics}
+		\caption{Healthcare}
+		\label{fig:Results_Exp2_Healthcare_Statistics}
+	\end{subfigure}
+	\caption{EXPERIMENT2: Statistics of ten experiments with the Evo-RoleMiner with setup in Table \ref{tab:exp2_setup} for Dataset1 and Healthcare dataset. The values for Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|PA|$) are the average minimum in the last Generation of all experiments.}
+	\label{fig:Results_Exp2}
+\end{figure}
 
-For the experiments with fitness function $F_{basic}^{min}$ on Dataset1 (see experiment 2a in table \ref{tab:exp2_results}), the average minimum number of roles in the results are two, which is according to the objective of minimizing roles in $F_{basic}^{min}$ a good result. But the number of roles in the Dataset1 is known to be four. The discovered small amount of roles has the drawback that the other objectives are harder to reach. The number of confidentiality violations has not reached zero in any of the ten experiments, where it is known that a solution exists with no violations when the role count is four. Also the average minimum number of roles for the Healthcare dataset (see experiment 2c in table \ref{tab:exp2_results}) seem to be very low with two roles compared to results in other papers where the lowest role count is 14 \cite{Ene}\cite{Molloy:2009:ERM:1542207.1542224}. The number of violations for the Healthcare dataset are not optimal, in the sense that when the according role model is applied some users will gain access rights and others will loose some. If this is acceptable is hard to judge since the details of the Healthcare dataset are unknown, e.g. how critical certain permissions are and how much noise is given.
+In all experiments the fitness is improving over time. The fitness functions look like a hyperbola, where the improvement is strong in the first generations and less strong in the last generations (see Figure \ref{fig:Results_Exp2_FitnessGraphs}). The average fitness value in the last generation in the experiments with fitness function $F_{edge}^{min}$ are better than in the experiments with fitness function $F_{basic}^{min}$ (see Figure \ref{fig:Results_Exp2}). A T-Test\footnote{A T-Test is used to test the null hypothesis that the means of two populations are equal} on the results of the experiments\footnote{See Appendix \ref{sec:A_Exp2} for data} confirms that this difference is statistically different (P-Value: 3.03E-17).
 
-The experiments with fitness function $F_{edge}^{min}$ show a slightly higher amount of the average minimum role count (see experiment 2b and 2d in table \ref{tab:exp2_results}). Comparing the minimum amount of roles of each experiment in experiment 2a and 2b with an unpaired T-Tests\footnote{A T-Test is used to test the null hypothesis that the means of two populations are equal} confirm that the difference is statistically significant (P-value less than \hl{0.0001}). The same is confirmed for the experiments in experiment 2c and 2d. This seem reasonable, since the fitness function $F_{edge}^{min}$ tries to minimize $|UA|$ and $|PA|$ and only has an indirect focus on minimizing the role count $|R|$.
+For the experiments with fitness function $F_{basic}^{min}$ on Dataset1 (see experiment 2a in Figure \ref{fig:Results_Exp2_Dataset1_Statistics}), the average minimum number of roles in the results are two, which is according to the objective of minimizing roles in $F_{basic}^{min}$ a good result. But it is known that a better result with a role count of four can be achieved (see Figure \ref{fig:dataset1}). The discovered small amount of roles has the drawback that the other objectives are harder to reach. The number of confidentiality violations has not reached zero in any of the ten experiments, where it is known that a solution exists with no violations when the role count is four.
 
-An optimal solution can not be reached if the role count or the assignment counts are zero. An optimal solution in regards of the violations of Dataset1 is not reached in the ten experiments with fitness function $F_{basic}^{min}$ and is reached once in ten experiments with fitness function $F_{edge}^{min}$ as seen in Figure \ref{fig:exp2b_RM}. For the Healthcare dataset no optimal solution in regards of the violations is reached in any experiment.
+Also the average minimum number of roles for the Healthcare dataset (see experiment 2c in Figure \ref{fig:Results_Exp2_Healthcare_Statistics}) seem to be very low with two roles compared to results in other papers where the lowest role count is 14 \cite{Ene}\cite{Molloy:2009:ERM:1542207.1542224}. The number of violations for the Healthcare dataset are not optimal, in the sense that when the according role model is applied some users will gain access rights and others will loose some. If this is acceptable is hard to judge since the details of the Healthcare dataset are unknown, e.g. how critical certain permissions are and how much noise is given.
+
+The experiments with fitness function $F_{edge}^{min}$ show a slightly higher amount of the average minimum role count (see experiment 2b and 2d in Figure \ref{fig:Results_Exp2}). Comparing the minimum amount of roles of each experiment in experiment 2a and 2b with an unpaired T-Tests confirm that the difference is statistically significant (P-Value: 1.61E-06). The same is confirmed for the experiments in experiment 2c and 2d. This seem reasonable, since the fitness function $F_{edge}^{min}$ tries to minimize $|UA|$ and $|PA|$ and only has an indirect focus on minimizing the role count $|R|$.
+
+It can be noted that the average minimum count of $|UA|$ and $|PA|$ in the experiments with fitness function $F_{basic}^{min}$ is lower than in the experiments with fitness function $F_{edge}^{min}$, although the latter functions' objective is to minimize $|UA|$ and $|PA|$. An explanation for this would be that the first fitness function encourages the reduction of the number of roles, which than lowers the maximum amount of possible $|UA|$ and $|PA|$.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\textwidth, trim=4cm 2cm 4cm 2cm, clip=true]{exp2b_RM}
-	\caption{EXPERIMENT 2b: Example of fitness-optimal solution role model resulting of Evo-RoleMiner with Fitness function $F_{edge}^{min}$ on Dataset1 with setup in table \ref{tab:exp2_setup}. From u.l. to l.r.: User-Role Matrix (Rows: Users, Columns: Roles), Role-Permission Matrix (Rows: Roles, Columns: Permissions), Resulting User-Permission Matrix (Rows: Users, Columns: Permissions), Original User-Permission Matrix from Input (Rows: Users, Columns: Permissions). A blue box stands for an assignment.}
+	\caption{EXPERIMENT 2b: Example of fitness-optimal solution role model resulting of Evo-RoleMiner with Fitness function $F_{edge}^{min}$ on Dataset1 with setup in table \ref{tab:exp2_setup}. From upper left to lower right: User-Role Matrix (Rows: Users, Columns: Roles), Role-Permission Matrix (Rows: Roles, Columns: Permissions), Resulting User-Permission Matrix (Rows: Users, Columns: Permissions), Original User-Permission Matrix from Input (Rows: Users, Columns: Permissions). A blue box stands for an assignment.}
 	\label{fig:exp2b_RM}
 \end{figure}
+
+An optimal solution can not be reached if the role count or the assignment counts are zero. An optimal solution in regards of the violations of Dataset1 is not reached in the ten experiments with fitness function $F_{basic}^{min}$ and is reached once in ten experiments with fitness function $F_{edge}^{min}$ as seen in Figure \ref{fig:exp2b_RM}. For the Healthcare dataset no optimal solution in regards of the violations is reached in any experiment.
 
 There are several elements in the EA, which can influence the number of roles. One element is the mutation and the probability for role removal. The fitness function also has a big impact. While in $F_{basic}^{min}$ it is obvious that the weight for the Role count $|R|$ has an impact, Experiment 1 (see section \ref{sec:exp1}) showed that also the number of $|UA|$ and $|PA|$ have an indirect influence on the role count. Therefore the weight for $|UA|$ + $|PA|$ in $F_{edge}^{min}$ can influence the role count. Furthermore also the violation count ($G_{conf}$ and $G_{accs}$) have an indirect impact on the role count, which was also found in the experiments of Experiment 1. A third element, which can lead to reduction of roles is the local optimization after a mutation and a crossover (see section \ref{sec:localOptimization}).
 

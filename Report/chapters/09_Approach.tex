@@ -3,14 +3,17 @@
 \label{sec:approach}
 The role mining problems (see section \ref{sec:roleMiningProblems}) have been approached with different problem formulations, techniques and algorithms. In this thesis the approach of solving role mining with an evolutionary computation approach is investigated. \hl{An evolutionary computation has the advantage of ... , which is needed for RoleMining.}
 
-Since there has not been a lot of research done up till now regarding Role Mining with evolutionary computation (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the domain-specific problem as evolutionary computation problem. The evolutionary algorithms, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described in the following sections. \hl{For handling constraints for an RBAC$_2$ role model, a penalty function and intelligent variation operators are introduced. In order to come to an human digestible representation of individuals for human feedback in an IEC approach, an alternative approach with a different representation and a Co-Evolution technique is presented.}
+Since there has not been a lot of research done up till now regarding Role Mining with evolutionary computation (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the Basic-RMP and Min-Edge-RMP as evolutionary computation problem. The focus is on building an RBAC$_0$ model from scratch, where the input is an access policy configuration as $UPA$-Matrix. Furthermore a measure for the role interpretability is suggested in order to measure the quality of a role model and to solve the Interference-RMP with the same approach.  
+
+The in the following sections the evolutionary algorithms, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described. For handling constraints for an RBAC$_2$ role model, a penalty function is suggested.
 
 	\section{Evo-RoleMiner and Evo-RoleMiner$M$}
+	\label{sec:EvoRoleMiner}
 	In this thesis a single- and a multi-objective EA for Role Mining has been constructed, where the objectives can be exchanged in regard to the considered Role Mining Problem. In the following the algorithms will be called Evo-RoleMiner and Evo-RoleMiner$M$ accordingly.
 	
 	The Evo-RoleMiner is based on the evolutionary algorithm process described in chapter \ref{sec:EA}. A pseudo-code is outlined in Algorithm \ref{alg:EA} in the Appendix.
 	
-	The Evo-RoleMiner$M$ is based on the NSGA-II algorithm described in section \ref{sec:nsga2}. The second version of the Evo-RoleMiner$M$ is based on the improved NSGA-II$R$ algorithm from Fortin et al.\cite{Fortin:2013} (see also section \ref{sec:crowdingDistance}). In a third version of the Evo-RoleMiner$M$ the second of two objectives can be relaxed by setting a weight (see also section \ref{sec:weightedNSGA2}). The third version builds on version two of the Evo-RoleMiner$M$ and is based on NSGA-II$R$ with weights.
+	The Evo-RoleMiner$M$ is based on the NSGA-II algorithm described in section \ref{sec:nsga2}. A second version of the Evo-RoleMiner$M$ is based on the improved NSGA-II$R$ algorithm from Fortin et al.\cite{Fortin:2013} (see also section \ref{sec:crowdingDistance}). In a third version of the Evo-RoleMiner$M$ the second of two objectives can be relaxed by setting a weight (see also section \ref{sec:weightedNSGA2}). The third version builds on version two of the Evo-RoleMiner$M$ and is based on NSGA-II$R$ with weights.
     
     \section{Representation of a Role Model as Individual}
     The representation of individuals in an EA is crucial for the success of the EA and influences the variation operators. Finding a good representation of role models as individuals for a Role Mining EA is a challenging task, since the number of roles for a role model is not necessarily predefined and part of the search. After considering a bit-string representation and the multi-chromosomal representation proposed by Saenko \& Kotenko\cite{Igor} (see Appendix \ref{sec:A_representations}), the improved representation proposed by Saenko \& Kotenko\cite{saenko2012design} has been chosen as representation of individuals. One of the drawbacks of the other representations are unnecessary information (unused roles). Another disadvantage of the representations are complex crossover operations.
@@ -106,94 +109,89 @@ Since there has not been a lot of research done up till now regarding Role Minin
     A similar approach is followed in Xu \& Stoller\cite{Xu}, but they calculate an attribute mismatch of roles, which does not consider the heterogeneity of users in different roles as well as homogeneity of users in the same role. In the following sections two approaches are discussed theoretically and one of the approaches is implemented.
     
     \fi
-    Two approaches have been considered to measure how well a role can be described by the user attribute values of its user-members. In the following both approaches are introduced, where the later one got implemented.
+    Two ideas have been developed in this thesis to measure how well a role can be described by the user attribute values of its user-members. In the following both ideas are introduced, where the later one has been implemented.
     
         \subsection{Role Cluster Approach}
-        One approach is to treat roles like clusters where the users and their attribute values are objects. A role-cluster is considered good if the user-objects within the role-cluster are compact and the user-objects between role-clusters are separated. This means that the user attribute values considered describe all users within a role (compactness), but no users not in the role (separation). The compactness and separation of a role-cluster can be measured with the average silhouette coefficients of the user-objects of a role-cluster\cite{Han}. If the silhouette coefficient of an user-object approaches 1, the role-cluster, the user is assigned to, is considered compact and the user-object is far away from other role-clusters. A negative silhouette coefficient says that the user-object is closer to user-objects of other role-clusters than to user-objects of the same role-clusters.
+        One suggested approach developed in this thesis is to treat roles like clusters where the users and their attribute values are objects. A role-cluster is considered good if the user-objects within the role-cluster are compact and the user-objects between role-clusters are separated. This means that the user attribute values considered describe all users within a role (compactness), but no users not in the role (separation). The compactness and separation of a role-cluster can be measured with the average silhouette coefficients of the user-objects of a role-cluster\cite{Han}. 
+        
+        For each user $u$ the average distance between the user and all other users in the role, the user $u$ belongs to, has to be calculated for the compactness measure:
+        \begin{equation}\label{eq:compactness}
+	        a(u) = \frac{\sum_{u' \in R_i, u \neq u'}dist(u,u')}{|R_i|-1}
+        \end{equation}
+        where user $u$ is in role $R_i$ as well as users $u'$. The average distance $dist$ is calculated based on the attributes of a user. The separation is measured by:
+        \begin{equation}\label{eq:separartion}
+        b(u) = \min \left\{{\frac{\sum_{u' \in R_j}dist(u,u')}{|R_j|}}\right\}
+        \end{equation}
+        where user $u$ is not in role $R_j$, but the users $u'$ are. The average distance $dist$ is calculated based on the attributes of a user. The silhouette coefficient of an user-object can then be calculated with:
+        \begin{equation}\label{eq:silhouette}
+        s(u) = \frac{b(u) - a(u)}{\max(a(u),b(u))}
+        \end{equation}
+        
+        To calculate the fitness of a role-cluster, the average silhouette coefficient of all users in the role can be calculated. If the average silhouette coefficient converges 1, the role-cluster is considered compact. A negative silhouette coefficient says that the user-object in a role is closer to user-objects of other role-clusters than to user-objects of the same role-clusters.
         
         This measure of the average silhouette coefficients requires the role-clusters to be crisp, which means a user-object can be only in one role-cluster. But since the users can have several roles the role-clusters are fuzzy. Furthermore the measure has to be executed for every user attribute combination. Therefore an altered calculation of silhouette coefficients has to be used or a different measure has to be used to evaluate the role-clusters. To evaluate fuzzy clusters the sum of the squared error (SSE) can be used\cite{Han}. It measures how well a fuzzy clustering fits a data set. In Rawashdeh \& Ralescu\cite{rawashdeh2012fuzzy} the authors suggest an algorithm for the silhouette coefficient in fuzzy clusters.
         
-        The role-cluster approach has not been followed further.
+        The role-cluster approach has not been implemented in this thesis.
         
         \subsection{Role Classifier-Rule Approach}
         \label{sec:classifierRule}
-        Another approach is to generate classifier-rules for roles and measure the accuracy of these rules. Additionally the rule should be simple and not too complex (e.g. many conditions, which identify exactly one user). For this supervised-learning approach, all users in a role get classified as being in the role, while all other users are classified as being not in the role. Hence for each role a binary classification problem has to be solved.
+        Another suggested approach developed in this thesis is to generate classifier-rules for roles and measure the accuracy of these rules. Additionally the rule should be simple and not too complex (e.g. many conditions, which identify exactly one user). For this supervised-learning approach, all users in a role get classified as being in the role, while all other users are classified as being not in the role. Hence for each role a binary classification problem has to be solved. Rules can be extracted from a decision tree or can obtained directly using a Sequential Covering algorithm\cite{Han}. Both approaches will be introduced in the following.
         
-        Rules can be extracted from a decision tree or can obtained directly using a Sequential Covering algorithm\cite{Han}. In traditional decision tree construction like ID3 or C4.5 the dataset gets repeatedly splitted based on the attribute which most effectively splits the dataset in one class or the other. The depth of the tree could be used as the measure of a rule.
+        \begin{itemize}
+        	\item \textbf{Rules from decision trees}\\
+        	In traditional decision tree construction like ID3 or C4.5 the dataset gets repeatedly split based on the attribute which most effectively splits the dataset in one class or the other (information gain). The depth of the tree could be used as the measure of the complexity of a rule. Figure \ref{fig:decisionTree} demonstrates an example decision tree for a role.
+        	
+        	\begin{figure}[H]
+        		\centering
+        	 	\includegraphics[scale=0.35]{DecisionTree}
+        	 	\caption{Example of decision tree for a role}
+        	 	\label{fig:decisionTree}
+        	\end{figure}
+        	
+        	The split by information gain is not necessarily wanted for the rules describing a role, since permissions originally have not been assigned to users which share the most common user attribute values, but rather because users gained legitimation through other specific attribute values. For example although users in a generated role are all located in $Denmark$, while users not in the role are located elsewhere, the reason that users of the role got assigned to the permission set the generated role is grouping could be due to the Departments they are in, which could be diverging. The information gain for the location would be higher, but not necessary the legitimation, why a user gets the permission set assigned through the role. Also the measure used for splitting the data in a decision tree is often biased towards class imbalances or multivalued attributes\cite{Han}.
+        	
+        	Furthermore classifier-rules for both classes are discovered, while for the measuring of the role only the rules for class "\textit{In the role}" are from interest. Therefore the decision tree approach is not considered further.
+        	
+        	\item \textbf{Direct rule induction}\\
+        	The second approach is to discover the most descriptive rules for a role (class "\textit{In the role}") by direct rule induction.
+        	
+        	The algorithm developed in this thesis got inspired by Sequential Covering algorithms, which directly learn rules for classification by repeatedly removing a portion of the dataset. In the following the algorithm for rule induction is described. The according pseudo-code of the algorithm can be seen in Algorithm \ref{alg:ruleInduction} in the Appendix \ref{sec:A_ruleInduction}.
+        	
+        	Before the algorithm is applied on a role, all users of the role in the role model get classified as "\textit{In the role}" or "\textit{Not in the role}". A set of all user attribute combinations is created (see line 2, Algorithm \ref{alg:EA}). If $X$ user attributes are considered, $2^X-1$ combinations are created. For example with the user attributes $Department$ and $Location$, the following combinations are possible:
+        	
+        	\centerline{($Department$), ($Location$), ($Department$, $Location$)}
+        	
+        	The Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2} on the next pages are supporting the following further description.
+        	
+        	The first user in the role is picked ((1) in Figure \ref{fig:ruleInduction1}) and the smallest user attribute combination (for example \{$Department$\}) is chosen ((2) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}). A rule is generated out of the user attribute values of the user for the chosen user attributes. In the example the $Department$ the user is in, creates a rule, i.e. $rule$=\{(\}$HR$\}.
+        	
+        	Next it will be checked if users not in the role also comply with the rule ((3) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}). If too many users outside the role also comply with the rule, the rule is discarded. Basically the sensitivity of the rule according to class "\textit{Not in the role}" is calculated and checked if it is beneath a specified threshold $t1$ (currently set to $t1$=$\frac{1}{3}$).
+        	
+        	If the rule persists the check, all users inside the role, which comply with the rule, are not considered any further and are removed in the current iteration of the considered attribute combination ((4) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}). Then it is measured how many users inside the role comply with the rule. Again the sensitivity is calculated, but this time on the users in class "\textit{In the role}". If a certain threshold $t2$ is met (currently set to $t2$=$\frac{2}{3}$) ((5) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}), the rule is considered as a potential classifier-rule for the role ((6) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}).
+        	
+        	If the threshold $t2$ is not met ((5) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}), the potential rule gets eventually extended by another OR-connecting rule by calling the procedure recursively with the reduced user set of the role ((7) in Figures \ref{fig:ruleInduction1} and \ref{fig:ruleInduction2}, but not applied). This can be specified by a parameter in the algorithm. By setting the parameter=2 an OR-connecting rule like $Department=HumanResources \vee Department=Sales$ can be constructed. 
+        	
+        	\begin{landscape}
+        		\begin{figure}
+        			\centering
+        			\includegraphics[scale=0.37]{RuleInduction1}
+        			\caption{Rule Induction Extract 1: (1) A user in the considered role is picked (2) smallest user attribute combination is picked and the rule {HR} is created (3) Check sensitivity of rule of users with "In Role=no" (4) Remove all users inside the role, which comply with the rule (5) Check sensitivity of rule of users with "In Role=yes" (6) Save rule as a potential classifier-rule for the role (7) Recursion, where the resulting rule set is OR-connected to the current rule (not applied in this extract) (8) Check if rule is perfect potential rule}
+        			\label{fig:ruleInduction1}
+        		\end{figure}
+        		\begin{figure}
+        			\centering
+        			\includegraphics[scale=0.37]{RuleInduction2} 
+        			\caption{Rule Induction Extract 2: (1) A user in the considered role is picked (2) smallest user attribute combination is picked and the rule {HR} is created (3) Check sensitivity of rule of users with "In Role=no" (4) Remove all users inside the role, which comply with the rule (5) Check sensitivity of rule of users with "In Role=yes" (6) Save rule as a potential classifier-rule for the role (7) Recursion, where the resulting rule set is OR-connected to the current rule (not applied in this extract) (8) Check if rule is perfect potential rule (9) Remove parent attribute combinations}
+        			\label{fig:ruleInduction2}
+        		\end{figure}
+        	\end{landscape}
+        	
+        	Certain user attribute combinations get removed when the potential rule yields a perfect potential rule, which is when the rule is complying with all users inside the role and with none of the users outside the role ((8) in Figure \ref{fig:ruleInduction2}). The user attribute combinations, where the perfect potential rule is a subset of, get removed ((9) in Figure \ref{fig:ruleInduction2}). If the potential rule is not perfect, a more complex user combination might yield a better potential rule and is kept as possibility in the user attribute set.
+        	
+        	The next smallest user attribute combination left (for example ($Location$)) is chosen and the procedure continues as described above until no user attribute combinations or users are left.
+        	 
+        \end{itemize}
         
-        The split by information gain is not necessarily wanted for the rules describing a role, since permissions originally have not been assigned to users which share the most common user attribute values, but rather because users gained legitimation through other specific attribute values. For example although users in a generated role are all located in $Denmark$, while users not in the role are located elsewhere, the reason that users of the role got assigned to the permission set the generated role is grouping could be due to the Departments they are in, which could be diverging. The information gain for the location would be higher, but not necessary the legitimation, why a user gets the permission set assigned through the role. Also the measure used for splitting the data in a decision tree is often biased towards class imbalances or multivalued attributes\cite{Han}.
-        
-        Furthermore classifier-rules for both classes are discovered, while for the measuring of the role only the rules for class "\textit{In the role}" are from interest. Therefore an application-specific algorithm has been created to discover the most descriptive rules for a role (class "\textit{In the role}").
-        
-        The algorithm got inspired by Sequential Covering algorithms, which directly learns rules for classification by repeatedly removing a portion of the dataset. In the following the algorithm for rule induction is described. The according pseudo-code of the algorithm can be seen in Algorithm \ref{alg:ruleInduction}.        
-        
-        \begin{algorithm}
-        	\small
-            \caption{Rule induction algorithm for classifier-rules for roles\protect\\
-            $D$ = List of role members, which are not matched by current rule\protect\\
-            $RM$ = List of users, which are member of the role\protect\\
-            $notRM$ = List of users, which are not members of the role\protect\\
-            $rule$ = Current rule\protect\\
-            $max$ = Maximum allowed rule size (number of OR-connected rules)\protect\\
-            $PB_{notRM}$ = Probability that rule matches a user in $notRM$\protect\\
-            $PB_{RM}$ = Probability that rule matches a user in $RM$}
-            \label{alg:ruleInduction}
-            \begin{algorithmic}[1]
-                \Procedure{ruleInduction}{$D$,$RM$,$notRM$,$rule$,$max$}
-                    \State $allAttrSets$ = Create all combinations of attributes
-                    \State sort($allAttrSets$)
-                    \State $ruleSet$ = []
-                    \While{ $len(D) > 0$}
-                        \State $member = D.pop()$
-                        \While{ $len(allAttrSets) > 0$}
-                            \State $attrSet = allAttrSets.pop()$
-                            \State $newRule$ = \textsc{createRule}($attrSet$,$member$)
-                            \State $rule$.add($newRule$)
-                            \State $PB_{notRM}$ = \textsc{calculateProbabilityInClass}($rule$,$notRM$)
-                            \If{ $PB_{notRM} <= (1/3)$}
-                                \State $PB_{RM}$ = \textsc{calculateProbabilityInClass}($rule$,$RM$)
-                                \State Remove users in $D$, which are matching $rule$
-                                \If{ $PB_{RM} >= (2/3)$}
-	                                \State $ruleSet$.append($rule$,$PB_{RM}$,$PB_{notRM}$)
-	                                \If{ $PB_{RM} == 1$ AND $PB_{notRM} == 0$}
-	                                \State $allAttrSets$ = \textsc{reduceAllAttrSet}($allAttrSets$, $rule$)
-	                                \EndIf
-                                \Else
-                                    \If { $size(rule) <= max$}
-                                        \State ... recursion ...
-                                        \iffalse
-                                        \State $extendedRules$ = ruleInduction($D$,$RM$,$notRM$,$rule$,$max$)
-                                        \For {$extendedRule$ in $extendedRules$}
-                                            \State $ruleSet$.append($extendedRule$)
-                                            \If{ $PB_{RM} == 1$ AND $PB_{notRM} == 0$}
-                                                \State $allAttrSets$=\textsc{reduceAllAttrSet}($allAttrSets$, $rule$)
-                                            \EndIf
-                                        \EndFor
-                                        \fi
-                                    \EndIf
-                                \EndIf
-                            \EndIf
-                        \EndWhile 
-                    \EndWhile
-                    \State \Return $ruleSet$
-                \EndProcedure
-            \end{algorithmic}
-        \end{algorithm}
-        
-    Before the algorithm is applied on a role, all users of the role in the role model get classified as "\textit{In the role}" or "\textit{Not in the role}". A set of all user attribute combinations is created (see line 2 in pseudo-code). If $X$ user attributes are considered, $2^X-1$ combinations are created. For example with the user attributes $Department$ and $Location$, the following combinations are possible:
-    
-    \centerline{($Department$), ($Location$), ($Department$, $Location$)}
-    
-    The first user in the role is picked and a the smallest user attribute combination (for example ($Department$)) is chosen (line 6). A rule is generated out of the user attribute values of the user for the chosen user attributes (line 7). In the example the $Department$ the user is in, creates a rule, i.e. $rule$=($HumanResources$).
-    
-    Next it will be checked if users not in the role also comply with the rule (line 11). If too many users outside the role also comply with the rule, the rule is discarded. Basically the sensitivity of the rule according to class "\textit{Not in the role}" is calculated and checked if it is beneath a specified threshold $t1$ (currently set to $t1$=$\frac{1}{3}$). If the rule persists the check (line 12), it is measured how many users inside the role comply with the rule (line 13). Again the sensitivity is calculated, but this time on the users in class "\textit{In the role}". Also all users inside the role, which comply with the rule, are not considered any further and are removed (line 14). If a certain threshold $t2$ is met (currently set to $t2$=$\frac{2}{3}$) (line 15), the rule is considered as a potential classifier-rule for the role (line 16).
-    
-    The next user left in the role is picked (line 2) and a the smallest user attribute combination left (for example ($Location$)) is chosen (line 8) and the procedure continues as described above until no user attribute combinations or users are left.
-    
-    Certain user attribute combinations get removed when the potential rule yields a perfect potential rule, which is when the rule is complying with all users inside the role and with none of the users outside the role (line 17). The user attribute combinations, where the perfect potential rule is a subset of, get removed (line 18). If the potential rule is not perfect, a more complex user combination might yield a better potential rule and is kept as possibility in the user attribute set.
-    
-    If the threshold $t2$ is not met (percentage of users inside the role comply with the rule is too low), the potential rule gets eventually extended by another OR-connecting rule by calling the procedure recursively (line 21). This can be specified by the parameter $max$ in the algorithm. By setting $max$=2 an OR-connecting rule like $Department=HumanResources \vee Department=Sales$ can be constructed.
-    
     After generating the rules for a role, the rule with the best accuracy gives the measure for the role interpretability ("meaningfulness"). The accuracy of a rule is measured by
     
     \begin{equation}
@@ -274,14 +272,13 @@ Since there has not been a lot of research done up till now regarding Role Minin
         \begin{equation}\label{eq:FBasic}
 	        F_{basic} = (w_1 * |R| + w_2 * G^{conf} + w_3 G^{accs})^{-1}
 	    \end{equation}	    
-	    where $G^{conf}$ are the number of confidentiality violations and $G^{accs}$ the number of availability violations. With the weights $w_i$ the influence of the single objectives can be adjusted. A similar fitness function is created, but formalized as Minimization Function:	    
-	    \begin{equation}\label{eq:FBasicMin}
-		    F_{basic}^{min} = w_1 * |R| + w_2 * G^{conf} + w_3 G^{accs}
+	    where $|R|$ is the number of roles, $G^{conf}$ are the number of confidentiality violations and $G^{accs}$ the number of availability violations. With the weights $w_i$ the influence of the single objectives can be adjusted. For the Evo-RoleMiner a minimization function is used since the math operation to turn the fitness function into a maximization function is unnecessary for the outcome of the result and has only a negative influence on the performance. The minimization function is the inverse function of maximization function \ref{eq:FBasic}:	    
+		\begin{equation}\label{eq:FBasicMin}
+		F_{basic}^{min} = w_1 * |R| + w_2 * G^{conf} + w_3 G^{accs}
 		\end{equation}		
-		For the Evo-RoleMiner the Minimization function is used since the math operation to turn the fitness function into a maximization function is unnecessary for the outcome of the result and has only a negative influence on the time performance.
 		
 		\subsection{Fitness Function for the Min-Edge-RMP}
-		Another commonly used objective function, the Weighted Structural Complexity (WSC)\cite{Molloy}\cite{Xu} has been used as implementation guideline. Since a role hierarchy (see section \ref{sec:rolehierarchies}) is not in the scope of this thesis, the WSC used is without the number of role-to-role inheritance relations. The WSC is therefore defined as:
+		Another commonly used objective function, the Weighted Structural Complexity (WSC) \cite{Molloy} \cite{Xu} has been used as implementation guideline. Since a role hierarchy (see section \ref{sec:rolehierarchies}) is not in the scope of this thesis, the WSC used is without the number of role-to-role inheritance relations. The WSC is therefore defined as:
 		\begin{equation}
 			WSC(\gamma,W) = w_1 * |R| + w_2 * |UA| + w_3 * |PA| + w_4 * |DUPA|
 		\end{equation}
@@ -316,15 +313,6 @@ Since there has not been a lot of research done up till now regarding Role Minin
     The termination of the EA is via a previously set generation limit.
     
     \section{Constraint Handling for RBAC$_2$ role models}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    In the RBAC$_2$ model (see section \ref{sec:rbac2}) constraints like SoD are taken into account. These can be used to guide the role engineering process, such that constraint violations are not occuring in the role model. Alternatively constraints violations in the role model can be accepted in the role model and are the constraints are complied in a post-mechanism.\\
-    The concept of penalties in EA seem to be a good fit to easily incorporate constraints in the Role Mining EA. A binary penalty function would distinguish between if an individual (role model) would violate a constraint or not. Individuals (role models) are therefore penalized with a bad fitness if they are not feasible (violating a constraint).\\
-    A distance-based penalty function would measure how difficult it would be to repair the solution.\\
-    \hl{implementation not completed}
-        
-    \section{Alternative Approach with Co-Evolution}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    Instead of that individuals represent RBAC models, the individuals represent roles. The motivation behind this approach is to involve human interaction in the survival selection of the EA. Since a whole RBAC model can be hardly evaluated at once, the individuals have to be a smaller fraction of the RBAC model.
-        \subsection{Representation of a role as individual}
-        \subsection{Variation Operators on role representation}
-        \subsection{Symbiotic, Adaptive Neuro-Evolution (SANE)}
+    In the RBAC$_2$ model (see section \ref{sec:rbac2}) constraints like Separation of Duties (SoD) are taken into account. These can be used to guide the role engineering process, such that constraint violations are not occuring in the role model. Alternatively constraints violations in the role model can be accepted in the role model and the constraints are complied in a post-mechanism.\\
+    The concept of penalties in EA seem to be a good fit to easily incorporate constraints in the Evo-RoleMiner and Evo-RoleMiner$M$. A binary penalty function would distinguish between if an individual (role model) would violate a constraint or not. Individuals (role models) are therefore penalized with a bad fitness if they are not feasible (violating a constraint).\\
+    Before the fitness of an individual is calculated the Evo-RoleMiner and Evo-RoleMiner$M$ are checking if all constraints are met, if they are given. If the individual (role model) is violating one of the constraint, the fitness is set to the worst fitness value.

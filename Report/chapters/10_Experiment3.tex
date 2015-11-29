@@ -28,24 +28,50 @@ In this set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBa
     \label{tab:exp3_setup}
 \end{table}
 
-The results can be seen in experiment 3a-d in table \ref{tab:exp2_results}. The results show that solutions with better fitness can be found by adjusting the parameters. One of the individuals with the best fitness solution of the experiments with the Healthcare dataset can be seen in Figure \ref{fig:exp3d_RM}. Examples of individuals with the best achieved fitness for the Dataset1 can be seen in the Appendix \ref{sec:A_Exp3a} and \ref{sec:A_Exp3b}.
-
-There are many parameters, which can be adjusted and other settings might lead to even better results.
-
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth, trim=4cm 2cm 4cm 2cm, clip=true]{exp3d_RM}
-    \caption{EXPERIMENT 3d: Example of role model resulting of Evo-RoleMiner with Fitness function $F_{edge}^{min}$ on the Healthcare dataset with setup in table \ref{tab:exp3_setup}. The role model has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. The fitness measure of the individual is 0.032. From u.l. to l.r.: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more user-role- and role-permission assignments causing the user-permission assignment.}
-    \label{fig:exp3d_RM}
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=1cm 2cm 1cm 1.5cm, clip=true]{Results_Exp3_Dataset1_Fitness}
+		\caption{Dataset1}
+		\label{fig:Results_Exp3_Dataset1_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.55\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=2cm 2cm 2cm 1.5cm, clip=true]{Results_Exp3_Dataset1_Statistics}
+		\caption{Dataset1}
+		\label{fig:Results_Exp3_Dataset1_Statistics}
+	\end{subfigure}
+	\begin{subfigure}{0.45\textwidth}
+		%\centering
+		\includegraphics[width=\textwidth, trim=1cm 2cm 1cm 1.5cm, clip=true]{Results_Exp3_Healthcare_Fitness}
+		\caption{Healthcare}
+		\label{fig:Results_Exp3_Healthcare_Fitness}
+	\end{subfigure}%
+	\begin{subfigure}{0.55\textwidth}
+		\centering
+		\includegraphics[width=\textwidth, trim=2cm 2cm 2cm 1.5cm, clip=true]{Results_Exp3_Healthcare_Statistics}
+		\caption{Healthcare}
+		\label{fig:Results_Exp3_Healthcare_Statistics}
+	\end{subfigure}
+	\caption{EXPERIMENT3: Statistics of ten experiments with the Evo-RoleMiner with setup in Table \ref{tab:exp3_setup} for Dataset1 and Healthcare dataset. The values for Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|PA|$) are the average minimum in the last Generation of all experiments.}
+	\label{fig:Results_Exp3}
 \end{figure}
 
-Another critical point is the diversity of the individuals in the populations in order to be able to find a perfect solution. When looking on the role count diversity it can be noted, that the individuals of a population quickly get the same role count size. The boxplot in Figure \ref{fig:exp3c_diversity} visualizes the role count diversity of the individuals in a population in different generations in one of the experiments. The boxplots in the other experiment look similar.
+The results can be seen in experiment 3a-d in Figure \ref{fig:Results_Exp3}. The results show that solutions with better fitness can be found compared to solutions in Experiment2 by adjusting the parameters. There are many parameters, which can be adjusted and other settings might lead to even better results. One of the individuals with the best fitness solution of the experiments with the Healthcare dataset can be seen in Figure \ref{fig:exp3d_RM}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth, trim=4cm 2cm 4cm 2cm, clip=true]{exp3d_RM}
+	\caption{EXPERIMENT 3d: Example of role model resulting of Evo-RoleMiner with Fitness function $F_{edge}^{min}$ on the Healthcare dataset with setup in Table \ref{tab:exp3_setup}. The role model has a role count of 14, one confidentiality violation, 23 availability violations, 152 user-role- and 192 role-permission-assignments. The fitness measure of the individual is 0.032. From upper left to lower right: User-Role Matrix, Role-Permission Matrix, Resulting User-Permission Matrix, Original User-Permission Matrix from Input. A blue box stands for an assignment. The darker the blue the more user-role- and role-permission assignments causing the user-permission assignment.}
+	\label{fig:exp3d_RM}
+\end{figure}
+
+A critical point is the diversity of the individuals in the populations in order to be able to find better solutions. When looking on the role count diversity it can be noted, that the individuals of a population quickly get the same role count size. The boxplot in Figure \ref{fig:exp3c_diversity} visualizes the role count diversity of the individuals in a population in different generations in one of the experiments (The boxplots in the other experiment look similar). It is therefore not surprising that it is difficult for the Evo-RoleMiner to find an individual with a minimum amount of violations. Therefore the Evo-RoleMiner$M$ is tested in the next experiments.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\textwidth]{exp3c_diversity}
-	\caption{EXPERIMENT 3c: Example boxplot of role count diversity of individuals of a population in different generations. Experiment was executed on the Healthcare dataset.}
+	\caption{EXPERIMENT 3c: Example boxplot of role count diversity of individuals of a population in different generations. Experiment was executed on the Healthcare dataset with the Evo-RoleMiner and fitness function $F_{basic}^{min}$.}
 	\label{fig:exp3c_diversity}
 \end{figure}
-
-It is therefore not surprising that it is difficult for the Evo-RoleMiner to find an individual with a minimum amount of violations. Therefore the Evo-RoleMiner$M$ is tested in the next experiments.

@@ -11,27 +11,29 @@
 %Graphics
 \usepackage{graphicx}
 \graphicspath{ {./Figures/} {./Figures/06_Domain/} {./Figures/07_EABackground/} {./Figures/09_Approach/} {./Figures/10_Experiments/} }
-\DeclareGraphicsExtensions{.png,.jpg,.pdf} 
+\DeclareGraphicsExtensions{.pdf,.png,.jpg} 
 \usepackage{afterpage}
 \usepackage[font={small,it}]{caption}
 \usepackage{subcaption}
+\usepackage{rotating}
+%\usepackage{tikz}
 
 %Packages for Watermark
-\usepackage[printwatermark]{xwatermark}
-\usepackage{xcolor}
+%\usepackage[printwatermark]{xwatermark}
+%\usepackage{xcolor}
 %\usepackage{graphicx}
-\usepackage{lipsum}
-\newwatermark[allpages,color=gray!5,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
+%\usepackage{lipsum}
+%\newwatermark[allpages,color=gray!5,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
 
 % Packages for tables
 \usepackage{longtable}
 \usepackage{float} % Improves the interface for defining floating objects such as figures and tables
-%\usepackage[table,xcdraw]{xcolor}
+\usepackage[table,xcdraw]{xcolor}
 \usepackage{listliketab}
 \usepackage{color, colortbl}
 \definecolor{myGray}{gray}{0.9}
 
-\usepackage{rotating}
+
 \usepackage{tabularx}
 \usepackage{mathptmx}
 \usepackage{textcomp}
@@ -67,7 +69,8 @@
 \usepackage[toc,page]{appendix}
 
 % Packages for landscape pages
-\usepackage{lscape}
+\usepackage{pdflscape}
+%\usepackage{lscape}
 
 % Unknown packages
 %\usepackage{listings}

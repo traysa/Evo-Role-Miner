@@ -70,7 +70,7 @@ In this section a basic introduction to the domain is given. It is important tha
     
         \subsection{Completeness}
         \label{sec:completeness}
-        The completeness measure is the mostly used measure in role mining\cite{Kunz}, for example it is used in Xu \& Stoller\cite{Xu} and Vaidya et al.\cite{Vaidya:2006}. Completeness is the degree to which the role model fulfills the existing user-permission assignments. When the user-role and the permission-role assignments of the role model are resolved, it should cover all current user-permission assignments. In figure \ref{fig:roleminingExample} an example is shown where user-permission assignments are split into user-role and the permission-role assignments. Resolving an role model would be the other way around - from user-role and permission-role assignments to user-permission assignment.
+        The completeness measure is the mostly used measure in role mining\cite{Kunz}, for example it is used in Xu \& Stoller\cite{Xu} and Vaidya et al.\cite{Vaidya:2007}. Completeness is the degree to which the role model fulfills the existing user-permission assignments. When the user-role and the permission-role assignments of the role model are resolved, it should cover all current user-permission assignments. In figure \ref{fig:roleminingExample} an example is shown where user-permission assignments are split into user-role and the permission-role assignments. Resolving an role model would be the other way around - from user-role and permission-role assignments to user-permission assignment.
         
         \begin{figure}[H]
             \centering
@@ -199,6 +199,7 @@ In this section a basic introduction to the domain is given. It is important tha
     In Vaidya et al.\cite{Vaidya:2007} it is shown that the Basic RMP, the $\delta$-approx. RMP and the Min-Noise RMP are NP-complete problems. The problems are mapped to the database tiling and the discrete basis problem, which are in the area of data mining and data analysis.
     
     \subsection{Related Problem: Boolean Matrix Decomposition Problem}
+    \label{sec:BMD-Problem}
     \hl{The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem.} In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
     
     \begin{itemize}

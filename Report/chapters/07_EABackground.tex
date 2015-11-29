@@ -150,11 +150,3 @@ The driving forces of evolutionary algorithms are the variation operators, which
     The definition of stochastically pareto dominance according to Clune et al.\cite{clune2013evolutionary} describes a type of dominance relation between two individuals, where two objectives are considered. Let $r$ be a random number in [0; 1] and $p$ the probability for taking the second objective into account. An individual $x_1$ dominates another individual $x_2$ if and only if 1) $r>p$ and $x_1$ is strictly better than $x_2$ with respect to the first objective 2) $r<=p$ and $x_1$ is not worse than $x_2$ with respect to either objective and $x_1$ is better than $x_2$ with respect to at least one objective.
     
     The stochastic pareto dominance replaces the pareto dominance in NSGA-II and is therefore used in the parent selection and when the individuals are sorted into non-domination levels.
-    \hl{Ask authors or point out missing information about how to handle the stochastic dominance calculation at two places.}
-    
-    \section{Co-Evolution}
-    \hl{SECTION UNDER CONSTRUCTION}\\
-    A special form of evolution in EAs is co-evolution. In co-evolution several separate populations are influencing the fitness of the individuals of each other. This idea is derived by co-evolution in biology, where the evolution of a species can influence the evolution of another species and vice versa.
-    
-    \subsection{Symbiotic, Adaptive Neuro-Evolution (SANE)}
-    \hl{Results not good enough}

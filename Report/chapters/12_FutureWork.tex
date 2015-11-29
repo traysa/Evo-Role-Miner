@@ -1,19 +1,13 @@
 \newpage
 \chapter{Future Work}
 \label{sec:futureWork}
-\hl{SECTION UNDER CONSTRUCTION}\\
-Future Work
-\begin{itemize}
-\item Different Representation especially when user attributes are included, e.g. Rule-based with Michigan Approach
-\item Measure for Interpretability of Roles
-\item Novelty Search
-\item Testing on bigger datasets
-\item Co-Evolution approach
-\item Integration of human interaction
-\end{itemize}
+% What could you not answer? Suggestions for further research
+The experiments in this thesis have been only executed on two small datasets. To get a better understanding on how to set parameters in the suggested EA and MOEA several datasets of different dimensions (user and permission size) and density (number of assignments) should be tested.
 
-\begin{itemize}
-	\item Limited diversity in the final population; Novelty Search might help
-	\item Interpretability measure only measures if there are reasonable rules or not; Advanced measure might help
-\end{itemize}
+There are several parts in the EA and MOEA, which can be further improved, for example to develop more intelligent variation operators. A different representation of individuals might reveal new opportunities. For example a representation, which is based on user attributes. A novelty search can counteract on limited diversity in a population.
+
+To find a measure for the comprehension of a role model or the interpretability of roles is an interesting measure. The initial ideas suggested in section \ref{sec:meaningfulness} could be investigated further. A more detailed research on how such an measure could be integrated into a role ming algorithm could be done.
+
+Another idea is the usage of Co-Evolution. In co-evolution several separate populations are influencing the fitness of the individuals of each other. This idea is derived by co-evolution in biology, where the evolution of a species can influence the evolution of another species and vice versa. Instead of that individuals represent RBAC models, the individuals represent roles. The motivation behind this approach is to involve human interaction in the survival selection of the EA. Since a whole RBAC model can be hardly evaluated at once, the individuals have to be a smaller fraction of the RBAC model.
+
     

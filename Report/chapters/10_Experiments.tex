@@ -1,8 +1,7 @@
 \newpage
 \chapter{Experiments}
 \label{sec:experiments}
-\hl{SECTION UNDER CONSTRUCTION}\\
-The experiments with the Evo-RoleMiner shall provide information, which is not given in Saenko \& Kotenko \cite{saenko2012design}. In particular how parameters can be set and how the objectives of the role models evolve and impact other objectives. Afterwards the MOEA Evo-RoleMiner$M$ is tested and compared to EA EvoRoleMiner. Also the EvoRoleMiner and EvoRoleMiner$M$ are tested on datasets commonly used in role mining research.
+The experiments with the Evo-RoleMiner provide information, which is not given in Saenko \& Kotenko \cite{saenko2012design}. In particular how parameters can be set and how the objectives of the role models evolve and impact other objectives. Afterwards the MOEA Evo-RoleMiner$M$ is tested and compared to EA EvoRoleMiner. Also the EvoRoleMiner and EvoRoleMiner$M$ are tested on datasets commonly used in role mining research.
 
 This chapter describes the setup of the experiments executed. First the data sets used in the experiments are described. Then the setup and the results of the experiments are introduced. The experiments have been divided into several steps, where the results of one experiment lead to the setup of the experiments after.
 
@@ -57,7 +56,7 @@ A visualization of synthetic dataset 1 and the healthcare dataset can be seen in
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{dataset1}
-    \caption{DATASET 1: Role model of synthetic dataset 1 including User-Permission Matrix. From u.l. to l.r.: User-Role Matrix (Rows: Users, Columns: Roles), Role-Permission Matrix (Rows: Roles, Columns: Permissions), Resulting User-Permission Matrix (Rows: Users, Columns: Permissions), User-Permission Matrix with Noise (Rows: Users, Columns: Permissions)}
+    \caption{DATASET 1: Role model of synthetic dataset 1 including User-Permission Matrix. From upper left to lower right: User-Role Matrix (Rows: Users, Columns: Roles), Role-Permission Matrix (Rows: Roles, Columns: Permissions), Resulting User-Permission Matrix (Rows: Users, Columns: Permissions), User-Permission Matrix with Noise (Rows: Users, Columns: Permissions)}
     \label{fig:dataset1}
 \end{figure}
 
@@ -73,10 +72,14 @@ A visualization of synthetic dataset 1 and the healthcare dataset can be seen in
 \import{chapters/}{10_Experiment3.tex}
 \import{chapters/}{10_Experiment4.tex}
 \import{chapters/}{10_Experiment5.tex}
-\import{chapters/}{10_Experiment6.tex}
-\import{chapters/}{10_Experiment7.tex}
+%\import{chapters/}{10_Experiment6.tex}
+%\import{chapters/}{10_Experiment7.tex}
 
-\section{Experiments with Co-Evolution}
-\hl{SECTION UNDER CONSTRUCTION}\\
-\subsection{Setup}
-\subsection{Measures}
+\section{Summary of Results}
+In Experiment 2 it is shown that the Evo-RoleMiner for the Min-Edge RMP (fitness function $F_{edge}^{min}$ \eqref{eq:FEdgeMin}) performs better than for the Basic RMP ($F_{basic}^{min}$ \eqref{eq:FBasicMin}).
+
+Experiment 3 demonstrates that parameter adjustments can reveal even better results. But the diversity of the role models in the population according role count gets very low after few generations and it is hard for the Evo-RoleMiner to find a better solution since the search space gets limited to role models with a specific role count.
+
+Experiment 4 demonstrates that a multi-objective EA can help in the search since a wider solution space with role models of different role count is discovered. The completeness measure (confidentiality and availability violations) is well suited for the objectives in a MOEA, due to its conflicting complexity measure supporters: Higher vs. lower role count and assignment count (see Experiment 1). But the complexity measure has to be also an objective to remove unnecessary duplicates in the resulting user-permission assignments (see section \ref{sec:exp_nsga2rweights}).
+
+In Experiment 5 it can not be demonstrated that the added interpretability measure improves the Evo-RoleMiner. The performance of the implemented rule induction is too bad to be tested on bigger datasets with several user attribute information.
