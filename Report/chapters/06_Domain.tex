@@ -10,17 +10,15 @@ In this section a basic introduction to the domain is given. It is important tha
     
     The National Institute of Standards and Technology (NIST) \cite{Hu13guideto} describes various logical access control models, which provide a policy framework that specifies how permissions are managed and who, under what circumstances, is entitled to which permissions and enforce these access control decisions. Some of these logical access control models are briefly described in the following to enable the reader to differentiate between the concepts.
     \iffalse There is no consensus on the terms access control models, mechanisms and techniques. In this thesis an access control policy model describes a policy framework that specifies how permissions are managed and who, under what circumstances, is entitled to which permission on a high-level. There are different Access Control Policy Models which come with different advantages and disadvantages. Some of these models are briefly described in the following to enable the reader to differentiate between the concepts. \fi
-    \begin{itemize}
-        \item \textbf{Identity-based Access Control (IBAC)}\\
+    \subsection*{Identity-based Access Control (IBAC)}
         In IBAC a user gets a certain access to a resource by being assigned directly to a permission, which is connected to a resource. On a low-level Access Control Lists (ACLs) are implementations of IBAC\footnote{In Windows OS the ACLs can also contain groups}. While IBAC may be manageable in companies with a small amount of users and permissions, the maintenance can be quickly overwhelming in consideration of satisfying all drivers of access control policies (see above).
         
-        \item \textbf{Role-based Access Control (RBAC)}\\
+	\subsection*{Role-based Access Control (RBAC)}
         In RBAC permissions are bundled to roles, which then are assigned to users. A user gets a certain access to a resource by being assigned to a role, which contains the corresponding permission to that access. In other words users inherit all permissions of the roles they are assigned to. The motivation of this extra abstraction layer of a role is to easier maintain the access control of users.
         Even more abstraction can be introduced by role hierarchies (see section \ref{sec:rolehierarchies}). \iffalse , where a role inherits all permissions of its parent-role.\fi The RBAC model, which contains the roles, the user assignments to roles, the permission assignments to roles and the role-hierarchy, needs to be defined before the access control mechanism can enforce the access control. The RBAC model can be an ease of administration in comparison to direct assignments in IBAC. The degree of the benefit is dependent on the RBAC model (see section \ref{sec:rbacmodels}).
         
-        \item \textbf{Attribute-based Access Control (ABAC)}\\
-        In Hu et al.\cite{Hu13guideto} the authors try to guide to a standard definition of ABAC, since there seems to be no consensus. The basic concept of ABAC is to introduce an additional abstraction layer in form of ABAC policies, which are basically complex boolean rule sets that can evaluate different kinds of attributes. These attributes could be user information (e.g. department, job title), resource information (e.g. threat level) or environment information (e.g. current time, current location). A user gets a certain access to a resource if the rule set is satisfiable. The rule sets need to be defined before the access control mechanism can enforce the access control. Compared to RBAC ABAC seems more flexible, but it also comes with challenges regarding risk and auditing\cite{Coyne:2013}.        
-    \end{itemize}
+	\subsection*{Attribute-based Access Control (ABAC)}
+        In Hu et al.\cite{Hu13guideto} the authors try to guide to a standard definition of ABAC, since there seems to be no consensus. The basic concept of ABAC is to introduce an additional abstraction layer in form of ABAC policies, which are basically complex boolean rule sets that can evaluate different kinds of attributes. These attributes could be user information (e.g. department, job title), resource information (e.g. threat level) or environment information (e.g. current time, current location). A user gets a certain access to a resource if the rule set is satisfiable. The rule sets need to be defined before the access control mechanism can enforce the access control. Compared to RBAC ABAC seems more flexible, but it also comes with challenges regarding risk and auditing\cite{Coyne:2013}.     
     
     The scope of this thesis is to research an approach which outputs an RBAC model. The RBAC model is often used in bigger organizations\cite{o20102010} and is leveraged by many Identity- and Access Management (IAM) systems. Some ideas of the ABAC model are exploited to some extent in the implementation of the thesis approach. In praxis many companies use a combination of ABAC and RBAC.
     
@@ -123,18 +121,14 @@ In this section a basic introduction to the domain is given. It is important tha
     \section{Role Engineering}
     Role engineering \cite{Coyne:2011} describes the process to create a role model for RBAC. This task is proved to be very difficult in large enterprises.
     
-    There are three different approaches to conquer the goal of finding the right role model: Top-Down, Bottom-Up and the Hybrid approach\cite{Coyne:2011}\cite{Frank}.
-    
-    \begin{itemize}
-        \item \textbf{Top-Down Approach}\\
+    There are three different approaches to conquer the goal of finding the right role model: Top-Down, Bottom-Up and the Hybrid approach\cite{Coyne:2011}\cite{Frank}.    
+    \subsection*{Top-Down Approach}
         One approach is to do a top-down analysis, where the roles are built out of business information. Business processes, business roles and security policies are analysed to build a suitable role model. The resulting roles contain high-level permissions, which make sense to the business, but have not necessarily a technical complement. Therefore the high-level permissions need to be mapped to technical permissions that are used by IT systems. The roles are easy to understand as they are derived from business concepts. The analysis of the business information by experts to a high-level role model and the mapping into low-level accesses by IT Specialists are very time-consuming and costly. Furthermore the resulting role model could lead to a different access control configuration than the current one. It is likely that users get less permissions than they used to have, which might prevent them from doing their tasks efficiently.
-        
-        \item \textbf{Bottom-Up Approach}\\        
+	\subsection*{Bottom-Up Approach} 
         The bottom-up approach exploits the current user-permission assignments and tries to gather a role model out of it. Since this approach often uses Data Mining Techniques, the method is also called Role Mining\cite{Kuhlmann}. This approach on the other hand is often failing in generating a comprehensive role model, which is accepted by the administrators\cite{Frank:2013}. Therefore it is necessary that the business is checking the semantic meaning of the roles generated before they are used in production.
         
-        \item \textbf{Hybrid approach}\\        
+	\subsection*{Hybrid approach}      
         Since the advantages and disadvantages of the top-down and the bottom-up approach are mirrored, hybrid approaches have been suggested \cite{Frank}\cite{6274146}. In these approaches the business information is leveraged to guide the computational generation of a role model out of user-permission assignments.
-    \end{itemize}
     
     A role model is evolving over time and needs constant maintenance\cite{Montrieux:2011}. Administrators and Re-attestation processes are changing the user-permission assignments by adding and removing users and permissions to and from roles. New users are joining and others get removed, same is valid for applications and their permissions. Separate access control configurations might need to be migrated to one access control configuration. The task of role engineering is therefore not a one time task, but an on-going process (role life-cycle management\cite{kern2002observations}). An over-the-time suboptimal role model can increase the administration costs and has to be optimized again to benefit from the advantages of RBAC.
     
