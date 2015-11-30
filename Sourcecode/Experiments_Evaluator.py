@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 import os, json, pickle
 import numpy
 import rm_Visualization as visual

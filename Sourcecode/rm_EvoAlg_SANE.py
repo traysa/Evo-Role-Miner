@@ -1,3 +1,5 @@
+__author__ = 'Theresa Brandt von Fackh'
+
 import random
 import numpy
 from deap import creator, base, tools

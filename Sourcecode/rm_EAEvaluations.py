@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 
 import MatrixOperators as matrixOps
 import rm_EADecoder as decoder
@@ -172,6 +172,22 @@ def evalFunc_RPCnt(individual, Original, constraints=[]):
 # No Normalization
 # -----------------------------------------------------------------------------------
 def evalFunc_AssignmentCnt(individual, Original, constraints=[]):
+    userSize = Original.shape[0]
+    permissionSize = Original.shape[1]
+    if (constraints and not feasible(individual, userSize, permissionSize, constraints)):
+        worstCase_numberOfRoles = min(userSize,permissionSize)
+        fitness = worstCase_numberOfRoles*2
+    else:
+        numberOfUR = statistics.URCnt(individual[0])
+        numberOfRP = statistics.RPCnt(individual[0])
+        fitness = numberOfUR+numberOfRP
+    return fitness,
+
+# -----------------------------------------------------------------------------------
+# Single Objective Evaluation: Number of Roles
+# No Normalization
+# -----------------------------------------------------------------------------------
+def evalFunc_AssignmentCnt2(individual, Original, constraints=[]):
     userSize = Original.shape[0]
     permissionSize = Original.shape[1]
     if (constraints and not feasible(individual, userSize, permissionSize, constraints)):

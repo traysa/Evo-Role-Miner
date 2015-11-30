@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 
 import random
 import rm_EAInitialization as init

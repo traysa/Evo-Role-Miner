@@ -13,6 +13,10 @@
 #    You should have received a copy of the GNU Lesser General Public
 #    License along with DEAP. If not, see <http://www.gnu.org/licenses/>.
 
+#==============================================
+# Extended by Theresa Brandt von Fackh
+#==============================================
+
 from __future__ import division
 import bisect
 import math

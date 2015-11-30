@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 
 import logging
 import rm_Utils as utils

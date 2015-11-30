@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 
 import rm_EAInitialization as init
 import rm_EAOptimizer as optimizer

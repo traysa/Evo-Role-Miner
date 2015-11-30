@@ -13,6 +13,9 @@
 #    You should have received a copy of the GNU Lesser General Public
 #    License along with DEAP. If not, see <http://www.gnu.org/licenses/>.
 
+#==============================================
+# Extended by Theresa Brandt von Fackh
+#==============================================
 
 from collections import defaultdict
 from itertools import chain, cycle

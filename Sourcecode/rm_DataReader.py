@@ -1,4 +1,4 @@
-__author__ = 'Theresa'
+__author__ = 'Theresa Brandt von Fackh'
 
 import os, pickle, numpy
 from deap import creator, base, tools, algorithms
