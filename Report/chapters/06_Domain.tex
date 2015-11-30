@@ -1,7 +1,7 @@
 \newpage
 \chapter{Domain and Problem}
 \label{sec:domain}
-In this section a basic introduction to the domain is given. It is important that the motivation and concepts of the domain are known in order to scope the problem definition and for guidance in the implementation of the approach.
+In this section a basic introduction to the domain is given. It is important that the motivation and concepts of the domain are known in order to scope the problem definition and for guidance in the implementation of the approach.\todo[]{Proof-read chapter 2}
 
     \section{Access Control Models}
     Access control ensures through policy definitions and enforcement that users\footnote{For simplicity the term "User" is used throughout the thesis although the term "subject" would be more general to also include e.g. service accounts.} can only access resources (e.g. files, applications, networks) they are authorized to. The policy definitions describe which user is authorized to which permission. A permission describes who has access to resource and which action (e.g. read, write, execute) can be done on a resource.
@@ -183,7 +183,7 @@ In this section a basic introduction to the domain is given. It is important tha
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, and the number of roles $k$, find an RBAC configuration $RC$ with $k$ roles, minimizing the deviation between $UPA$ and $RC$."}\\
         Compared to the $\delta$-approx. RMP, the Min-Noise RMP bounds the number of roles, and minimizes the $\delta$-approximation.
         
-        \item \textbf{The Min-Edge Role-Mining Problem}\cite{Vaidya:2009}\\
+        \item \textbf{The Min-Edge Role-Mining Problem}\cite{Vaidya:2009:EMA:1544133.1544137}\\
         \textit{"Given a set of users $U$, a set of permissions $P$ and a user-permission assignment $UPA$, find an RBAC configuration $RC$ that is consistent with $UPA$ and minimizes the number user-role assignments and role-permission assignments."}\\
         Compared to the Basic RMP, the Min-Edge RMP is not minimizing the number of roles, but the number of $UA$ and $PA$ assignments. It is argued that minimizing the assignments also minimizes the administrative load. Furthermore the Min-Edge RMP discovers redundant roles that are heavily used\cite{4497438}.
         
@@ -200,7 +200,7 @@ In this section a basic introduction to the domain is given. It is important tha
     
     \subsection{Related Problem: Boolean Matrix Decomposition Problem}
     \label{sec:BMD-Problem}
-    \hl{The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem.} In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
+    The role mining problem is related to the Boolean Matrix Decomposition (BMD) Problem. In Lu et al.\cite{4497438} the RMP is first modelled as BMD, where a binary matrix is decomposed into two matrices. The combination of these matrices results into the original matrix. Several different decompositions can exist for a matrix.
     
     \begin{itemize}
 	    \item \textbf{Boolean Matrix Multiplication Definition:}\\
@@ -211,5 +211,5 @@ In this section a basic introduction to the domain is given. It is important tha
     
     For RMP a user-permission assignment matrix ($C$) needs to be decomposed into a user-role assignments matrix ($A$) and a role-permission assignments matrix ($B$). Variable $k$ then represents the number of roles, variable $m$ and $n$ the number of users and permissions accordingly. Therefore finding the minimal $k$ in the BMD problem corresponds to finding the minimal number of roles in the basic RMP. The notion of BMD for the RMP is also used in this thesis and has been already introduced in previous sections (see Figure \ref{fig:roleminingExample} and \ref{fig:rolemodelComparison}).
    
-    
+\hfill \break    
 In this thesis the role mining problem is tackled with evolutionary algorithms. An introduction to evolutionary algorithms is given in the next chapter.

@@ -2,6 +2,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage{import}
 
+% Packages for TODO notes
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\usepackage{xargs} % Use more than one optional parameter in a new commands
+%\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1!}}
+
 % Packages for Line spacing
 \linespread{1.3} % 1.5 spacing
 \usepackage[english]{babel}
@@ -28,7 +33,8 @@
 % Packages for tables
 \usepackage{longtable}
 \usepackage{float} % Improves the interface for defining floating objects such as figures and tables
-\usepackage[table,xcdraw]{xcolor}
+%\usepackage[table,xcdraw]{xcolor}
+\usepackage{xcolor}
 \usepackage{listliketab}
 \usepackage{color, colortbl}
 \definecolor{myGray}{gray}{0.9}
@@ -72,6 +78,9 @@
 \usepackage{pdflscape}
 %\usepackage{lscape}
 
+% Packages for PDF pages
+\usepackage{pdfpages}
+
 % Unknown packages
 %\usepackage{listings}
 %\usepackage{color}
@@ -85,7 +94,9 @@
 %\include{glossary}
 
 \begin{document}
-	
+\includepdf[fitpaper=true, pages=-]{ITU_Frontpage.pdf}
+\todo[]{Fill out ITU Frontpage}
+		
 \renewcommand{\baselinestretch}{1.0}\normalsize
 \import{chapters/}{00_TitlePage.tex}
 \renewcommand{\baselinestretch}{1.3}\normalsize
@@ -130,6 +141,11 @@
     \import{chapters/}{15_AppendixA.tex}
     \import{chapters/}{16_AppendixB.tex}
     \import{chapters/}{17_AppendixC.tex}
+    \import{chapters/}{18_AppendixD.tex}
 \end{appendices}
+
+\newpage
+\setcounter{tocdepth}{1}
+\listoftodos
 
 \end{document}

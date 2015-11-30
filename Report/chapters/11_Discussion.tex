@@ -1,7 +1,6 @@
 \newpage
 \chapter{Discussion}
 \label{sec:discussion}
-\hl{SECTION UNDER CONSTRUCTION}\\
 \iffalse
 \hl{adequacy, efficiency, productiveness, effectiveness (choose your criteria, state them clearly and justify them)
 be careful that you are using a fair measure, and that you are actually measuring what you claim to be measuring
@@ -15,14 +14,12 @@ Which could be the system you made and the reasons for various design decisions,
 The discussion of the findings can be included in these chapters, or the discussion can be put  in a separate chapter. 
 The issues from the theory chapter (chapter 2) should be discussed here.}
 \fi
-
-\section{Answer to the research question}
 % shortly summarize your question, the core argument and main results, always with respect to your question
-The thesis question of \hl{how a role model can be mined from scratch with an evolutionary computation approach} has been investigated by analyzing the domain and providing an EA and three implementations of a MOEA. Several different fitness functions are exchangeable and several parameters can be set in the implementation and have been tested.
+The thesis question of how a role model can be mined from an access control policy with an evolutionary computation approach has been investigated by analyzing the domain and providing an EA and three implementations of a MOEA. Several different fitness functions are exchangeable and several parameters can be set in the implementation and have been tested.
 
-The results show that an EA and an MOEA can find solutions for the role mining problems on small access policy configurations. The tested MOEAs perform better than the EA. The MOEA based on NSGA-II$R$\cite{Fortin:2013} performs better than the MOEA based on NSGA-II\cite{Deb:2002}. The MOEA based on NSGA-II$R$ is extended with a stochastic version of Pareto dominance, which allows to set weights for the objectives\cite{clune2013evolutionary}. The results show that the MOEA with weights contributes the search by relaxing the objective of role model complexity.
+The results show that an EA and an MOEA can find solutions for the role mining problems for small access control policies. The improvement by Fortin et al.\cite{Fortin:2013} for the NSGA-II algorithm could be applied, resulting with a better performance than the MOEA based on classic NSGA-II\cite{Deb:2002}. The usage of a stochastic version of pareto dominance\cite{clune2013evolutionary} relaxes the second objective in the improved MOEA. This allows to include the complexity measure as objective with a lower selection pressure on. The resulting role models can achieve less duplicate user-permission assignments than in the resulting role models of the previous versions of the MOEA.
 
-The question if business information data can improve the evolutionary computation approach can not be confirmed. Approaches for measuring "meaningfulness" of roles are given (see section \ref{sec:meaningfulness}), but either not implemented or the complexity is too costly to be tested.
+The question if business information data can improve the evolutionary computation approach can not be confirmed. Approaches for measuring interpretability ("meaningfulness") of roles are given (see section \ref{sec:meaningfulness}), but either not implemented or the complexity is too costly to be tested.
 
 \section{Contribution to current research}
 % What are the theoretical and empirical implications of your results for current research? What have we learnt?
@@ -30,63 +27,37 @@ This thesis contributes with an analysis of the resulting role models of using a
 
 \section{Reflection}
 % Critically reflect upon your procedure
-The EA for role mining presented in the paper of Saenko \& Kotenko lacks information to re-build the EA. These gaps have tried to be filled in this thesis. The results in Saenko \& Kotenko are based on artificial datasets. In this thesis also a small real dataset, commonly used in role mining research, is tested on the single-objective EA "Evo-RoleMiner", which shall reconstruct the implementation of Saenko \& Kotenko.
+The following reflections on the approach are splitted into topics.
+\subsection*{Parameters}
+	After re-adjusting parameters for the EA and MOEAs several times a role model of the given access control policy with few violations can be found with the Evo-RoleMiner. However, there exists little knowledge on how to choose the weight given only the access control policy as input data. The density of assignments in the given access control policy might help in the decision, but there is no concrete rule existing. For example, the weight for the number of roles in the fitness function $F_{basic}^{Min}$ had to be set very low or even to a negative value (which encourages a maximization of role numbers) in the Evo-RoleMiner for the synthetic dataset to be able to find a role model, which does not violate the original access control policy (see section \ref{sec:exp3}).
+	
+	The evolutionary algorithms have many parameters and it is difficult to find a good configuration without pre-knowledge. The parameters have to be tuned by a trial-and-error approach, which is very time-consuming. A solution for this would be self-adaptation, where the parameters of the EA are evolving with the individuals in a population\cite{Eiben}. For example if the average role count of the role models (indivduals) get close to the minimum role count of the role models, the probability of the mutation of adding roles can be set higher. 
+	
+\subsection*{Variation operators}
+	The mutation in the EA and MOEAs chosen is highly random and chances are low that the mutation help to break out of a premature convergence to a local optimum. A mutation of adding or removing a user or permission in a role model might not be strong enough to lead to a better fitness of the offspring. This can be especially the case if user-permission matrix of the given access control policy is very sparse. Also the mutation of adding roles is generating completely random roles, where the algorithm might have discovered before, that certain combinations of users and permissions in a role are negatively influencing the fitness. A more guided mutation might improve the implemented EA. To elaborate on the thought, the probabilities for the different mutation types can be exchanged by an intelligent mutation, which chooses the mutation according to the current state.
+	
+	The local optimization after a mutation or crossover (see section \ref{sec:localOptimization}) is helping to avoid duplicates. On the other hand it misses out the chance that different variation operators on the role models with same user- or permission list can be explored, which might be close to a role, which is improving the role model heavily. Also the local optimization is currently first combining roles with the same user list. When a role with identical user and permission list occurs, it is not checked if a permission combining of the roles lead to a better role model. On the other hand the chances that this conflict occurs gets more rare the higher the dimension of users and permissions are.
+	
+\subsection*{Scalability}
+	The experiments in this thesis are executed on very small datasets, such that visualizations of resulting role models can be used to support argumentations. But they might not reflect cases, which enterprises often have to face. Enterprises can have thousands of users and millions of permissions. The access control policies might  be separated into smaller chunks, e.g. to only consider users of one department and find their according role model or consider only one application and its permissions for constructing a role model for that application. Finding a good role model which spans every user and permission in the enterprise on the other hand, might not be manageable in a decent amount of time.
+	
+	Experiment 6 showed how quick a bigger dataset rises in computation complexity. The results in Saenko \& Kotenko\cite{saenko2012design} measure how many generations are needed to find a role model, which describes the given access control policy. The computation time achieved for different datasets of different dimensions stated in the paper could not be achieved by the approach of this thesis. This might be due to the data, available computation resources or the implementation.
+	
+	Since the dimension of real datasets are often much bigger than the datasets tested in this thesis, it can be argued that the implementations are unlikely to be used in practice when other role mining techniques perform faster and achieve similar results. A parallel EA could help in this regard. The basic idea of a parallel EA is to have multiple populations in parallel. Each population is evolved separately, but after a certain amount of generations, selected individuals from each population get exchanged with the individuals of an other population.\cite{Eiben}
+	
+\subsection*{Multi-Objectives}
+	The role mining problems have several objectives and which objectives are considered depends on the particular case. Since the EA tend to converge to objectives, which optimal state can be more easily reached (e.g. minimizing role count), MOEAs seem to be the right approach, since they are searching for the trade-off solutions between several objectives and the individuals in a population are more diverse. However the problem of lacking diversity is not solved by the MOEA. It still can be difficult for the algorithm to break out of a niche, especially when the optimum of the objectives can not be equally easily achieved, which is the case of objective "Role Count" and "Violations". While for the first objective only the gene (role) size has to be reduced, the second objective requires the right setting of the genes (user and permission list). This could speak for a disadvantageous representation.
+	
+\subsection*{Interpretability}
+	To measure the comprehension of a role model is a difficult task, since in the end only system administrators can judge if a role model is in their eyes comprehensive or not. By measuring the interpretability of roles by how predictive they are by using business information like user attributes is a first step. In theory it could help the evolutionary algorithm of choosing a role model with better predictive roles than a role model with less predictive roles, if the completeness and complexity measure is the same for both role models. 	
+	
+	The measure for the role model is just an average of the interpretability of the roles it contains. That means that a highly interpretable role can get lost with the role model, since other roles in the role model are less interpretable. Therefore guiding the variation operators towards more interpretable roles in a role model might be a better approach than using an average role interpretability measure within the fitness function.
+	
+	Compared to the other objectives in the fitness function, the interpretability measure requires the calculation of rules, which then get measured. This quickly gets computationally expensive when the dimensions of the dataset or the EA parameters, e.g. population and generation size, rises. In particular if the rule induction algorithm is deterministic. An approximation algorithm with lower time complexity, that produces almost as good rules for the measure of role model interpretability, could improve the performance. But still the objective requires some greater computation than for example just getting the length of a data object, which is the case of the role count objective. An approach could be to store the interpretability measure with the role model and variation operators are calculating the interpretability of a role model offspring. By this, the fitness function only needs to read the measure from the role model.
+	
+	In the experiments it is looked on how well the original intended role model can be obtained by the Evo-RoleMiner and Evo-RoleMiner$M$ when using the synthetic dataset. Since evolutionary algorithms are a stochastic search, they do not guarantee to find an optimal solution in a finite amount of time. Different role models can be a solution. For real datasets an evaluation of the resulting role models can be only executed by domain experts and the administrators, who have to work with the role model.
+	
+	Also when the business information can be included into the role mining algorithm, in practice the resulting roles or role models have to be analysed and optimized in a post-process. The inclusion of business measure can only help to produce a better starting point for the post-process.
 
-After re-adjusting parameters several times a decent role model can be found with the Evo-RoleMiner. However, there exists little knowledge on how to choose the weight given only the access policy configuration as input data. The density of assignments in the given access policy configuration might help in the decision, but there is no concrete rule existing. For example, the weight for the number of roles in the fitness function $F_{basic}^{Min}$ had to be set very low or even to a negative value (which encourages a maximization of role numbers) in the Evo-RoleMiner for the synthetic dataset to be able to find a role model, which does not violate the original access configuration policy (see section \ref{sec:exp3}).
-
-The evolutionary algorithms have many parameters and it is hard to find a good adjustment without pre-knowledge. The parameters have to be tuned by a trial-and-error approach, which is very time-consuming. A solution for this would be self-adaptation, where the parameters of the EA are evolving with the individuals in a population\cite{Eiben}. For example if the average role count of the role models (indivduals) get close to the minimum role count of the role models, the probability of the mutation of adding roles can be set higher.
-
-The experiments in this thesis are executed on very small datasets, since the visualizations of resulting rolemodels can be used to support argumentations. But they might not reflect cases, which enterprises often have to face. Enterprises can have thousands of users and millions of permissions, which might can make digestible in smaller chunks, but will be still bigger than the datasets used in the experiments. \hl{Experiment X showed how quick a bigger dataset rises in computation complexity.} The results in Saenko \& Kotenko measure how many generations are needed to find a role model, which describes the given $UPA$. The computation time achieved for different datasets of different dimensions stated in the paper could not be achieved by the approach of this thesis. This might be due to the data, available computation resources or the implementation.
-
-Since the dimension of real datasets are often much bigger than the datasets tested in this thesis, it can be argued that the implementations are unlikely to be used in praxis when other role mining techniques perform faster and achieve similar results. A parallel EA could help in this regard. The basic idea of a parallel EA is to have multiple populations in parallel. Each population is evolved separately, but after a certain amount of generations, selected individuals from each population get exchanged with the individuals of an other population.\cite{Eiben}
-
-The approach in this thesis builds strongly on the related boolean matrix decomposition problem (see section \ref{BMD-Problem}), which also Saenko \& Kotenkos work is building on. A different approach and representation might suit better.
-
-The mutation chosen is highly random and chances are low that the mutation help to come out of a premature convergence to a local optimum. A mutation of adding or removing a user or permission in a role model might not be strong enough to lead to a better fitness of the offspring. This can be especially the case if the original user-permission matrix is very sparse. Also the mutation of adding roles is generating complete random roles, where the algorithm might have discovered before, that certain combinations of users and permissions in a role are negatively influencing the fitness. A more guided mutation might improve the implemented EA.
-
-The local optimization after a mutation or crossover (see section \ref{sec:localoptimization}) is helping to avoid duplicates. On the other hand it misses out the chance that a different variation operators on the role models with same user- or permission list can be explored, which might be close to a role, which is improving the role model heavily. Also the local optimization is currently first combining roles with the same user list. When a role with identical user and permission list occurs, it is not checked if a permission combining of the roles leads to a better role model. On the other hand the chances that this conflict occurs gets more rare the higher the dimension of users and permissions are.
-
-To measure the comprehension of a role model is a difficult task, since in the end only domain experts can judge if a role model is in their eyes comprehensive or not. By measuring the interpretability of roles by how predictive they are by using business information like user attributes is a first step. In theory it could help the evolutionary algorithm of choosing a role model with better predictive roles than a role model with less predictive roles, if the completeness and complexity measure is the same for both role models. The measure for the role model is just an average of the interpretability of the roles it contains. That means that a highly interpretable role can get lost with the role model, since other roles in the role model are less interpretable. Therefore guiding the variation operators towards more interpretable roles in a role model might be a better approach than using an interpretability measure within the fitness function.
-
-In the experiments it is looked on how well the original intended role model can be obtained by the Evo-RoleMiner and Evo-RoleMiner$M$ when using the synthetic dataset. Evolutionary algorithms do not guarantee to find an optimal solutions in a finite amount of time.
-
-\begin{itemize}
-	
-	\item Multi-objective EA solution\\
-	The multi-objective EA "Evo-RoleMiner$M$" on the other hand relaxes the challenges of setting the right parameters, by 
-	
-	\hl{Furthermore real datasets contain noise, where overentitlements are more likely than underentitlements. The evolutionary computation approach might not identify the noise.}
-	
-	\item Interpretability vs. Minimal assignments\\
-	
-	\item Interpretability measure
-	Individuals might have the same Fitness and even re-created the original UP-Matrix, but it does not mean that the role model is the same; Additional attributes, like user attributes, could help by e.g. introducing an Interpretability measure to distinguish the role models.
-	
-	The suggested interpretability measure scales badly the more attributes are considered. \hl{In experiment X the healthcare dataset and the synthetic user attribute information provided by Xu \& Stoller the experiment has been aborted after the initial fitness evaluation has not been finished within X hours.} It is though questionable if user information of 20 attributes is considered in companies. Talking to experts in praxis, the attributes used for hybrid role mining are around a handful, like e.g. employee type, department, costcenter, job function and less often the location. Also, the information of user attributes is often not given or incomplete.
-	
-	Rules, which might have lead to a role, might not be identified again as the rule, the role was created on
-	
-	In praxis the resulting roles or rolemodels from bottom-up role mining are analysed and optimized in a post-process, where business information is used as a measure. In this thesis' approach the business information is included in the role mining computation.
-	
-	By measuring the role interpretability in role models with the help of certain user attributes will mostly reveal roles, which are interpretable by these user attributes. Other roles in the role model will be created to cover the access policy configurations, which ar not covered by the roles with high interpretability according to the chosen user attributes.
-	
-	The motivation for generating roles, which are interpretable by user attributes, is to predict the roles a user shall have. Furthermore the interpretable roles in RBAC can be easily migrated to ABAC.
-	
-	\item Min-Noise RMP\\
-	The Evo-RoleMiner and the Evo-RoleMiner$M$ provide the option of only calculating role models of a fixed role count, which is anticipated by the Min-Noise RMP. In this case, an other representation of individuals might be more suitable, since the role size is not part of the search.
-	
-	
-	\item Crossover is just a bigger mutation
-	\item The optimization of combining roles with similar roles or similar permissions is not necessarily optimal?
-	\item A smarter mutation, which does not allow "invalid" role models is...
-	
-	
-	\item Individuals might have the same Fitness and even re-created the original UP-Matrix, but it does not mean that the role model is the same; Additional attributes, like user attributes, could help by e.g. introducing an Interpretability measure to distinguish the role models
-	
-	\item Multiobjective EA shows ...
-	\item Multiobjective EA can ...
-	\item Noise in the data can ...
-	\item Constraint handling can be easily introduced, but...
-	\item Rolemodel is hard to evaluate as a whole by a human
-	\item The alternative approach is not developed far enough to see any advantage ...
-\end{itemize}
+\hfill \break
+After all an evolutionary computation approach can be still attractive for role mining. But there is still research necessary to get to a state, which is promising for the usage in practice. Future work in this field is suggested in the next chapter.

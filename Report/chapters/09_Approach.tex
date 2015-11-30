@@ -1,11 +1,11 @@
 \newpage
 \chapter{Approach}
 \label{sec:approach}
-The role mining problems (see section \ref{sec:roleMiningProblems}) have been approached with different problem formulations, techniques and algorithms. In this thesis the approach of solving role mining with an evolutionary computation approach is investigated. \hl{An evolutionary computation has the advantage of ... , which is needed for RoleMining.}
+The role mining problems (see section \ref{sec:roleMiningProblems}) have been approached with different problem formulations, techniques and algorithms. In this thesis the approach of solving role mining with an evolutionary computation approach is investigated. Evolutionary computation might be a new interesting approach for Role Mining.
 
-Since there has not been a lot of research done up till now regarding Role Mining with evolutionary computation (see chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the Basic-RMP and Min-Edge-RMP as evolutionary computation problem. The focus is on building an RBAC$_0$ model from scratch, where the input is an access policy configuration as $UPA$-Matrix. Furthermore a measure for the role interpretability is suggested in order to measure the quality of a role model and to solve the Interference-RMP with the same approach.  
+Since there has not been a lot of research done up till now regarding Role Mining with evolutionary computation (see Chapter \ref{sec:relatedWork} for related work), the research in this thesis starts with a basic set up of the Basic-RMP and Min-Edge-RMP as evolutionary computation problem. The focus is on building an RBAC$_0$ model from scratch, where the input is an access policy configuration as $UPA$-Matrix. Furthermore a measure for the role interpretability is suggested in order to measure the quality of a role model and to solve the Interference-RMP with the same approach.  
 
-The in the following sections the evolutionary algorithms, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described. For handling constraints for an RBAC$_2$ role model, a penalty function is suggested.
+In the following sections the evolutionary algorithms, the representation of an individual, variation operators, selection mechanisms and fitness functions used in this approach are described. For handling constraints for an RBAC$_2$ role model, a penalty function is suggested.\todo[]{Proof-read chapter 5}
 
 	\section{Evo-RoleMiner and Evo-RoleMiner$M$}
 	\label{sec:EvoRoleMiner}
@@ -89,7 +89,7 @@ The in the following sections the evolutionary algorithms, the representation of
     
     \section{Measuring the Interpretability of Roles}
     \label{sec:meaningfulness}
-    The goal is to generate a role model, which is accepted by the business, in particular the security administrators. Therefore an appropriate measure has to be found. The interpretability of a role shall express how easy a reasonable interpretation of the role can be identified, such that the role gets adopted by security administrators. An interpretable role is also called a "meaningful" role.
+    The goal is to generate a role model, which is accepted by the business, in particular the security administrators. Therefore an appropriate measure has to be found. The interpretability of a role shall express how easy a reasonable interpretation of the role can be identified, such that the role gets adopted by security administrators. An interpretable role is also called a "meaningful" role. Another motivation for generating roles, which are interpretable by user attributes, is to predict the roles a user shall have. Furthermore the interpretable roles in RBAC can be easily migrated to ABAC.
     
     The interpretability of a role in this thesis is measured with the help of user attributes. One or more user attributes can describe the users of a role. For example:
     
@@ -131,7 +131,7 @@ The in the following sections the evolutionary algorithms, the representation of
         
         This measure of the average silhouette coefficients requires the role-clusters to be crisp, which means a user-object can be only in one role-cluster. But since the users can have several roles the role-clusters are fuzzy. Furthermore the measure has to be executed for every user attribute combination. Therefore an altered calculation of silhouette coefficients has to be used or a different measure has to be used to evaluate the role-clusters. To evaluate fuzzy clusters the sum of the squared error (SSE) can be used\cite{Han}. It measures how well a fuzzy clustering fits a data set. In Rawashdeh \& Ralescu\cite{rawashdeh2012fuzzy} the authors suggest an algorithm for the silhouette coefficient in fuzzy clusters.
         
-        The role-cluster approach has not been implemented in this thesis.
+        For the role-cluster approach no working implementation has been achieved.
         
         \subsection{Role Classifier-Rule Approach}
         \label{sec:classifierRule}
@@ -174,13 +174,13 @@ The in the following sections the evolutionary algorithms, the representation of
         	\begin{landscape}
         		\begin{figure}
         			\centering
-        			\includegraphics[scale=0.37]{RuleInduction1}
+        			\includegraphics[scale=0.45]{RuleInduction1}
         			\caption{Rule Induction Extract 1: (1) A user in the considered role is picked (2) smallest user attribute combination is picked and the rule {HR} is created (3) Check sensitivity of rule of users with "In Role=no" (4) Remove all users inside the role, which comply with the rule (5) Check sensitivity of rule of users with "In Role=yes" (6) Save rule as a potential classifier-rule for the role (7) Recursion, where the resulting rule set is OR-connected to the current rule (not applied in this extract) (8) Check if rule is perfect potential rule}
         			\label{fig:ruleInduction1}
         		\end{figure}
         		\begin{figure}
         			\centering
-        			\includegraphics[scale=0.37]{RuleInduction2} 
+        			\includegraphics[scale=0.45]{RuleInduction2} 
         			\caption{Rule Induction Extract 2: (1) A user in the considered role is picked (2) smallest user attribute combination is picked and the rule {HR} is created (3) Check sensitivity of rule of users with "In Role=no" (4) Remove all users inside the role, which comply with the rule (5) Check sensitivity of rule of users with "In Role=yes" (6) Save rule as a potential classifier-rule for the role (7) Recursion, where the resulting rule set is OR-connected to the current rule (not applied in this extract) (8) Check if rule is perfect potential rule (9) Remove parent attribute combinations}
         			\label{fig:ruleInduction2}
         		\end{figure}
@@ -262,7 +262,8 @@ The in the following sections the evolutionary algorithms, the representation of
     	For maximizing the average interpretability of roles in a role model the worst case would be a value of 0, where no descriptive rule for any role in the rolemodel can be found. The best case is a value of 1.
     \end{itemize}
         
-    \section{Fitness Functions}        
+    \section{Fitness Functions}
+    \label{sec:fitnessFunctions}       
     Several objectives are often combined by scalarisation into one function in the research of role mining. This also needs to be done for the Evo-RoleMiner, since it allows only one fitness function. In the following subsections fitness functions for the Evo-RoleMiner are derived. A selection of the objective measures (see previous section) are combined by scalarisation to a fitness function. All objective measures get normalized to a value between 0 and 1 before they get combined.
     
     For the multi-objective Evo-RoleMiner$M$ two or more fitness functions can be defined. A fitness function can be the minimization or maximization of an objective measure (see previous section). To simplify a multiobjective problem the fitness functions can be also scalarization function as introduced in the following subsections. An example for two objective fitness functions in the Evo-RoleMiner$M$ could be "Minimizing Role Count" and "Minimizing Violations", where the latter is a scalarization function of confidentiality and availability violations.
@@ -316,3 +317,6 @@ The in the following sections the evolutionary algorithms, the representation of
     In the RBAC$_2$ model (see section \ref{sec:rbac2}) constraints like Separation of Duties (SoD) are taken into account. These can be used to guide the role engineering process, such that constraint violations are not occuring in the role model. Alternatively constraints violations in the role model can be accepted in the role model and the constraints are complied in a post-mechanism.\\
     The concept of penalties in EA seem to be a good fit to easily incorporate constraints in the Evo-RoleMiner and Evo-RoleMiner$M$. A binary penalty function would distinguish between if an individual (role model) would violate a constraint or not. Individuals (role models) are therefore penalized with a bad fitness if they are not feasible (violating a constraint).\\
     Before the fitness of an individual is calculated the Evo-RoleMiner and Evo-RoleMiner$M$ are checking if all constraints are met, if they are given. If the individual (role model) is violating one of the constraint, the fitness is set to the worst fitness value.
+    
+\hfill \break
+Next the approach presented in this chapter is tested with access control policy datasets. The evolutionary computation and the resulting role models are visualized and analyzed.

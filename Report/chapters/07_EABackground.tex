@@ -1,11 +1,13 @@
 \newpage
 \chapter{Introduction to Evolutionary algorithms}
 \label{sec:EA}
-Evolutionary algorithms (EAs) are stochastic search algorithms inspired by the concept of the natural evolution. The general idea is to have a population of individuals, which is evolving over generations to create fitter individuals by natural selection (survival of the fittest). There are different variants of EAs: Genetic algorithms (GA), evolution strategies (ES), evolutionary programming (EP) and genetic programming (GP). All variants follow the same common concept described in the following with differences in technical details such as the representation of individuals\cite{Eiben}. Figure \ref{fig:eaflowchart} shows a flow chart of an evolutionary algorithm process, which will be described in the following.
+Evolutionary algorithms (EAs) are stochastic search algorithms inspired by the concept of the natural evolution. The general idea is to have a population of individuals, which is evolving over generations to create fitter individuals by natural selection (survival of the fittest). There are different variants of EAs: Genetic algorithms (GA), evolution strategies (ES), evolutionary programming (EP) and genetic programming (GP). All variants follow the same common concept described in the following with differences in technical details such as the representation of individuals\cite{Eiben}.
+
+Figure \ref{fig:eaflowchart} on the next page shows a flow chart of an evolutionary algorithm process, which will be described in the following.\todo[]{Proof-read chapter 3}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.27]{EAFlowchart}
+	\includegraphics[scale=0.4]{EAFlowchart}
 	\caption{The general scheme of an evolutionary algorithm as a flow-chart \cite{Eiben}}
 	\label{fig:eaflowchart}
 \end{figure}
@@ -150,3 +152,6 @@ The driving forces of evolutionary algorithms are the variation operators, which
     The definition of stochastically pareto dominance according to Clune et al.\cite{clune2013evolutionary} describes a type of dominance relation between two individuals, where two objectives are considered. Let $r$ be a random number in [0; 1] and $p$ the probability for taking the second objective into account. An individual $x_1$ dominates another individual $x_2$ if and only if 1) $r>p$ and $x_1$ is strictly better than $x_2$ with respect to the first objective 2) $r<=p$ and $x_1$ is not worse than $x_2$ with respect to either objective and $x_1$ is better than $x_2$ with respect to at least one objective.
     
     The stochastic pareto dominance replaces the pareto dominance in NSGA-II and is therefore used in the parent selection and when the individuals are sorted into non-domination levels.
+    
+\hfill \break
+In the next chapter other research on role-ming with evolutionary computation approaches are introduced.

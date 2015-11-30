@@ -1,10 +1,9 @@
-\newpage
 \section{Experiment 5 - Interpretability Objective}
 \label{sec:exp5}
-When looking back on the solution with an optimal fitness found in one of the experiments in Experiment 2, it can be noted that the matrix decomposition of the resulting UPA (see Figure \ref{fig:exp2b_RM}) looks different than the matrices dataset 1 has been constructed on (see Figure \ref{fig:dataset1}). It shows that several solutions for a matrix decomposition can exist. To distinguish them another measure is needed. 
+When looking back on the solution with an optimal fitness found in one of the experiments in Experiment 2, it can be noted that the matrix decomposition of the resulting $UPA$ (see Figure \ref{fig:exp2b_RM}) looks different than the matrices Dataset1 has been constructed on (see Figure \ref{fig:dataset1}). It shows that several solutions for a matrix decomposition can exist. To distinguish them another measure is needed. 
 
 One reason why bottom-up role mining is criticized, is that a solution might be found based on given technical data (user-permission-assignments), but it is not necessary feasible for the business. Therefore the Interpretability objective and the fitness functions
-$F_{basic\_INT}^{min}$ \eqref{eq:FEdgeMin_INT} and $F_{edge\_INT}^{min}$ \eqref{eq:FEdgeMin_INT} are observed in this phase.
+$F_{basic\_INT}^{min}$ \eqref{eq:FEdgeMin_INT} and $F_{edge\_INT}^{min}$ \eqref{eq:FEdgeMin_INT} are observed in this experiment. The Experiment is executed with the Evo-RoleMiner.
 
 For the experiments the setup in table \ref{tab:exp3_setup} is taken and executed on the Dataset1. The weight for the interpretability measure is set 1.0. The results can be seen in Figure \ref{fig:Results_Exp5}.
 
@@ -26,4 +25,11 @@ For the experiments the setup in table \ref{tab:exp3_setup} is taken and execute
 	\label{fig:Results_Exp5}
 \end{figure}
 
-The same experiments have been executed on the healthcare dataset with the user attribute information provided by Xu \& Stoller\cite{Xu}. The experiments have been aborted after the fitness calculation of the first generation could not be finished in a decent time. There are 20 attributes for the users in the healthcare dataset. For the interpretability measure rules are generated, where $2^X-1$ combinations of X attributes are created. While for Dataset1 with 3 user attributes seven combinations are created and tested, the healthcare dataset requires 1048575 combinations for 20 attributes. The rule induction gets too expensive to finish in reasonable time.
+The same experiments have been executed on the healthcare dataset with the user attribute information provided by Xu \& Stoller\cite{Xu}. The experiments have been aborted after the fitness calculation of the first generation could not be finished in a decent time. There are 20 attributes for the users in the healthcare dataset. For the interpretability measure rules are generated, where $2^X-1$ combinations of X attributes are created. While for Dataset1 with three user attributes seven combinations are created and tested, the healthcare dataset requires 1,048,575 combinations for 20 attributes. The rule induction gets too expensive to finish in reasonable time.
+\iffalse
+As a separated experiment the Evo-RoleMiner$M$ based on NSGA-II$R$ with weights (third version) has been tested on the Dataset2, where one objective is the minimization of the combined violations count $|G_{conf} + G_{accs}|$ and the second objective is the minimization of function:
+\begin{equation}
+	F = $|UA + PA|$ - INT + 1
+\end{equation}
+where $|UA + PA|$ is an normalized user- and permission assignment count and $INT$ the average interpretability of roles. In order to not get negative values the function ends with an addition of one.
+\fi

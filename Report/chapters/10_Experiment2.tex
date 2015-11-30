@@ -1,6 +1,6 @@
 \section{Experiment 2 - Fitness Functions}
 \label{sec:exp2}
-In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} and $F_{edge}^{min}$ \eqref{eq:FEdgeMin} are tested on the Dataset1 (Experiment 2a and 2b) and the Healthcare dataset (Experiment 2c and 2d) . The setup for the experiments can be seen in table \ref{tab:exp2_setup}. The weights for $F_{basic}^{min}$ and $F_{edge}^{min}$ are set all to one.
+In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{eq:FBasicMin} and $F_{edge}^{min}$ \eqref{eq:FEdgeMin} are tested on the Dataset1 (Experiment 2a and 2b) and the Healthcare dataset (Experiment 2c and 2d). The setup for the experiments can be seen in table \ref{tab:exp2_setup}. The weights for $F_{basic}^{min}$ and $F_{edge}^{min}$ are set all to 1.0.
 
 \begin{table}[H]
     \centering
@@ -28,18 +28,20 @@ In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{
     \label{tab:exp2_setup}
 \end{table}
 
+In all experiments the fitness is improving over time. The fitness functions look like a hyperbola, where the improvement is strong in the first generations and less strong in the last generations (see Figure \ref{fig:Results_Exp2_FitnessGraphs} on the next page). 
+
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{0.5\textwidth}
 		%\centering
 		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2a_Fitness}
-		\caption{$F_{basic}^{min}$, Dataset1, 100 generations}
+		\caption{$F_{basic}^{min}$, Dataset1, 1000 generations}
 		\label{fig:exp2a_Fitness}
 	\end{subfigure}%
 	\begin{subfigure}{0.5\textwidth}
 		\centering
 		\includegraphics[width=\textwidth, trim=0cm 2cm 0cm 2cm, clip=true]{exp2b_Fitness}
-		\caption{$F_{edge}^{min}$, Dataset1, 100 generations}
+		\caption{$F_{edge}^{min}$, Dataset1, 1000 generations}
 		\label{fig:exp2b_Fitness}
 	\end{subfigure}
 	
@@ -85,17 +87,17 @@ In the second set of experiments the fitness functions $F_{basic}^{min}$ \eqref{
 		\caption{Healthcare}
 		\label{fig:Results_Exp2_Healthcare_Statistics}
 	\end{subfigure}
-	\caption{EXPERIMENT2: Statistics of ten experiments with the Evo-RoleMiner with setup in Table \ref{tab:exp2_setup} for Dataset1 and Healthcare dataset. The values for Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|PA|$) are the average minimum in the last Generation of all experiments.}
+	\caption{EXPERIMENT2: Statistics of ten experiments with the Evo-RoleMiner with setup in Table \ref{tab:exp2_setup} for Dataset1 and Healthcare dataset. The values for Fitness, Confidentiality violations ($|G_{conf}|$), Availability violations ($|G_{accs}|$), Roles ($|R|$), User-Role-Assignments ($|UA|$) and Role-Permission assignments ($|PA|$) are the average minimum in the last generation of all experiments.}
 	\label{fig:Results_Exp2}
 \end{figure}
 
-In all experiments the fitness is improving over time. The fitness functions look like a hyperbola, where the improvement is strong in the first generations and less strong in the last generations (see Figure \ref{fig:Results_Exp2_FitnessGraphs}). The average fitness value in the last generation in the experiments with fitness function $F_{edge}^{min}$ are better than in the experiments with fitness function $F_{basic}^{min}$ (see Figure \ref{fig:Results_Exp2}). A T-Test\footnote{A T-Test is used to test the null hypothesis that the means of two populations are equal} on the results of the experiments\footnote{See Appendix \ref{sec:A_Exp2} for data} confirms that this difference is statistically different (P-Value: 3.03E-17).
+The average fitness value in the last generation in the experiments with fitness function $F_{edge}^{min}$ are better than in the experiments with fitness function $F_{basic}^{min}$ (see Figure \ref{fig:Results_Exp2}). A T-Test\footnote{A T-Test is used to test the null hypothesis that the means of two populations are equal} on the results of the experiments\footnote{See Appendix \ref{sec:A_Exp2} for data} confirms that this difference is statistically different (P-Value is less than 0.0001).
 
 For the experiments with fitness function $F_{basic}^{min}$ on Dataset1 (see experiment 2a in Figure \ref{fig:Results_Exp2_Dataset1_Statistics}), the average minimum number of roles in the results are two, which is according to the objective of minimizing roles in $F_{basic}^{min}$ a good result. But it is known that a better result with a role count of four can be achieved (see Figure \ref{fig:dataset1}). The discovered small amount of roles has the drawback that the other objectives are harder to reach. The number of confidentiality violations has not reached zero in any of the ten experiments, where it is known that a solution exists with no violations when the role count is four.
 
 Also the average minimum number of roles for the Healthcare dataset (see experiment 2c in Figure \ref{fig:Results_Exp2_Healthcare_Statistics}) seem to be very low with two roles compared to results in other papers where the lowest role count is 14 \cite{Ene}\cite{Molloy:2009:ERM:1542207.1542224}. The number of violations for the Healthcare dataset are not optimal, in the sense that when the according role model is applied some users will gain access rights and others will loose some. If this is acceptable is hard to judge since the details of the Healthcare dataset are unknown, e.g. how critical certain permissions are and how much noise is given.
 
-The experiments with fitness function $F_{edge}^{min}$ show a slightly higher amount of the average minimum role count (see experiment 2b and 2d in Figure \ref{fig:Results_Exp2}). Comparing the minimum amount of roles of each experiment in experiment 2a and 2b with an unpaired T-Tests confirm that the difference is statistically significant (P-Value: 1.61E-06). The same is confirmed for the experiments in experiment 2c and 2d. This seem reasonable, since the fitness function $F_{edge}^{min}$ tries to minimize $|UA|$ and $|PA|$ and only has an indirect focus on minimizing the role count $|R|$.
+The experiments with fitness function $F_{edge}^{min}$ show a slightly higher amount of the average minimum role count (see experiment 2b and 2d in Figure \ref{fig:Results_Exp2}). Comparing the minimum amount of roles of each experiment in experiment 2a and 2b with an unpaired T-Tests confirm that the difference is statistically significant (P-Value is less than 0.0001). The same is confirmed for the experiments in experiment 2c and 2d. This seem reasonable, since the fitness function $F_{edge}^{min}$ tries to minimize $|UA|$ and $|PA|$ and only has an indirect focus on minimizing the role count $|R|$.
 
 It can be noted that the average minimum count of $|UA|$ and $|PA|$ in the experiments with fitness function $F_{basic}^{min}$ is lower than in the experiments with fitness function $F_{edge}^{min}$, although the latter functions' objective is to minimize $|UA|$ and $|PA|$. An explanation for this would be that the first fitness function encourages the reduction of the number of roles, which than lowers the maximum amount of possible $|UA|$ and $|PA|$.
 

@@ -1,6 +1,18 @@
 \section{Experiment 1 - Single Objectives}
 \label{sec:exp1}
-For the first experiment the single objective functions (see section \ref{sec:objectiveMeasure}) are validated by using them as fitness function in the Evo-RoleMiner. A basic setup is chosen seen in Table \ref{tab:exp1_setup}. The experiments are based on the Dataset1. The number for individuals and generation is chosen relatively low since it is not aim to find a solution but rather to confirm the implementation and to analyse the single objectives in relation to each other.
+For the first experiment single objective fitness functions are tested on the Evo-RoleMiner. The objectives tested are:
+\begin{itemize}
+	\item Confidentiality Violations (Experiment 1a)
+	\item Availability Violations (Experiment 1b)
+	\item Role Count (Experiment 1c)
+	\item User-Role-Assignment Count (Experiment 1d)
+	\item Role-Permission-Assignment (Experiment 1e)
+	\item Average Role Interpretability (Experiment 1f)
+\end{itemize}
+These are the objective measures introduces in section \ref{sec:objectiveMeasure}. All single objective fitness functions are formulated as minimization function except the fitness function with objective "Average Role Interpretability", which is a maximization fitness function.
+The experiments are executed in order to validate the objective measures and to analyse the single objectives in relation to each other.
+
+A basic setup is chosen seen in Table \ref{tab:exp1_setup}. The experiments are based on the Dataset1.
 
 \begin{table}[H]
     \centering
@@ -27,22 +39,22 @@ For the first experiment the single objective functions (see section \ref{sec:ob
     \label{tab:exp1_setup}
 \end{table}
 
-For the single objective "Minimizing Confidentiality" it is expected that the individuals (role models) violate confidentiality compared to the original access configuration $UPA$ less over time. The results in Figure \ref{fig:exp1_conf} are confirming this and also show that individuals have less roles over time. This can be explained by that a lower count of roles probably result in less user-role- and role-permission assignments, which on the other hand lowers the probability of violating confidentiality. At the same time less user-role- and role-permission assignments let the probability for availability violations rise, which can be also seen in Figure \ref{fig:exp1_conf}.
-
-An opposite impact can be seen when single objective "Minimizing Availability" is used as fitness function (see Figure \ref{fig:exp1_accs}). In the first generations the availability violations quickly achieve the goal of zero. During the same generations the role count, user-role- and role-permission assignments are rising. It is more likely that every user gets his permission (given in the original UPA-Matrix), if the amount of roles, user-role- and role-permission assignments are higher.
-
-Hence, the objectives of minimizing confidentiality violations and minimizing availability violations can be conflicting. Other results of the first phase can be seen in the Appendix \ref{sec:A_Exp1}.
-
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.33, trim=4cm 2cm 4cm 3cm, clip=true]{exp1_conf}
-    \caption{EXPERIMENT 1a: Results of EvoRoleMiner with Fitness function $F=G_{conf}$ on Dataset1 with setup in table \ref{tab:exp1_setup}. From upper left to lower right: Confidentiality Violations, Availability Violations, Role Count, User-Role Assignments, Role-Permission Assignments, Interpretability.}
+    \caption{EXPERIMENT 1a: Results of Evo-RoleMiner with Fitness function $F=G_{conf}$ on Dataset1 with setup in table \ref{tab:exp1_setup}. From upper left to lower right: Confidentiality Violations, Availability Violations, Role Count, User-Role Assignments, Role-Permission Assignments, Interpretability.}
     \label{fig:exp1_conf}
 \end{figure}
+
+For the single objective "Confidentiality Violations" it is expected that the individuals (role models) violate confidentiality compared to the original access configuration $UPA$ less over time. The results in Figure \ref{fig:exp1_conf} are confirming this and also show that individuals have less roles over time. This can be explained by that a lower count of roles probably result in less user-role- and role-permission assignments, which on the other hand lowers the probability of violating confidentiality. At the same time less user-role- and role-permission assignments let the probability for availability violations rise, which can be also seen in Figure \ref{fig:exp1_conf}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.33, trim=4cm 2cm 4cm 3cm, clip=true]{exp1_accs}
-    \caption{EXPERIMENT 1b: Results of EvoRoleMiner with Fitness function $F=G_{accs}$ on Dataset1 with setup in table \ref{tab:exp1_setup}. From upper left to lower right: Confidentiality Violations, Availability Violations, Role Count, User-Role Assignments, Role-Permission Assignments, Interpretability.}
+    \caption{EXPERIMENT 1b: Results of Evo-RoleMiner with Fitness function $F=G_{accs}$ on Dataset1 with setup in table \ref{tab:exp1_setup}. From upper left to lower right: Confidentiality Violations, Availability Violations, Role Count, User-Role Assignments, Role-Permission Assignments, Interpretability.}
     \label{fig:exp1_accs}
 \end{figure}
+
+An opposite impact can be seen when single objective "Availability Violations" is used as fitness function (see Figure \ref{fig:exp1_accs}). In the first generations the availability violations quickly achieve the goal of zero. During the same generations the role count, user-role- and role-permission assignments are rising. It is more likely that every user gets his permission (given in the original UPA-Matrix), if the amount of roles, user-role- and role-permission assignments are higher.
+
+Hence, the objectives of minimizing confidentiality violations and minimizing availability violations can be conflicting. Other results of the first phase can be seen in the Appendix \ref{sec:A_Exp1}.

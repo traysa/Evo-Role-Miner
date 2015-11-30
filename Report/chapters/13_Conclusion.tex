@@ -1,7 +1,6 @@
 \newpage
 \chapter{Conclusion}
 \label{sec:conclusion}
-\hl{SECTION UNDER CONSTRUCTION}\\
 \iffalse
 \hl{State what you've done and what you've found
 	Summarize contributions (achievements and impact)
@@ -13,3 +12,12 @@
 	Comparison with the literature presented in chapter 2: how do your results fill in, advance or contradict previously reported research?
 	What are the implications of your research for people working in the field that you have studies? In which direction should further research go? }
 \fi
+In this thesis two types of role-mining algorithms based on evolutionary computation have been developed, which generate role models from scratch by given access control policies.
+The first evolutionary algorithm developed is partially based on the work from previous research\cite{saenko2012design} and aims for the objectives of role mining problems. The different components of the algorithm are explained and evaluated. 
+A second approach is a multi-objective evolutionary algorithm for role mining based on NSGA-II\cite{Deb:2002}. The improvement by Fortin et al. for the NSGA-II\cite{Fortin:2013} could be successfully applied. The usage of a stochastic version of pareto dominance\cite{clune2013evolutionary} has been applied on the improved algorithm to relax the objective of minimizing role model complexity.
+In experiments the different algorithms and objectives are tested on a synthetic dataset and the commonly used Healthcare dataset in role-mining research\cite{Ene}.
+The results show that the algorithms can find solutions regarding to the chosen objectives.
+The resulting role models require further optimization by domain experts before they can be applied in practice.
+Furthermore suggestions for measuring "role interpretability" are made, which are based on data mining techniques.
+
+For future work different directions of evolutionary computation are suggested for a role mining algorithm. For example Co-Evolution and Interactive Evolutionary Algorithms can contribute to involve expert knowledge into the algorithm to lead to more optimal role models.
